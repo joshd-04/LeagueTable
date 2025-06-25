@@ -923,12 +923,10 @@ export async function turnFixtureIntoResult(
     });
 
     // Delete fixture from fixture list
-    console.log(fixtureId, leagueId);
     await Fixture.findByIdAndDelete(fixtureId);
     await League.findByIdAndUpdate(leagueId, {
       $pull: { fixtures: fixtureId },
     });
-    console.log(696969);
 
     // Change the form of the away and the home team
     const homeGoals = basicOutcome.reduce(
