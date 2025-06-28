@@ -14,22 +14,33 @@ import {
   getFixturesStillToBePlayed,
   leagueCreationController,
   leagueFetcherController,
+  myAssociatedLeaguesFetcherController,
   startNextMatchweek,
   startNextSeasonController,
   teamsAddingController,
   turnFixtureIntoResult,
 } from './controllers/leagueController';
+import cors from 'cors';
 
 connectDB();
 
 const app = express();
+
+app.use(
+  cors({
+    origin: 'http://localhost:3001', // allow your frontend
+  })
+);
+
+// app.use(cors());
+
 const port = 3000;
 
 // This object contains the REQUIRED fields to be sent by the client. If any required fields are absent, the request is rejected.
 
 export const requiredFields: RequiredFields = {
-  '/api/register': ['username', 'email', 'passwordHash'],
-  '/api/login': ['username', 'email', 'passwordHash'],
+  '/api/register': ['username', 'email', 'password'],
+  '/api/login': ['username', 'email', 'password'],
   '/api/leagues': ['name', 'maxSeasonCount', 'leagueType', 'tables'],
   '/api/leagues/:id/teams': ['teams'],
   '/api/result': ['fixtureId', 'basicOutcome'],
@@ -38,6 +49,7 @@ export const requiredFields: RequiredFields = {
 // Middlewares
 // Convert incoming data into json
 app.use(express.json());
+app.options('*', cors());
 
 // Routes
 /* 
@@ -61,6 +73,12 @@ app.post(
   leagueCreationController
 );
 
+// Gets all league id's with minimal info that are associated with you e.g. yours or favourites etc
+app.get(
+  '/api/leagues/associated',
+  protectedRoute,
+  myAssociatedLeaguesFetcherController
+);
 app.get('/api/leagues/:id', leagueFetcherController);
 
 app.post(

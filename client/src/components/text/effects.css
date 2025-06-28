@@ -1,0 +1,3 @@
+.underline-container-bg::after {
+  background-color: var(--text);
+}

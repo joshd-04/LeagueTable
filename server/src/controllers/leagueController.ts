@@ -17,6 +17,7 @@ import {
 } from '../util/helpers';
 import Fixture from '../models/fixtureModel';
 import Result from '../models/resultModel';
+import User from '../models/userModel';
 
 interface LeagueCreationReqBody {
   name: string;
@@ -239,6 +240,34 @@ export async function leagueFetcherController(
         results: league.results,
       },
     });
+  } catch (e: any) {
+    next(new ErrorHandling(500, undefined, `Unexpected error ${e.message}`));
+  }
+}
+
+export async function myAssociatedLeaguesFetcherController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  /* Args: none
+    Returns: list of league ids and minimal league info
+  */
+  const userId: string = req.body.userId;
+  // For now, there is no favouriting or bookmarking functionality.
+  // So just return the user's created leagues
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(
+        new ErrorHandling(404, {
+          message: `User with ID '${userId}' not found`,
+        })
+      );
+    }
+    const leagues = await League.find({ leagueOwner: user._id });
+    res.status(200).json({ created: leagues });
   } catch (e: any) {
     next(new ErrorHandling(500, undefined, `Unexpected error ${e.message}`));
   }
