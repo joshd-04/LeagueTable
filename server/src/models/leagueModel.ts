@@ -7,6 +7,7 @@ const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
   currentSeason: { type: Number, required: true },
   currentMatchweek: { type: Number, required: true },
   maxSeasonCount: { type: Number, required: true },
+  divisionsCount: { type: Number, required: true },
   leagueType: { type: String, required: true },
   tables: [
     {
@@ -21,6 +22,11 @@ const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
   ],
   fixtures: [{ type: Schema.Types.ObjectId, ref: 'fixtures', required: true }],
   results: [{ type: Schema.Types.ObjectId, ref: 'results', required: true }],
+  setup: {
+    tablesAdded: { type: Boolean },
+    teamsAdded: { type: Boolean },
+    leagueFinished: { type: Boolean },
+  },
 });
 
 const League: Model<ILeagueSchema> = mongoose.model('leagues', leagueSchema);

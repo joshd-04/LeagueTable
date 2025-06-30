@@ -47,13 +47,14 @@ export function protectedRoute(
   next: NextFunction
 ) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({ message: 'Unauthorized: No token provided' });
+    const token = req.cookies.token;
+
+    if (!token) {
+      next(
+        new ErrorHandling(401, { message: 'Not authenticated. Please log in.' })
+      );
       return;
     }
-
-    const token = authHeader.split(' ')[1];
     const SECRET_KEY = readDotenv('JWT_SECRET_KEY');
     if (!SECRET_KEY) {
       next(
@@ -87,17 +88,17 @@ export function protectedRoute(
 
       // Put user's id on the req.body for convenience for later use
       req.body.userId = payload.userId;
-      req.body.accountType = payload.accountType;
       next();
     } catch {
       next(
         new ErrorHandling(401, {
-          message: 'Unexpected JWT token format recieved.',
+          message: 'Not authenticated. Please log in.',
         })
       );
       return;
     }
   } catch (e: any) {
+    console.error(e);
     return next(
       new ErrorHandling(
         500,

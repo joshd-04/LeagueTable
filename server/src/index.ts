@@ -1,8 +1,10 @@
 import { ErrorHandling } from './util/errorChecking';
 import express, { NextFunction, Request, Response } from 'express';
 import {
+  getMyAccountController,
   loginController,
   registrationController,
+  signOutController,
 } from './controllers/authController';
 import {
   enforceRequiredFields,
@@ -17,22 +19,22 @@ import {
   myAssociatedLeaguesFetcherController,
   startNextMatchweek,
   startNextSeasonController,
+  tablesAddingController,
   teamsAddingController,
   turnFixtureIntoResult,
 } from './controllers/leagueController';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import {
+  favouriteLeagueController,
+  followLeagueController,
+  unfavouriteLeagueController,
+  unfollowLeagueController,
+} from './controllers/userController';
 
 connectDB();
 
 const app = express();
-
-app.use(
-  cors({
-    origin: 'http://localhost:3001', // allow your frontend
-  })
-);
-
-// app.use(cors());
 
 const port = 3000;
 
@@ -41,13 +43,23 @@ const port = 3000;
 export const requiredFields: RequiredFields = {
   '/api/register': ['username', 'email', 'password'],
   '/api/login': ['username', 'email', 'password'],
-  '/api/leagues': ['name', 'maxSeasonCount', 'leagueType', 'tables'],
+  '/api/leagues': ['name', 'maxSeasonCount', 'leagueType', 'divisionsCount'],
+  '/api/leagues/:id/tables': ['tables'],
   '/api/leagues/:id/teams': ['teams'],
   '/api/result': ['fixtureId', 'basicOutcome'],
+  '/api/users/favourites': ['leagueId'],
+  '/api/users/following': ['leagueId'],
 };
 
 // Middlewares
 // Convert incoming data into json
+app.use(
+  cors({
+    origin: 'http://localhost:3001', // allow your frontend
+    credentials: true,
+  })
+);
+app.use(cookieParser());
 app.use(express.json());
 app.options('*', cors());
 
@@ -65,7 +77,10 @@ app.get('/', (req, res) => {
 // Auth
 app.post('/api/register', enforceRequiredFields, registrationController);
 app.post('/api/login', enforceRequiredFields, loginController);
+app.get('/api/signout', protectedRoute, signOutController);
+app.get('/api/me', protectedRoute, getMyAccountController);
 
+// League endpoints
 app.post(
   '/api/leagues',
   protectedRoute,
@@ -80,6 +95,13 @@ app.get(
   myAssociatedLeaguesFetcherController
 );
 app.get('/api/leagues/:id', leagueFetcherController);
+
+app.post(
+  '/api/leagues/:id/tables',
+  protectedRoute,
+  enforceRequiredFields,
+  tablesAddingController
+);
 
 app.post(
   '/api/leagues/:id/teams',
@@ -107,6 +129,35 @@ app.post(
   protectedRoute,
   enforceRequiredFields,
   turnFixtureIntoResult
+);
+
+// User endpoints
+app.patch(
+  '/api/users/favourites',
+  protectedRoute,
+  enforceRequiredFields,
+  favouriteLeagueController
+);
+
+app.delete(
+  '/api/users/favourites',
+  protectedRoute,
+  enforceRequiredFields,
+  unfavouriteLeagueController
+);
+
+app.patch(
+  '/api/users/following',
+  protectedRoute,
+  enforceRequiredFields,
+  followLeagueController
+);
+
+app.delete(
+  '/api/users/following',
+  protectedRoute,
+  enforceRequiredFields,
+  unfollowLeagueController
 );
 
 /*

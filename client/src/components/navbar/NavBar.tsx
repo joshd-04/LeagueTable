@@ -4,15 +4,21 @@ import LinkButton from '@/components/text/LinkButton';
 import Subtitle from '@/components/text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
 import { usePathname, useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import Logo from '../logo/logo';
 
 export function NavBar() {
   const pathname = usePathname();
   const { isLoggedIn } = useAccount();
+  useEffect(() => {
+    console.log(isLoggedIn);
+  }, [isLoggedIn]);
 
   const { colorTheme, setColorTheme } = useContext(GlobalContext).colorTheme;
-  const { setUser } = useContext(GlobalContext).account;
+  const { user, setUser } = useContext(GlobalContext).account;
 
   const router = useRouter();
 
@@ -24,7 +30,11 @@ export function NavBar() {
     }
   }
 
-  function handleSignOut() {
+  async function handleSignOut() {
+    await fetchAPI(`${API_URL}/signout`, {
+      method: 'GET',
+      credentials: 'include',
+    });
     setUser(null);
     router.push('/');
   }
@@ -50,7 +60,13 @@ export function NavBar() {
 
   const buttonsLoggedIn = (
     <>
-      <Button onClick={() => {}} color="var(--text)" bgHoverColor="var(--bg)">
+      <Button
+        onClick={() => {
+          router.push('/create-league');
+        }}
+        color="var(--text)"
+        bgHoverColor="var(--bg)"
+      >
         Create league
       </Button>
       <Button
@@ -63,6 +79,10 @@ export function NavBar() {
     </>
   );
 
+  if (user === undefined) {
+    return <></>;
+  }
+
   return (
     <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] border-b-2 border-b-[var(--border)]">
       <LinkButton
@@ -72,7 +92,7 @@ export function NavBar() {
         shadowEffect={false}
         bgHoverColor="transparent"
       >
-        <Subtitle style={{ fontWeight: 700 }}>LeagueTable</Subtitle>
+        <Logo />
       </LinkButton>
       <div
         className={`${

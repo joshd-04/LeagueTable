@@ -5,6 +5,7 @@ import { API_URL } from '@/util/config';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { User } from '@/util/definitions';
 import { useRouter } from 'next/navigation';
+import { fetchAPI } from '@/util/api';
 
 export default function RegistrationForm() {
   // Values
@@ -85,7 +86,7 @@ export default function RegistrationForm() {
 
     // p.s password hashing will be done on server side. much safer that way.
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      const response = await fetchAPI(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,31 +96,30 @@ export default function RegistrationForm() {
           email: email,
           password: password,
         }),
+        credentials: 'include',
       });
 
-      const body = await response.json();
       setButtonText("Let's go");
 
-      if (body.status === 'fail') {
-        if (body.statusCode === 409) {
-          const message = body.data.message as string;
+      if (response.status === 'fail') {
+        if (response.statusCode === 409) {
+          const message = response.data.message as string;
           if (message.includes('email')) {
             setEmailError(message);
           } else if (message.includes('username')) {
             setUsernameError(message);
           }
         }
-      } else if (body.status === 'error') {
-        const message = body.data.message as string;
+      } else if (response.status === 'error') {
+        const message = response.data.message as string;
         setError(message);
       } else {
-        // success, when successfully logging in, the account info is returned from the api, without extra structure
+        // success
         const user: User = {
-          id: body.userId,
-          username: body.username,
-          email: body.email,
-          accountType: body.accountType,
-          JWTToken: body.token,
+          id: response.data.userId,
+          username: response.data.username,
+          email: response.data.email,
+          accountType: response.data.accountType,
         };
         setUser(user);
         router.push('/');

@@ -9,6 +9,12 @@ const userSchema: Schema<IUserSchema> = new mongoose.Schema({
   leaguesCreated: [
     { type: Schema.Types.ObjectId, ref: 'leagues', required: true },
   ],
+  favouriteLeagues: [
+    { type: Schema.Types.ObjectId, ref: 'leagues', required: true },
+  ],
+  followedLeagues: [
+    { type: Schema.Types.ObjectId, ref: 'leagues', required: true },
+  ],
 });
 
 const User: Model<IUserSchema> = mongoose.model('users', userSchema);

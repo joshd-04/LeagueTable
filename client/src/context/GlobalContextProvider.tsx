@@ -5,7 +5,7 @@ import { handleColorThemeToggle } from '@/util/helpers';
 
 interface GlobalContextInterface {
   account: {
-    user: User | null;
+    user: User | undefined | null;
     setUser: (user: User | null) => void;
   };
   colorTheme: {
@@ -41,7 +41,7 @@ export default function GlobalContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | undefined | null>(undefined);
   const [colorTheme, setColorTheme] = useState<'light' | 'dark'>('dark');
   const [error, setError] = useState('');
 

@@ -3,5 +3,4 @@ export interface User {
   username: string;
   email: string;
   accountType: 'free' | 'pro';
-  JWTToken: string;
 }

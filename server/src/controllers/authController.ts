@@ -4,6 +4,7 @@ import { ErrorHandling } from '../util/errorChecking';
 import jwt from 'jsonwebtoken';
 import { readDotenv } from '../util/helpers';
 import bcrypt from 'bcrypt';
+import { IUserSchema } from '../util/definitions';
 
 interface RegisterReqBody {
   email: string;
@@ -66,19 +67,23 @@ export async function registrationController(
       email,
       accountType: 'free',
       leaguesCreated: [],
+      favouriteLeagues: [],
+      followedLeagues: [],
     });
 
     // Send success response and log user in
 
-    const formattedUser = {
-      userId: user._id,
-      username: user.username,
-      email: user.email,
-      accountType: user.accountType,
-    };
-
-    const token = generateJWTToken(formattedUser, next);
-    res.status(201).json({ ...formattedUser, token });
+    const token = generateJWTToken({ userId: user._id }, next);
+    res.cookie('token', token, {
+      httpOnly: true,
+      // secure: true, // true in production (HTTPS)
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    res.status(201).json({
+      status: 'success',
+      data: { message: 'Successfully logged in' },
+    });
   } catch (e: any) {
     next(new ErrorHandling(500, undefined, e.message));
   }
@@ -129,15 +134,20 @@ export async function loginController(
     // If correct password given
     const passwordsMatch = await bcrypt.compare(password, user.passwordHash);
     if (passwordsMatch) {
-      const formattedUser = {
-        userId: user._id,
-        username: user.username,
-        email: user.email,
-        accountType: user.accountType,
-      };
+      const userId: any = user._id;
 
-      const token = generateJWTToken(formattedUser, next);
-      res.status(200).json({ ...formattedUser, token });
+      const token = generateJWTToken({ userId: userId }, next);
+      res.cookie('token', token, {
+        path: '/',
+        httpOnly: true,
+        // secure: true, // true in production (HTTPS)
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+      res.status(200).json({
+        status: 'success',
+        data: { message: 'Successfully logged in' },
+      });
     } else {
       next(new ErrorHandling(401, { message: 'Invalid credentials' }));
     }
@@ -146,15 +156,57 @@ export async function loginController(
   }
 }
 
-function generateJWTToken(
-  formattedUser: {
-    userId: unknown;
-    username: string;
-    email: string;
-    accountType: 'free' | 'pro';
-  },
-  nextFn: NextFunction
+export function signOutController(
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) {
+  try {
+    res
+      .clearCookie('token', {
+        path: '/',
+        httpOnly: true,
+        // secure: true, // true in production (HTTPS)
+        sameSite: 'lax',
+      })
+      .status(200)
+      .json({
+        status: 'success',
+        data: { message: 'Successfully signed out' },
+      });
+  } catch (e: any) {
+    next(new ErrorHandling(500, undefined, e.message));
+  }
+}
+
+export async function getMyAccountController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.body.userId;
+    const user: IUserSchema | null = await User.findById(userId);
+
+    if (!user) {
+      next(new ErrorHandling(404, { message: "User doesn't exist" }));
+      return;
+    }
+    res.status(200).json({
+      status: 'success',
+      data: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        accountType: user.accountType,
+      },
+    });
+  } catch (e: any) {
+    next(new ErrorHandling(500, undefined, e.message));
+  }
+}
+
+function generateJWTToken(payload: any, nextFn: NextFunction) {
   const SECRET_KEY = readDotenv('JWT_SECRET_KEY');
   if (!SECRET_KEY) {
     nextFn(
@@ -167,6 +219,6 @@ function generateJWTToken(
     return;
   }
 
-  const token = jwt.sign(formattedUser, SECRET_KEY, { expiresIn: '7d' });
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '7d' });
   return token;
 }

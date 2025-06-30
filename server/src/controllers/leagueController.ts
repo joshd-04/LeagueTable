@@ -6,6 +6,7 @@ import {
   IResultSchema,
   ITeamDetails,
   ITeamsSchema,
+  IUserSchema,
 } from '../util/definitions';
 import { ErrorHandling } from '../util/errorChecking';
 import { Document, Types } from 'mongoose';
@@ -23,15 +24,8 @@ interface LeagueCreationReqBody {
   name: string;
   leagueOwner?: string;
   maxSeasonCount: number;
+  divisionsCount: number;
   leagueType: 'basic' | 'advanced';
-  tables: {
-    season?: number;
-    division: number;
-    name: string;
-    numberOfTeams: number;
-    numberOfTeamsToBeRelegated: number;
-    numberOfTeamsToBePromoted: number;
-  }[];
 }
 
 export async function leagueCreationController(
@@ -39,24 +33,34 @@ export async function leagueCreationController(
   res: Response,
   next: NextFunction
 ) {
-  /*  Args: name, maxSeasonCount, leagueType, tables: {
+  /*  Args: name, maxSeasonCount, leagueType, divisionsCount. tables: {
     division, name, numberOfTeams, numberOfTeamsToBeRelegated, numberOfTeamsToBePromoted
   }
       Returns: 
 
-      Note: there is a separate endpoint to add teams to the league
+      Note: there is a separate endpoint to add tables (then teams) to the league
   */
   try {
     const userId: string = req.body.userId;
-    const accountType: 'free' | 'pro' = req.body.accountType;
-    const { name, maxSeasonCount, leagueType, tables }: LeagueCreationReqBody =
-      req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new ErrorHandling(404, { message: 'User not found.' }));
+    }
+    const accountType = user.accountType;
+
+    const {
+      name,
+      maxSeasonCount,
+      leagueType,
+      divisionsCount,
+    }: LeagueCreationReqBody = req.body;
 
     const errors: {
       name?: string;
       leagueType?: string;
       maxSeasonCount?: string;
-      table?: string;
+      divisionsCount?: string;
     } = {};
 
     // Make sure the user does not already have a league with the same name
@@ -81,6 +85,145 @@ export async function leagueCreationController(
     // @ts-ignore
     if (leagueType !== 'basic' && leagueType !== 'advanced') {
       errors.leagueType = "leagueType can only be 'basic' or 'advanced'";
+    }
+
+    if (divisionsCount < 1) {
+      errors.divisionsCount = 'divisionsCount must be greater than 0';
+    }
+    if (maxSeasonCount < 1) {
+      errors.maxSeasonCount = 'maxSeasonsCount must be greater than 0';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return next(new ErrorHandling(400, errors));
+    }
+
+    const league = await League.create({
+      name: name,
+      leagueOwner: userId,
+      currentSeason: 0,
+      currentMatchweek: 0,
+      maxSeasonCount: maxSeasonCount,
+      divisionsCount: divisionsCount,
+      leagueType: leagueType,
+      tables: [],
+      fixtures: [],
+      results: [],
+      setup: {
+        tablesAdded: false,
+        teamsAdded: false,
+        leagueFinished: false,
+      },
+    });
+
+    // Add the league to the user's created league list
+    await User.findByIdAndUpdate(userId, {
+      $push: { leaguesCreated: league._id },
+    });
+
+    // Return sanitized league
+
+    const sanitizedLeague = {
+      _id: league._id,
+      name: league.name,
+      currentSeason: league.currentSeason,
+      currentMatchweek: league.currentMatchweek,
+      maxSeasonCount: league.maxSeasonCount,
+      divisionsCount: league.divisionsCount,
+      leagueType: league.leagueType,
+      tables: league.tables,
+      fixtures: league.fixtures,
+      results: league.results,
+    };
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        league: sanitizedLeague,
+      },
+    });
+  } catch (e: any) {
+    return next(
+      new ErrorHandling(
+        500,
+        undefined,
+        `An unexpected error occured whilst trying to create a new league. ${e.message}`
+      )
+    );
+  }
+}
+
+export async function tablesAddingController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  /*  Args: tables: [{
+    division, name, numberOfTeams, numberOfTeamsToBeRelegated, numberOfTeamsToBePromoted
+}]
+      Returns: 
+
+      Note: there is a separate endpoint to add tables (then teams) to the league
+  */ try {
+    const userId: string = req.body.userId;
+    //  Make sure the user owns the specified league
+    const leagueId = req.params.id;
+    let league: ILeagueSchema | null;
+    try {
+      league = await League.findById(leagueId);
+    } catch {
+      return next(
+        new ErrorHandling(404, {
+          message: `League with ID '${leagueId}' not found`,
+        })
+      );
+    }
+
+    if (!league) {
+      return next(
+        new ErrorHandling(404, {
+          message: `League with ID '${leagueId}' not found`,
+        })
+      );
+    }
+
+    if (league.leagueOwner.toString() !== userId) {
+      return next(
+        new ErrorHandling(403, {
+          message: `You are not permitted to make edits to this league`,
+        })
+      );
+    }
+
+    // Make sure the league doesnt already have the tables
+
+    if (league.setup.tablesAdded) {
+      return next(
+        new ErrorHandling(403, {
+          message: 'You have already added tables to this league',
+        })
+      );
+    }
+
+    const tables: {
+      season?: number;
+      division: number;
+      name: string;
+      numberOfTeams: number;
+      numberOfTeamsToBeRelegated: number;
+      numberOfTeamsToBePromoted: number;
+    }[] = req.body.tables;
+
+    const errors: {
+      table?: string;
+    } = {};
+
+    if (tables.length !== league.divisionsCount) {
+      return next(
+        new ErrorHandling(400, {
+          message: `This league has ${league.divisionsCount} tables, you gave: ${tables.length}`,
+        })
+      );
     }
 
     // Ensure each table provided follows the correct structure
@@ -138,8 +281,12 @@ export async function leagueCreationController(
       }
     });
 
-    if (Object.keys(errors).length > 0) {
-      return next(new ErrorHandling(400, errors));
+    if (Object.entries(errors).length > 0) {
+      return next(
+        new ErrorHandling(400, {
+          message: errors.table,
+        })
+      );
     }
 
     // Add the missing season to the tables and leagueOwner properties
@@ -147,132 +294,57 @@ export async function leagueCreationController(
       table.season = 0;
     });
 
-    const league = await League.create({
-      name: name,
-      leagueOwner: userId,
-      currentSeason: 0,
-      currentMatchweek: 0,
-      maxSeasonCount: maxSeasonCount,
-      leagueType: leagueType,
-      tables: tables,
-      fixtures: [],
-      results: [],
+    const newLeague = await League.findOneAndUpdate(
+      { _id: leagueId },
+      {
+        $push: {
+          tables: {
+            $each: tables, // array of items to append
+          },
+        },
+      },
+      { new: true }
+    );
+    if (!newLeague) {
+      return next(
+        new ErrorHandling(
+          500,
+          undefined,
+          'Something went wrong adding your tables to the league'
+        )
+      );
+    }
+    // Update setup flag
+    await League.findByIdAndUpdate(leagueId, {
+      $set: { 'setup.tablesAdded': true },
     });
 
     const sanitizedLeague = {
-      _id: league._id,
-      name: league.name,
-      currentSeason: league.currentSeason,
-      currentMatchweek: league.currentMatchweek,
-      maxSeasonCount: league.maxSeasonCount,
-      leagueType: league.leagueType,
-      tables: tables,
-      fixtures: league.fixtures,
-      results: league.results,
+      name: newLeague.name,
+      currentSeason: newLeague.currentSeason,
+      maxSeasonCount: newLeague.maxSeasonCount,
+      divisionsCount: newLeague.divisionsCount,
+      leagueType: newLeague.leagueType,
+      tables: newLeague.tables,
+      fixtures: newLeague.fixtures,
+      results: newLeague.results,
     };
 
-    res.status(201).json({
-      status: 'success',
-      data: {
-        league: sanitizedLeague,
-      },
-    });
+    res
+      .status(201)
+      .json({ status: 'success', data: { league: sanitizedLeague } });
   } catch (e: any) {
     return next(
       new ErrorHandling(
         500,
         undefined,
-        `An unexpected error occured whilst trying to create a new league. ${e.message}`
+        `An unexpected error occured whilst trying to add tables to the league. ${e.message}`
       )
     );
   }
 }
 
-export async function leagueFetcherController(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const leagueId = req.params.id;
-    if (leagueId.length === 0) {
-      return next(
-        new ErrorHandling(400, { message: `League ID must be provided` })
-      );
-    }
-    let league;
-    try {
-      league = await League.findById(leagueId).populate([
-        { path: 'tables.teams' },
-        { path: 'leagueOwner' },
-        {
-          path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
-        },
-      ]);
-    } catch (error) {
-      console.log(error);
-      return next(
-        new ErrorHandling(404, {
-          message: `League with ID '${leagueId}' not found`,
-        })
-      );
-    }
-    if (!league) {
-      return next(
-        new ErrorHandling(404, {
-          message: `League with ID '${leagueId}' not found`,
-        })
-      );
-    }
-
-    res.status(200).json({
-      league: {
-        _id: league._id,
-        name: league.name,
-        leagueOwner: league.leagueOwner,
-        currentSeason: league.currentSeason,
-        currentMatchweek: league.currentMatchweek,
-        maxSeasonCount: league.maxSeasonCount,
-        leagueType: league.leagueType,
-        tables: league.tables,
-        fixtures: league.fixtures,
-        results: league.results,
-      },
-    });
-  } catch (e: any) {
-    next(new ErrorHandling(500, undefined, `Unexpected error ${e.message}`));
-  }
-}
-
-export async function myAssociatedLeaguesFetcherController(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  /* Args: none
-    Returns: list of league ids and minimal league info
-  */
-  const userId: string = req.body.userId;
-  // For now, there is no favouriting or bookmarking functionality.
-  // So just return the user's created leagues
-
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return next(
-        new ErrorHandling(404, {
-          message: `User with ID '${userId}' not found`,
-        })
-      );
-    }
-    const leagues = await League.find({ leagueOwner: user._id });
-    res.status(200).json({ created: leagues });
-  } catch (e: any) {
-    next(new ErrorHandling(500, undefined, `Unexpected error ${e.message}`));
-  }
-}
-
+// Need to check if tables have been added first
 export async function teamsAddingController(
   req: Request,
   res: Response,
@@ -312,22 +384,18 @@ export async function teamsAddingController(
       })
     );
   }
+  // Make sure the league has tables
+
+  if (!league.setup.tablesAdded) {
+    return next(
+      new ErrorHandling(403, {
+        message: 'You must add tables to this league first.',
+      })
+    );
+  }
 
   // Make sure the league doesn't already have the teams
-  const numberOfTeams = (
-    await League.aggregate([
-      { $match: { _id: new Types.ObjectId(leagueId) } },
-      { $unwind: '$tables' },
-      {
-        $group: {
-          _id: '$_id',
-          totalTeams: { $sum: { $size: '$tables.teams' } },
-        },
-      },
-    ])
-  )[0].totalTeams;
-
-  if (numberOfTeams > 0) {
+  if (league.setup.teamsAdded) {
     return next(
       new ErrorHandling(403, {
         message: 'You have already added teams to this league',
@@ -420,15 +488,21 @@ export async function teamsAddingController(
       new ErrorHandling(
         500,
         undefined,
-        'Something went wrong adding your teams to the leaguessss'
+        'Something went wrong adding your teams to the league'
       )
     );
   }
+
+  // Update setup flag
+  await League.findByIdAndUpdate(leagueId, {
+    $set: { 'setup.teamsAdded': true },
+  });
 
   const sanitizedLeague = {
     name: newLeague.name,
     currentSeason: newLeague.currentSeason,
     maxSeasonCount: newLeague.maxSeasonCount,
+    divisionsCount: newLeague.divisionsCount,
     leagueType: newLeague.leagueType,
     tables: newTables,
     fixtures: newLeague.fixtures,
@@ -439,6 +513,216 @@ export async function teamsAddingController(
   res
     .status(201)
     .json({ status: 'success', data: { league: sanitizedLeague } });
+}
+
+// Check if teams or tables have been added or not. if not, then set a flag so the client knows.
+export async function leagueFetcherController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const leagueId = req.params.id;
+    if (leagueId.length === 0) {
+      return next(
+        new ErrorHandling(400, { message: `League ID must be provided` })
+      );
+    }
+    let league;
+    try {
+      // Make sure the league has tables
+      try {
+        league = await League.findById(leagueId);
+      } catch (error) {
+        return next(
+          new ErrorHandling(404, {
+            message: `League with ID '${leagueId}' not found`,
+          })
+        );
+      }
+      if (!league) {
+        return next(
+          new ErrorHandling(404, {
+            message: `League with ID '${leagueId}' not found`,
+          })
+        );
+      }
+      if (!league.setup.tablesAdded) {
+        return next(
+          new ErrorHandling(403, {
+            message: 'You must add tables to this league first.',
+            property: 'tables',
+          })
+        );
+      }
+      if (!league.setup.teamsAdded) {
+        return next(
+          new ErrorHandling(403, {
+            message: 'You must add teams to this league first.',
+            property: 'teams',
+          })
+        );
+      }
+      league = await League.findById(leagueId).populate([
+        { path: 'tables.teams' },
+        { path: 'leagueOwner' },
+        {
+          path: 'fixtures',
+          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+        },
+      ]);
+    } catch (error) {
+      return next(
+        new ErrorHandling(404, {
+          message: `League with ID '${leagueId}' not found`,
+        })
+      );
+    }
+    if (!league) {
+      return next(
+        new ErrorHandling(404, {
+          message: `League with ID '${leagueId}' not found`,
+        })
+      );
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        league: {
+          _id: league._id,
+          name: league.name,
+          leagueOwner: league.leagueOwner,
+          currentSeason: league.currentSeason,
+          currentMatchweek: league.currentMatchweek,
+          maxSeasonCount: league.maxSeasonCount,
+          leagueType: league.leagueType,
+          tables: league.tables,
+          fixtures: league.fixtures,
+          results: league.results,
+        },
+      },
+    });
+  } catch (e: any) {
+    next(new ErrorHandling(500, undefined, `Unexpected error ${e.message}`));
+  }
+}
+
+export async function myAssociatedLeaguesFetcherController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  /* Args: none
+    Returns: list of league ids and minimal league info
+  */
+  const userId: string = req.body.userId;
+  // For now, there is no favouriting or bookmarking functionality.
+  // So just return the user's created leagues
+
+  try {
+    const user = await User.findById(userId).populate([
+      {
+        path: 'leaguesCreated',
+      },
+      {
+        path: 'favouriteLeagues',
+        populate: { path: 'leagueOwner' },
+      },
+      {
+        path: 'followedLeagues',
+        populate: { path: 'leagueOwner' },
+      },
+    ]);
+
+    if (!user) {
+      return next(
+        new ErrorHandling(404, {
+          message: `User with ID '${userId}' not found`,
+        })
+      );
+    }
+
+    const createdLeagues: ILeagueSchema[] = user.leaguesCreated;
+    const favouriteLeagues: ILeagueSchema[] = user.favouriteLeagues;
+    const followedLeagues: ILeagueSchema[] = user.followedLeagues;
+
+    const filteredCreatedLeagues = createdLeagues.map((league) => {
+      const actions: string[] = [];
+      if (!league.setup.tablesAdded) actions.push('tables');
+      if (!league.setup.teamsAdded) actions.push('teams');
+      if (league.setup.leagueFinished) actions.push('finished');
+      return {
+        _id: league._id,
+        name: league.name,
+        currentSeason: league.currentSeason,
+        currentMatchweek: league.currentMatchweek,
+        numDivisions: league.tables.length,
+        numTeams: league.tables.reduce(
+          (acc, table) => acc + table.numberOfTeams,
+          0
+        ),
+        owner: {
+          name: 'You',
+          _id: user._id,
+          accountType: user.accountType,
+        },
+        actions: actions,
+      };
+    });
+
+    const filteredFavouriteLeagues = favouriteLeagues.map((league) => {
+      // @ts-ignore
+      const leagueOwner: IUserSchema = league.leagueOwner;
+      return {
+        _id: league._id,
+        name: league.name,
+        currentSeason: league.currentSeason,
+        currentMatchweek: league.currentMatchweek,
+        numDivisions: league.tables.length,
+        numTeams: league.tables.reduce(
+          (acc, table) => acc + table.numberOfTeams,
+          0
+        ),
+        owner: {
+          name: leagueOwner.username,
+          _id: leagueOwner._id,
+          accountType: leagueOwner.accountType,
+        },
+      };
+    });
+    const filteredFollowedLeagues = followedLeagues.map((league) => {
+      // @ts-ignore
+      const leagueOwner: IUserSchema = league.leagueOwner;
+      return {
+        _id: league._id,
+        name: league.name,
+        currentSeason: league.currentSeason,
+        currentMatchweek: league.currentMatchweek,
+        numDivisions: league.tables.length,
+        numTeams: league.tables.reduce(
+          (acc, table) => acc + table.numberOfTeams,
+          0
+        ),
+        owner: {
+          name: leagueOwner.username,
+          _id: leagueOwner._id,
+          accountType: leagueOwner.accountType,
+        },
+      };
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        created: filteredCreatedLeagues,
+        favourites: filteredFavouriteLeagues,
+        following: filteredFollowedLeagues,
+      },
+    });
+  } catch (e: any) {
+    next(new ErrorHandling(500, undefined, `Unexpected error ${e.message}`));
+  }
 }
 
 export async function startNextSeasonController(
@@ -628,7 +912,7 @@ export async function startNextSeasonController(
 
     const updatedLeague = await League.findById(leagueId);
 
-    res.status(200).send({ status: 'success', league: updatedLeague });
+    res.status(200).json({ status: 'success', league: updatedLeague });
   } catch (e: any) {
     console.error(e);
     return next(

@@ -3,8 +3,8 @@ import Button from '@/components/text/Button';
 import { useContext, useState } from 'react';
 import { API_URL } from '@/util/config';
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import { User } from '@/util/definitions';
 import { useRouter } from 'next/navigation';
+import { fetchAPI } from '@/util/api';
 
 export default function LoginForm() {
   // Values
@@ -19,7 +19,6 @@ export default function LoginForm() {
   const [buttonText, setButtonText] = useState('Let me in!');
 
   const globalContext = useContext(GlobalContext);
-  const setUser = globalContext.account.setUser;
   const setError = globalContext.errors.setError;
 
   const [buttonColor, setButtonColor] = useState('var(--primary)');
@@ -43,7 +42,7 @@ export default function LoginForm() {
 
     // p.s password hashing will be done on server side. much safer that way.
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetchAPI(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,27 +52,18 @@ export default function LoginForm() {
           email: null,
           password: password,
         }),
+        credentials: 'include',
       });
-
-      const body = await response.json();
       setButtonText("Let's go");
 
-      if (body.status === 'fail') {
-        const message = body.data.message as string;
+      if (response.status === 'fail') {
+        const message = response.data.message as string;
         setError(message);
-      } else if (body.status === 'error') {
-        const message = body.data.message as string;
+      } else if (response.status === 'error') {
+        const message = response.data.message as string;
         setError(message);
       } else {
-        // success, when successfully logging in, the account info is returned from the api, without extra structure
-        const user: User = {
-          id: body.userId,
-          username: body.username,
-          email: body.email,
-          accountType: body.accountType,
-          JWTToken: body.token,
-        };
-        setUser(user);
+        // success
         // Do a nice welcome animation
         setButtonText('Welcome!');
         setButtonColor('var(--success)');

@@ -30,9 +30,9 @@ export default function Button({
   const bg = isHovering ? bgHoverColor : 'transparent';
 
   style = {
-    ...style,
     backgroundColor: bg,
     color: color,
+    ...style,
   };
 
   return (
@@ -48,6 +48,8 @@ export default function Button({
       whileTap={{ scale: 0.98 }}
       onHoverStart={() => setIsHovering(true)}
       onHoverEnd={() => setIsHovering(false)}
+      onFocus={() => setIsHovering(true)}
+      onBlur={() => setIsHovering(false)}
       style={style}
     >
       {/* If its a borderless button show the underline effect */}

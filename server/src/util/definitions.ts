@@ -6,10 +6,16 @@ export interface ILeagueSchema extends Document {
   currentSeason: number;
   currentMatchweek: number;
   maxSeasonCount: number;
+  divisionsCount: number;
   leagueType: 'basic' | 'advanced';
   tables: ITable[];
   fixtures: Types.ObjectId[];
   results: Types.ObjectId[];
+  setup: {
+    tablesAdded: boolean;
+    teamsAdded: boolean;
+    leagueFinished: boolean;
+  };
 }
 
 export interface ITable {
@@ -75,5 +81,6 @@ export interface IUserSchema extends Document {
   passwordHash: string;
   accountType: 'free' | 'pro';
   leaguesCreated: [];
-  x: number;
+  favouriteLeagues: [];
+  followedLeagues: [];
 }
