@@ -36,9 +36,12 @@ export default function CreateLeagueForm() {
   const { isLoggedIn } = useAccount();
 
   useEffect(() => {
-    if (!isLoggedIn) router.replace('/');
+    if (!isLoggedIn) {
+      console.log('not logged in');
+      router.replace('/');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid

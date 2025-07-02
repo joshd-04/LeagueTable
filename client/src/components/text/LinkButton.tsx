@@ -38,7 +38,7 @@ export default function LinkButton({
   return (
     <Link href={href} passHref className="">
       <motion.div
-        className={`inline-block font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] py-[5px] px-[20px] cursor-pointer rounded-[10px] ${border} ${shadow} hover:border-transparent  transition-colors duration-250 `}
+        className={`inline-block font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] py-[5px] px-[20px] cursor-pointer rounded-[10px] ${border} ${shadow} hover:border-transparent  transition-colors duration-250 text-center`}
         whileHover={
           {
             // backgroundColor: bgHoverColor,

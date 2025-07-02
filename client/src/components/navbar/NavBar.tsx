@@ -1,24 +1,26 @@
 'use client';
 import Button from '@/components/text/Button';
 import LinkButton from '@/components/text/LinkButton';
-import Subtitle from '@/components/text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { usePathname, useRouter } from 'next/navigation';
-import { useContext, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import Logo from '../logo/logo';
+import DarkModeSVG from '@/assets/svg components/DarkMode';
+import LightModeSVG from '@/assets/svg components/LightMode';
+import AccountCircleSVG from '@/assets/svg components/AccountCircle';
 
 export function NavBar() {
   const pathname = usePathname();
-  const { isLoggedIn } = useAccount();
-  useEffect(() => {
-    console.log(isLoggedIn);
-  }, [isLoggedIn]);
-
   const { colorTheme, setColorTheme } = useContext(GlobalContext).colorTheme;
   const { user, setUser } = useContext(GlobalContext).account;
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [isHoveringAccountMenuButton, setIsHoveringAccountMenuButton] =
+    useState(false);
+
+  const { isLoggedIn } = useAccount();
 
   const router = useRouter();
 
@@ -39,6 +41,18 @@ export function NavBar() {
     router.push('/');
   }
 
+  let accountMenuButtonStyle: { [key: string]: string | number } = {
+    padding: '0 10px',
+    zIndex: 20,
+  };
+
+  if (isAccountMenuOpen) {
+    accountMenuButtonStyle = {
+      ...accountMenuButtonStyle,
+      backgroundColor: 'var(--accent)',
+    };
+  }
+
   const buttonsLoggedOut = (
     <>
       <LinkButton
@@ -46,7 +60,7 @@ export function NavBar() {
         color="var(--text)"
         bgHoverColor="var(--bg-light)"
       >
-        Login
+        Log in
       </LinkButton>
       <LinkButton
         href="/register"
@@ -70,18 +84,60 @@ export function NavBar() {
         Create league
       </Button>
       <Button
-        onClick={handleSignOut}
-        color="var(--danger)"
-        bgHoverColor="var(--bg)"
+        color="transparent"
+        bgHoverColor="var(--bg-light)"
+        borderlessButton={true}
+        underlineEffect={false}
+        style={accountMenuButtonStyle}
+        onClick={() => setIsAccountMenuOpen((prev) => !prev)}
       >
-        Sign out
+        <AccountCircleSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
       </Button>
+      {isAccountMenuOpen && (
+        <>
+          <div className="absolute top-[4.5rem] right-[14rem] bg-[var(--bg)] rounded-[10px] z-20 shadow-[var(--shadow)]">
+            <ul className="flex flex-col gap-1">
+              <li>
+                <Button
+                  // onClick={handleSignOut}
+                  color="var(--text)"
+                  bgHoverColor="var(--bg-light)"
+                  borderlessButton={true}
+                  underlineEffect={false}
+                  shadowEffect={false}
+                  style={{ fontSize: '1rem' }}
+                >
+                  option 2
+                </Button>
+              </li>
+              <li>
+                <Button
+                  onClick={() => {
+                    setIsAccountMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  color="var(--danger)"
+                  bgHoverColor="var(--bg-light)"
+                  shadowEffect={false}
+                  style={{ fontSize: '1rem' }}
+                >
+                  Sign out
+                </Button>
+              </li>
+            </ul>
+          </div>
+          <div
+            className="absolute top-0 left-0 w-[100vw] h-[100vh] z-10"
+            onClick={() => setIsAccountMenuOpen(false)}
+          ></div>
+        </>
+      )}
     </>
   );
 
-  if (user === undefined) {
-    return <></>;
-  }
+  // if (user === undefined) {
+  //   return <></>;
+  // }
 
   return (
     <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] border-b-2 border-b-[var(--border)]">
@@ -131,10 +187,17 @@ export function NavBar() {
         {isLoggedIn ? buttonsLoggedIn : buttonsLoggedOut}
         <Button
           onClick={toggleTheme}
-          color="#1C9DEA"
+          color="transparent"
           bgHoverColor="var(--bg-light)"
+          borderlessButton={true}
+          underlineEffect={false}
+          style={{ padding: '0 10px' }}
         >
-          Toggle
+          {colorTheme === 'light' ? (
+            <DarkModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
+          ) : (
+            <LightModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
+          )}
         </Button>
       </div>
     </div>

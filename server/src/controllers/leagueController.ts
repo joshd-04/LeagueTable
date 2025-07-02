@@ -550,6 +550,7 @@ export async function leagueFetcherController(
       if (!league.setup.tablesAdded) {
         return next(
           new ErrorHandling(403, {
+            league: league.toObject(),
             message: 'You must add tables to this league first.',
             property: 'tables',
           })
@@ -558,6 +559,7 @@ export async function leagueFetcherController(
       if (!league.setup.teamsAdded) {
         return next(
           new ErrorHandling(403, {
+            league: league.toObject(),
             message: 'You must add teams to this league first.',
             property: 'teams',
           })

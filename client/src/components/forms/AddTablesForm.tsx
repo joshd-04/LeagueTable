@@ -1,5 +1,4 @@
 'use client';
-import InputField from '@/components/form/InputField';
 import Button from '@/components/text/Button';
 import {
   Dispatch,
@@ -13,7 +12,6 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import Label from '../text/Label';
-import { motion } from 'motion/react';
 import useAccount from '@/hooks/useAccount';
 import Subtitle from '../text/Subtitle';
 
@@ -76,7 +74,7 @@ export default function AddTablesForm({
   useEffect(() => {
     if (!isLoggedIn) router.replace('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid

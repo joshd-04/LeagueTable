@@ -228,12 +228,12 @@ function LeagueRow({
   handleClick,
   handleFavClick,
 }: LeagueRowProps) {
-  const { colorTheme } = useContext(GlobalContext).colorTheme;
+  // const { colorTheme } = useContext(GlobalContext).colorTheme;
   const [isHoveringFav, setIsHoveringFav] = useState(false);
   const [isPressingFav, setIsPressingFav] = useState(false);
 
   const isFavourited = simplifiedLeagues.favourites.includes(league._id);
-  const isFollowing = simplifiedLeagues.following.includes(league._id);
+  // const isFollowing = simplifiedLeagues.following.includes(league._id);
 
   return (
     <motion.button

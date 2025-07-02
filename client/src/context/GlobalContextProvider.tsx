@@ -37,13 +37,17 @@ export const GlobalContext =
   createContext<GlobalContextInterface>(defaultGlobalContext);
 
 export default function GlobalContextProvider({
+  initialUser,
+  initialError,
   children,
 }: {
+  initialUser: User | undefined | null;
+  initialError: string;
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User | undefined | null>(undefined);
+  const [user, setUser] = useState<User | undefined | null>(initialUser);
   const [colorTheme, setColorTheme] = useState<'light' | 'dark'>('dark');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialError);
 
   // On mount, set the color theme to the user's sytem theme
   // useEffect(() => {

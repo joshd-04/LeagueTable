@@ -6,7 +6,11 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 
-export default function LoginForm() {
+export default function LoginForm({
+  callbackUrl = '/',
+}: {
+  callbackUrl?: string;
+}) {
   // Values
   const [username, setUsername] = useState<string | number>('');
   // const [email, setEmail] = useState<string | number>('');
@@ -69,7 +73,7 @@ export default function LoginForm() {
         setButtonColor('var(--success)');
         setButtonHoverColor('var(--bg-light)');
         setTimeout(() => {
-          router.push('/');
+          router.push(callbackUrl);
         }, 300);
       }
     } catch (err) {

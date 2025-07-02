@@ -9,6 +9,7 @@ interface ButtonProps {
   color: string;
   bgHoverColor: string;
   borderlessButton?: boolean;
+  underlineEffect?: boolean;
   shadowEffect?: boolean;
   style?: CSSProperties;
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export default function Button({
   color,
   bgHoverColor,
   borderlessButton = false,
+  underlineEffect = borderlessButton,
   shadowEffect = true,
   style,
   children,
@@ -37,7 +39,7 @@ export default function Button({
 
   return (
     <motion.button
-      className={`font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] py-[5px] px-[20px] cursor-pointer rounded-[10px] ${border} ${shadow} hover:border-transparent   transition-colors duration-250 `}
+      className={`font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] py-[5px] px-[20px] cursor-pointer rounded-[10px] ${border} ${shadow} hover:border-transparent   transition-colors duration-250 text-center`}
       onClick={onClick}
       type={type}
       whileHover={
@@ -53,7 +55,7 @@ export default function Button({
       style={style}
     >
       {/* If its a borderless button show the underline effect */}
-      {borderlessButton ? (
+      {underlineEffect ? (
         <span
           className={`relative after:content-[''] after:h-[3px] after:left-[0px] after:bottom-[-5px] after:block  after:absolute underline-container-bg ${
             isHovering ? 'after:w-full' : 'after:w-0'
