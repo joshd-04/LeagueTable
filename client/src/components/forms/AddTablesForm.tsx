@@ -142,7 +142,6 @@ export default function AddTablesForm({
         }),
         credentials: 'include',
       });
-      setButtonText("Let's go");
 
       if (response.status === 'fail') {
         setError(response.data.message);
@@ -156,7 +155,7 @@ export default function AddTablesForm({
         setButtonColor('var(--success)');
         setButtonHoverColor('var(--bg-light)');
         setTimeout(() => {
-          router.push(`/leagues/${response.data.league._id}`);
+          router.push(`/leagues/${leagueId}`);
         }, 300);
       }
     } catch (e) {
@@ -167,7 +166,7 @@ export default function AddTablesForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-[20px] mt-[40px] w-[620px] bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
+      className="p-[20px] w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
     >
       {Array(divisionsCount)
         .fill('')
@@ -340,7 +339,7 @@ function FormSection({
           step={1}
           className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-black/50 border-2 w-full 
               "
-          placeholder="default: 0"
+          placeholder="Default: 0"
           value={divisionInputs[divisionIndex].numberOfTeamsToBeRelegated}
           onChange={(e) => {
             setDivisionErrors((prev) => {

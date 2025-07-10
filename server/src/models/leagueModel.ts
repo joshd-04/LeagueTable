@@ -3,9 +3,20 @@ import { ILeagueSchema } from '../util/definitions';
 
 const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
   name: { type: String, required: true },
+  leagueLevel: { type: String, required: true },
+  // 'Standard' league features only:
+  announcement: { type: String },
+  newsFeed: [
+    {
+      matchweek: { type: Number },
+      news: [{ type: String }],
+    },
+  ],
+  // Free league features:
   leagueOwner: { type: Schema.Types.ObjectId, ref: 'users', required: true },
   currentSeason: { type: Number, required: true },
   currentMatchweek: { type: Number, required: true },
+  finalMatchweek: { type: Number, required: true },
   maxSeasonCount: { type: Number, required: true },
   divisionsCount: { type: Number, required: true },
   leagueType: { type: String, required: true },

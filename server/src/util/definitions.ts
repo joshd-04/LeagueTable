@@ -2,9 +2,13 @@ import { Document, Types } from 'mongoose';
 
 export interface ILeagueSchema extends Document {
   name: string;
+  leagueLevel: 'free' | 'standard';
+  announcement?: string;
+  newsFeed?: { season: number; matchweek: number; news: string[] };
   leagueOwner: Types.ObjectId;
   currentSeason: number;
   currentMatchweek: number;
+  finalMatchweek: number;
   maxSeasonCount: number;
   divisionsCount: number;
   leagueType: 'basic' | 'advanced';
@@ -30,6 +34,7 @@ export interface ITable {
 
 export interface ITeamDetails {
   teamId: Types.ObjectId;
+  name: string;
   division: number;
   leaguePosition: number;
   form: string;
@@ -50,6 +55,7 @@ export interface IFixtureSchema extends Document {
 }
 
 export interface IResultSchema extends Document {
+  date: Date;
   season: number;
   name: string;
   division: number;
@@ -59,7 +65,12 @@ export interface IResultSchema extends Document {
   neutralGround: boolean;
   kickoff?: Date;
   basicOutcome: team[];
-  detailedOutcome?: { team: team; scorer: string; assist?: string }[];
+  detailedOutcome?: {
+    team: team;
+    scorer: string;
+    assist?: string;
+    isOwnGoal: boolean;
+  }[];
 }
 
 export interface ITeamsSchema extends Document {

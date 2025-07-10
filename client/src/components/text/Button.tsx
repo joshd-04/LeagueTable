@@ -5,12 +5,13 @@ import './effects.css';
 
 interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   color: string;
   bgHoverColor: string;
   borderlessButton?: boolean;
   underlineEffect?: boolean;
   shadowEffect?: boolean;
+  disabled?: boolean;
   style?: CSSProperties;
   children: React.ReactNode;
 }
@@ -23,25 +24,37 @@ export default function Button({
   borderlessButton = false,
   underlineEffect = borderlessButton,
   shadowEffect = true,
+  disabled = false,
   style,
   children,
 }: ButtonProps) {
   const [isHovering, setIsHovering] = useState(false);
-  const border = !borderlessButton ? 'border-2 border-solid' : '';
+  const border = !borderlessButton
+    ? `border-2 border-solid border-[${disabled ? 'var(--border)' : color}]`
+    : '';
   const shadow = shadowEffect ? 'shadow-[var(--shadow)]' : '';
-  const bg = isHovering ? bgHoverColor : 'transparent';
+  let bg = 'transparent';
+  if (isHovering && !disabled) {
+    bg = bgHoverColor;
+  } else if (isHovering && disabled) {
+    bg = 'transparent';
+  }
 
   style = {
     backgroundColor: bg,
-    color: color,
+    color: disabled ? 'var(--border) ' : color,
+    cursor: disabled ? 'not-allowed' : 'pointer',
     ...style,
   };
 
   return (
     <motion.button
-      className={`font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] py-[5px] px-[20px] cursor-pointer rounded-[10px] ${border} ${shadow} hover:border-transparent   transition-colors duration-250 text-center`}
+      className={`font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem]  py-[5px] px-[20px]  rounded-[10px] ${border} ${shadow} ${
+        !disabled && 'hover:border-transparent'
+      } transition-colors duration-250 text-center`}
       onClick={onClick}
       type={type}
+      disabled={disabled}
       whileHover={
         {
           // backgroundColor: bgHoverColor,

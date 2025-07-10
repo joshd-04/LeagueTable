@@ -1,7 +1,8 @@
-import mongoose, { Model, Schema, Types } from 'mongoose';
+import mongoose, { Model, Schema } from 'mongoose';
 import { IResultSchema } from '../util/definitions';
 
 const resultSchema: Schema<IResultSchema> = new mongoose.Schema({
+  date: { type: Date, required: true, default: Date.now },
   season: { type: Number, required: true },
   division: { type: Number, required: true },
   matchweek: { type: Number, required: true },

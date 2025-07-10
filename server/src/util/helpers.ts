@@ -115,6 +115,7 @@ export function calculateTeamPoints(team: ITeamsSchema) {
 
 export function sortTeams(teams: ITeamsSchema[]) {
   /* compareFn: positive = swap, negative = dont swap, equal = equal
+  descending order: b-a
 
   Favour teams with:
   1. More points
@@ -129,22 +130,22 @@ export function sortTeams(teams: ITeamsSchema[]) {
     const pointsB = calculateTeamPoints(teamB);
 
     if (pointsA !== pointsB) {
-      return pointsA - pointsB;
+      return pointsB - pointsA;
     }
     // 2. Better goal difference
     const gdA = teamA.goalsFor - teamA.goalsAgainst;
     const gdB = teamB.goalsFor - teamB.goalsAgainst;
 
     if (gdA !== gdB) {
-      return gdA - gdB;
+      return gdB - gdA;
     }
 
     // 3. Goals scored
     if (teamA.goalsFor !== teamB.goalsFor) {
-      return teamA.goalsFor - teamB.goalsFor;
+      return teamB.goalsFor - teamA.goalsFor;
     }
     // this is temporary:
-    return teamA.goalsFor - teamB.goalsFor;
+    return teamB.goalsFor - teamA.goalsFor;
 
     // 4. Team who got most points in the H2H of this season
     // TODO: finish tiebreaker system
@@ -157,92 +158,107 @@ export function sortTeams(teams: ITeamsSchema[]) {
 
 export async function generateFixtures(league: ILeagueSchema) {
   function shuffleArray<T>(array: T[]): T[] {
-    let shuffled = [...array]; // Create a copy to avoid mutation
+    let shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1)); // Random index from 0 to i
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap elements
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
   }
-  // Get fixtures into one 1d array
+
   const games: IFixtureSchema[] = [];
 
   league.tables
     .filter((table) => table.season === league.currentSeason)
     .forEach((table) => {
-      const teamsList = table.teams as ITeamsSchema[];
+      let teams = [...(table.teams as ITeamsSchema[])];
 
-      // each array is a matchweek
-      let fixtures: IFixtureSchema[] = [];
+      if (teams.length % 2 !== 0) {
+        // Add dummy "bye" team if odd number
+        teams.push({ _id: new Types.ObjectId(), name: 'BYE' } as ITeamsSchema);
+      }
 
-      for (let i = 0; i < teamsList.length; i++) {
-        for (let j = 0; j < teamsList.length; j++) {
-          if (i == j) {
-            continue;
+      const totalMatchweeks = (teams.length - 1) * 2;
+      const half = teams.length / 2;
+
+      let matchweeks: IFixtureSchema[][] = [];
+
+      // First half of the season
+      for (let round = 0; round < teams.length - 1; round++) {
+        let roundFixtures: IFixtureSchema[] = [];
+
+        for (let i = 0; i < half; i++) {
+          const home = teams[i];
+          const away = teams[teams.length - 1 - i];
+
+          if (home.name !== 'BYE' && away.name !== 'BYE') {
+            roundFixtures.push({
+              _id: new Types.ObjectId(),
+              season: league.currentSeason,
+              division: table.division,
+              matchweek: round + 1,
+              homeTeamDetails: home._id,
+              awayTeamDetails: away._id,
+              neutralGround: false,
+            } as IFixtureSchema);
           }
-          const fixture: IFixtureSchema = {
-            _id: new Types.ObjectId(),
-            season: league.currentSeason,
-            division: table.division,
-            matchweek: 0,
-            homeTeamDetails: teamsList[i]._id,
-            awayTeamDetails: teamsList[j]._id,
-            neutralGround: false,
-          } as IFixtureSchema;
-
-          fixtures.push(fixture);
         }
+
+        matchweeks.push(roundFixtures);
+
+        // Rotate teams for next round (keep first team static)
+        const staticTeam = teams[0];
+        const rotated = [staticTeam, ...teams.slice(1).rotateRight(1)];
+        teams = rotated;
       }
 
-      fixtures = shuffleArray(fixtures);
-
-      let matchweeks: { matchweek: number; games: IFixtureSchema[] }[] = [];
-      for (let i = 0; i < (teamsList.length - 1) * 2; i++) {
-        matchweeks.push({ matchweek: i + 1, games: [] });
-      }
-
-      matchweeks.forEach((matchweek) => {
-        if (matchweek.games.length === teamsList.length / 2) return;
-
-        const remainingFixtures = [...fixtures]; // Create a copy of the fixtures array
-
-        remainingFixtures.forEach((match) => {
-          if (matchweek.games.length === teamsList.length / 2) return;
-
-          // Check if any team in the current fixture is already playing in this matchweek
-          const isTeamPlaying = matchweek.games.some(
-            (game) =>
-              game.homeTeamDetails.equals(match.homeTeamDetails) ||
-              game.awayTeamDetails.equals(match.homeTeamDetails) ||
-              game.awayTeamDetails.equals(match.awayTeamDetails) ||
-              game.homeTeamDetails.equals(match.awayTeamDetails)
-          );
-
-          if (isTeamPlaying) return;
-
-          // Add the match to the matchweek
-          matchweek.games.push(match);
-
-          // Remove the match from the original fixtures array
-          const index = fixtures.indexOf(match);
-          if (index > -1) {
-            fixtures.splice(index, 1);
-          }
-        });
+      // Second half of the season (reverse home/away)
+      const secondHalf = matchweeks.map((roundFixtures, i) => {
+        return roundFixtures.map((fixture) => ({
+          ...fixture,
+          _id: new Types.ObjectId(),
+          matchweek: matchweeks.length + i + 1,
+          homeTeamDetails: fixture.awayTeamDetails,
+          awayTeamDetails: fixture.homeTeamDetails,
+        }));
       });
 
-      matchweeks = shuffleArray(matchweeks);
-      matchweeks.forEach((mw, i) => {
-        mw.matchweek = i + 1;
-        mw.games.forEach((g) => {
-          g.matchweek = mw.matchweek;
-        });
-      });
+      const allFixtures = [...matchweeks.flat(), ...secondHalf.flat()];
 
-      matchweeks.forEach((mw) => games.push(...mw.games));
+      // Optional: shuffle the entire matchweek order or games per week if needed
+      // But DO NOT change pairings or matchweeks once scheduled.
+
+      allFixtures.forEach((g) => games.push(new Fixture(g)));
     });
 
   await Fixture.insertMany(games);
 
   return games;
+}
+
+declare global {
+  interface Array<T> {
+    rotateRight(n?: number): T[];
+  }
+}
+
+Array.prototype.rotateRight = function <T>(this: T[], n = 1): T[] {
+  return this.slice(-n).concat(this.slice(0, -n));
+};
+
+export function generateJWTToken(payload: any, nextFn: NextFunction) {
+  const SECRET_KEY = readDotenv('JWT_SECRET_KEY');
+  if (!SECRET_KEY) {
+    nextFn(
+      new ErrorHandling(
+        500,
+        undefined,
+        'No JWT_SECRET_KEY environment variable found for JWT signature'
+      )
+    );
+    return;
+  }
+
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '7d' });
+  return token;
 }

@@ -20,6 +20,7 @@ export function handleColorThemeToggle(newColorTheme: 'light' | 'dark') {
       '--accent',
       'hsl(200, 95%, 80%)'
     );
+    document.documentElement.style.setProperty('--danger', 'hsl(0, 70%, 50%)');
     document.documentElement.style.setProperty(
       '--warning',
       'hsl(30, 70%, 50%)'
@@ -43,6 +44,7 @@ export function handleColorThemeToggle(newColorTheme: 'light' | 'dark') {
       '--accent',
       'hsl(200, 95%, 10%)'
     );
+    document.documentElement.style.setProperty('--danger', 'hsl(0, 60%, 60%)');
     document.documentElement.style.setProperty(
       '--warning',
       'hsl(60, 60%, 60%)'

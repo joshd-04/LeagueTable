@@ -8,7 +8,6 @@ import { AnimatePresence, motion } from 'motion/react';
 
 export default function ErrorMessage() {
   const { error, setError } = useContext(GlobalContext).errors;
-  console.log('hello');
 
   return (
     <>

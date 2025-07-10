@@ -9,7 +9,7 @@ export default function Heading1({
 }) {
   return (
     <h1
-      className="font-[family-name:var(--font-instrument-sans)] font-bold text-[2.25rem] md:text-[3rem] xl:text-[4.5rem] text-[var(--text)]"
+      className="inline font-[family-name:var(--font-instrument-sans)] font-bold text-[2.25rem] md:text-[3rem] xl:text-[4.5rem] text-[var(--text)]"
       style={style}
     >
       {children}

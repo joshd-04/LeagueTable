@@ -11,6 +11,7 @@ interface ButtonProps {
   borderlessButton?: boolean;
   underlineEffect?: boolean;
   shadowEffect?: boolean;
+  disabled?: boolean;
   style?: CSSProperties;
   children: React.ReactNode;
 }
@@ -20,25 +21,38 @@ export default function LinkButton({
   color,
   bgHoverColor,
   borderlessButton = false,
+  underlineEffect = borderlessButton,
   shadowEffect = true,
+  disabled = false,
   style,
   children,
 }: ButtonProps) {
   const [isHovering, setIsHovering] = useState(false);
 
-  const border = !borderlessButton ? 'border-2 border-solid' : '';
+  const border = !borderlessButton
+    ? `border-2 border-solid border-[${disabled ? 'var(--border)' : color}]`
+    : '';
   const shadow = shadowEffect ? 'shadow-[var(--shadow)]' : '';
-  const bg = isHovering ? bgHoverColor : 'transparent';
+  let bg = 'transparent';
+  if (isHovering && !disabled) {
+    bg = bgHoverColor;
+  } else if (isHovering && disabled) {
+    bg = 'transparent';
+  }
 
   style = {
-    ...style,
     backgroundColor: bg,
-    color: color,
+    color: disabled ? 'var(--border) ' : color,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    ...style,
   };
+
   return (
     <Link href={href} passHref className="">
       <motion.div
-        className={`inline-block font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] py-[5px] px-[20px] cursor-pointer rounded-[10px] ${border} ${shadow} hover:border-transparent  transition-colors duration-250 text-center`}
+        className={`inline-block w-full font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem]  py-[5px] px-[20px]  rounded-[10px] ${border} ${shadow} ${
+          !disabled && 'hover:border-transparent'
+        } transition-colors duration-250 text-center`}
         whileHover={
           {
             // backgroundColor: bgHoverColor,
@@ -48,12 +62,14 @@ export default function LinkButton({
         whileTap={{ scale: 0.98 }}
         onHoverStart={() => setIsHovering(true)}
         onHoverEnd={() => setIsHovering(false)}
+        onFocus={() => setIsHovering(true)}
+        onBlur={() => setIsHovering(false)}
         style={style}
       >
         {/* If its a borderless button show the underline effect */}
-        {borderlessButton ? (
+        {underlineEffect ? (
           <span
-            className={`relative after:content-[''] after:h-[3px] after:left-[0px] after:bottom-[-5px] after:block underline-container-bg after:absolute ${
+            className={`relative after:content-[''] after:h-[3px] after:left-[0px] after:bottom-[-5px] after:block underline-container-bg w-full after:absolute ${
               isHovering ? 'after:w-full' : 'after:w-0'
             } after:transition-all`}
           >

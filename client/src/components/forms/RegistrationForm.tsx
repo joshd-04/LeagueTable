@@ -33,22 +33,28 @@ export default function RegistrationForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
+    let errorsPresent = false;
 
     if (!username) {
       setUsernameError('this is required');
+      errorsPresent = true;
     }
     if (!email) {
       setEmailError('this is required');
+      errorsPresent = true;
     }
     if (!password) {
       setPasswordError('this is required');
+      errorsPresent = true;
     }
     if (!passwordConfirmation) {
       setPasswordConfirmationError('this is required');
+      errorsPresent = true;
     }
 
     if (password.toString().length < 8) {
       setPasswordError('needs to be atleast 8 characters');
+      errorsPresent = true;
     }
     // Go through password and see if upper lower and number are present
     let containsUpper = false;
@@ -68,19 +74,15 @@ export default function RegistrationForm() {
       setPasswordError(
         'needs to have atleast 1 lowercase, 1 uppercase and 1 number'
       );
+      errorsPresent = true;
     }
 
     if (password !== passwordConfirmation) {
       setPasswordConfirmationError('passwords do not match');
+      errorsPresent = true;
     }
 
-    if (
-      usernameError ||
-      emailError ||
-      passwordError ||
-      passwordConfirmationError
-    )
-      return;
+    if (errorsPresent) return;
 
     setButtonText('...');
 

@@ -32,15 +32,18 @@ export default function LoginForm({
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
+    let errorsPresent = false;
 
     if (!username) {
       setUsernameError('this is required');
+      errorsPresent = true;
     }
     if (!password) {
       setPasswordError('this is required');
+      errorsPresent = true;
     }
 
-    if (usernameError || passwordError) return;
+    if (errorsPresent) return;
 
     setButtonText('...');
 

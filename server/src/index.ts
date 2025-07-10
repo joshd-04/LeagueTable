@@ -5,7 +5,7 @@ import {
   loginController,
   registrationController,
   signOutController,
-} from './controllers/authController';
+} from './controllers/auth';
 import {
   enforceRequiredFields,
   protectedRoute,
@@ -13,7 +13,12 @@ import {
 } from './util/helpers';
 import connectDB from './util/db';
 import {
-  getFixturesStillToBePlayed,
+  calculateSeasonStatsController,
+  calculateSeasonSummaryController,
+  getFixtureByIdController,
+  getFixturesController,
+  getResultsController,
+  getTeamsController,
   leagueCreationController,
   leagueFetcherController,
   myAssociatedLeaguesFetcherController,
@@ -22,7 +27,7 @@ import {
   tablesAddingController,
   teamsAddingController,
   turnFixtureIntoResult,
-} from './controllers/leagueController';
+} from './controllers/league';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import {
@@ -30,7 +35,8 @@ import {
   followLeagueController,
   unfavouriteLeagueController,
   unfollowLeagueController,
-} from './controllers/userController';
+} from './controllers/user';
+import morgan from 'morgan';
 
 connectDB();
 
@@ -59,6 +65,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
 app.options('*', cors());
@@ -111,18 +118,29 @@ app.post(
 );
 
 app.get(
-  '/api/leagues/:id/startNextSeason',
+  '/api/leagues/:id/start-next-season',
   protectedRoute,
   startNextSeasonController
 );
 
 app.get(
-  '/api/leagues/:id/startNextMatchweek',
+  '/api/leagues/:id/start-next-matchweek',
   protectedRoute,
   startNextMatchweek
 );
 
-app.get('/api/leagues/:id/fixturesStillToBePlayed', getFixturesStillToBePlayed);
+app.get('/api/leagues/:leagueId/fixtures/:fixtureId', getFixtureByIdController);
+app.get('/api/leagues/:id/fixtures', getFixturesController);
+
+app.get('/api/leagues/:id/results', getResultsController);
+
+app.get(
+  '/api/leagues/:id/season-summary-stats',
+  calculateSeasonSummaryController
+);
+
+app.get('/api/leagues/:id/stats', calculateSeasonStatsController);
+app.get('/api/leagues/:id/teams', getTeamsController);
 
 app.post(
   '/api/result',

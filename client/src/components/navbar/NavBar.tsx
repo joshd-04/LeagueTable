@@ -6,7 +6,7 @@ import useAccount from '@/hooks/useAccount';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { usePathname, useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { CSSProperties, useContext, useState } from 'react';
 import Logo from '../logo/logo';
 import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
@@ -17,8 +17,6 @@ export function NavBar() {
   const { colorTheme, setColorTheme } = useContext(GlobalContext).colorTheme;
   const { user, setUser } = useContext(GlobalContext).account;
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const [isHoveringAccountMenuButton, setIsHoveringAccountMenuButton] =
-    useState(false);
 
   const { isLoggedIn } = useAccount();
 
@@ -41,7 +39,7 @@ export function NavBar() {
     router.push('/');
   }
 
-  let accountMenuButtonStyle: { [key: string]: string | number } = {
+  let accountMenuButtonStyle: CSSProperties = {
     padding: '0 10px',
     zIndex: 20,
   };
@@ -74,15 +72,17 @@ export function NavBar() {
 
   const buttonsLoggedIn = (
     <>
-      <Button
-        onClick={() => {
-          router.push('/create-league');
-        }}
-        color="var(--text)"
-        bgHoverColor="var(--bg)"
-      >
-        Create league
-      </Button>
+      {!pathname.startsWith('/leagues/') && (
+        <Button
+          onClick={() => {
+            router.push('/create-league');
+          }}
+          color="var(--text)"
+          bgHoverColor="var(--bg)"
+        >
+          Create league
+        </Button>
+      )}
       <Button
         color="transparent"
         bgHoverColor="var(--bg-light)"
@@ -91,7 +91,10 @@ export function NavBar() {
         style={accountMenuButtonStyle}
         onClick={() => setIsAccountMenuOpen((prev) => !prev)}
       >
-        <AccountCircleSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
+        <span className="text-[var(--text)] flex flex-row gap-[10px]">
+          {user?.username}{' '}
+          <AccountCircleSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
+        </span>
       </Button>
       {isAccountMenuOpen && (
         <>
@@ -150,39 +153,42 @@ export function NavBar() {
       >
         <Logo />
       </LinkButton>
-      <div
-        className={`${
-          pathname === '/' && !isLoggedIn ? 'flex' : 'hidden'
-        } gap-2`}
-      >
-        <Button
-          onClick={() => {}}
-          borderlessButton={true}
-          shadowEffect={false}
-          color="var(--text)"
-          bgHoverColor="transparent"
-        >
-          Features
-        </Button>
-        <Button
-          onClick={() => {}}
-          borderlessButton={true}
-          shadowEffect={false}
-          color="var(--text)"
-          bgHoverColor="transparent"
-        >
-          Use cases
-        </Button>
-        <Button
-          onClick={() => {}}
-          borderlessButton={true}
-          shadowEffect={false}
-          color="var(--text)"
-          bgHoverColor="transparent"
-        >
-          FAQ
-        </Button>
-      </div>
+      {pathname === '/' && !isLoggedIn && (
+        <div>
+          <Button
+            onClick={() => {}}
+            borderlessButton={true}
+            shadowEffect={false}
+            color="var(--text)"
+            bgHoverColor="transparent"
+          >
+            Features
+          </Button>
+          <Button
+            onClick={() => {}}
+            borderlessButton={true}
+            shadowEffect={false}
+            color="var(--text)"
+            bgHoverColor="transparent"
+          >
+            Use cases
+          </Button>
+          <Button
+            onClick={() => {}}
+            borderlessButton={true}
+            shadowEffect={false}
+            color="var(--text)"
+            bgHoverColor="transparent"
+          >
+            FAQ
+          </Button>
+        </div>
+      )}
+      {/* {pathname.startsWith('/leagues/') && (
+        <div className="flex flex-col justify-center">
+          <Subtitle>Florian Wirtz Universal</Subtitle>
+        </div>
+      )} */}
       <div className="flex gap-2">
         {isLoggedIn ? buttonsLoggedIn : buttonsLoggedOut}
         <Button

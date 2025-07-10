@@ -37,7 +37,6 @@ export default function CreateLeagueForm() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      console.log('not logged in');
       router.replace('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,40 +45,40 @@ export default function CreateLeagueForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
+    let errorsPresent = false;
 
     if (!leagueName) {
       setLeagueNameError('this is required');
+      errorsPresent = true;
     }
     if (!maxSeasonCount) {
       setMaxSeasonCountError('this is required');
+      errorsPresent = true;
     }
     if (!leagueType) {
       setLeagueTypeError('this is required');
+      errorsPresent = true;
     }
     if (!divisionsCount) {
       setDivisionsCountError('this is required');
+      errorsPresent = true;
     }
     if (+maxSeasonCount <= 0) {
       setMaxSeasonCountError('must be greater than zero');
+      errorsPresent = true;
     }
     if (+divisionsCount <= 0) {
       setDivisionsCountError('must be greater than zero');
+      errorsPresent = true;
+    }
+    if (+divisionsCount > 2) {
+      setDivisionsCount(
+        'free users cannot have more than 2 divisions per league'
+      );
+      errorsPresent = true;
     }
 
-    console.log(
-      leagueNameError,
-      maxSeasonCountError,
-      leagueTypeError,
-      divisionsCountError
-    );
-
-    if (
-      leagueNameError !== '' ||
-      maxSeasonCountError !== '' ||
-      leagueTypeError !== '' ||
-      divisionsCountError !== ''
-    )
-      return;
+    if (errorsPresent) return;
 
     setButtonText('...');
 
@@ -133,7 +132,7 @@ export default function CreateLeagueForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-[20px] mt-[40px] w-[620px] bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
+      className="p-[20px]  w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
     >
       <InputField
         type="text"

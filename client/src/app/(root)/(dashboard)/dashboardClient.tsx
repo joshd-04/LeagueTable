@@ -79,7 +79,6 @@ export default function DashboardClient({
           body: JSON.stringify({ leagueId: leagueId }),
         });
         if (response.status === 'success') {
-          console.log(leagues);
           const league =
             leagues.created.find((league) => league._id === leagueId) ||
             leagues.following.find((league) => league._id === leagueId);
@@ -101,7 +100,6 @@ export default function DashboardClient({
           body: JSON.stringify({ leagueId: leagueId }),
         });
         if (response.status === 'success') {
-          console.log(leagues);
           const league =
             leagues.created.find((league) => league._id === leagueId) ||
             leagues.following.find((league) => league._id === leagueId);
@@ -278,7 +276,11 @@ function LeagueRow({
             {league.owner.name}
           </Label>
           <Label style={{ color: 'var(--text-muted)' }}>
-            Season {league.currentSeason} matchweek {league.currentMatchweek}
+            {league.actions?.length > 0 ? (
+              <span className="text-[var(--warning)]">action required</span>
+            ) : (
+              `Season ${league.currentSeason} matchweek ${league.currentMatchweek}`
+            )}
           </Label>
           <Label style={{ color: 'var(--text-muted)' }}>
             {league.numDivisions} division{league.numDivisions > 1 ? 's' : ''}

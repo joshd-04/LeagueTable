@@ -12,6 +12,7 @@ export interface LeagueInterface {
   numDivisions: number;
   numTeams: number;
   owner: { _id: string; name: string; accountType: 'free' | 'pro' };
+  actions: string[];
 }
 
 export default async function Dashboard({
