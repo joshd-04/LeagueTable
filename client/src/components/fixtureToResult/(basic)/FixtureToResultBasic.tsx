@@ -15,7 +15,7 @@ export default function FixtureToResultBasic({
 }: {
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  fetchLatestData: () => Promise<void>;
+  fetchLatestData?: () => Promise<void>;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
 
@@ -43,7 +43,9 @@ export default function FixtureToResultBasic({
       credentials: 'include',
     });
     setShowFixtureToResult(null);
-    await fetchLatestData();
+    if (fetchLatestData) {
+      await fetchLatestData();
+    }
   }
 
   return (

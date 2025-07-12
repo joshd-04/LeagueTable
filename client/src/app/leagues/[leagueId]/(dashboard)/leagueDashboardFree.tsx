@@ -26,7 +26,12 @@ import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 
 interface widgetDataInterface {
-  fixtures: Fixture[];
+  league: League;
+  fixtures: {
+    totalFixtures: number;
+    fixturesReturned: number;
+    fixtures: Fixture[];
+  };
   results: Result[];
   seasonSummaryStats: SeasonSummaryStatsInterface;
   seasonStats: SeasonStats;
@@ -35,10 +40,8 @@ interface widgetDataInterface {
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardFree({
-  league,
   widgetData,
 }: {
-  league: League;
   widgetData: widgetDataInterface;
 }) {
   const context = useContext(GlobalContext);
@@ -54,36 +57,57 @@ export default function LeagueDashboardFree({
 
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
-    if (user.id === league.leagueOwner._id) {
+    if (user.id === dashboardData.league.leagueOwner._id) {
       userOwnsThisLeague = true;
     }
   }
 
-  const teamsCount = league.tables.reduce((acc, cur) => {
+  const teamsCount = dashboardData.league.tables.reduce((acc, cur) => {
     return acc + cur.numberOfTeams;
   }, 0);
 
   async function fetchLatestData() {
-    const [fixtures, results, seasonSummaryStats, stats, teams] =
+    const [league, fixtures, results, seasonSummaryStats, stats, teams] =
       await Promise.all([
-        fetchAPI(`${API_URL}/leagues/${league._id}/fixtures?limit=3`, {
+        fetchAPI(`${API_URL}/leagues/${dashboardData.league._id}`, {
+          method: 'GET',
+          credentials: 'include',
+        }),
+        fetchAPI(
+          `${API_URL}/leagues/${dashboardData.league._id}/fixtures?limit=3`,
+          {
+            method: 'GET',
+          }
+        ),
+        fetchAPI(
+          `${API_URL}/leagues/${dashboardData.league._id}/results?limit=3`,
+          {
+            method: 'GET',
+          }
+        ),
+        fetchAPI(
+          `${API_URL}/leagues/${dashboardData.league._id}/season-summary-stats`,
+          {
+            method: 'GET',
+          }
+        ),
+        fetchAPI(`${API_URL}/leagues/${dashboardData.league._id}/stats`, {
           method: 'GET',
         }),
-        fetchAPI(`${API_URL}/leagues/${league._id}/results?limit=3`, {
-          method: 'GET',
-        }),
-        fetchAPI(`${API_URL}/leagues/${league._id}/season-summary-stats`, {
-          method: 'GET',
-        }),
-        fetchAPI(`${API_URL}/leagues/${league._id}/stats`, {
-          method: 'GET',
-        }),
-        fetchAPI(`${API_URL}/leagues/${league._id}/teams?division=1`, {
-          method: 'GET',
-        }),
+        fetchAPI(
+          `${API_URL}/leagues/${dashboardData.league._id}/teams?division=1`,
+          {
+            method: 'GET',
+          }
+        ),
       ]);
     const newWidgetData = {
-      fixtures: fixtures.data.fixtures as Fixture[],
+      league: league.data.league as League,
+      fixtures: {
+        totalFixtures: fixtures.data.totalFixtures as number,
+        fixturesReturned: fixtures.data.fixturesReturned as number,
+        fixtures: fixtures.data.fixtures as Fixture[],
+      },
       results: results.data.results as Result[],
       seasonSummaryStats: seasonSummaryStats.data
         .seasonSummaryStats as SeasonSummaryStatsInterface,
@@ -94,7 +118,7 @@ export default function LeagueDashboardFree({
   }
   return (
     <div className="flex flex-col gap-[20px]">
-      <LeagueBanner league={league}>
+      <LeagueBanner league={dashboardData.league}>
         <Heading1
           style={{
             position: 'absolute',
@@ -103,7 +127,7 @@ export default function LeagueDashboardFree({
             translate: '-50%',
           }}
         >
-          {league.name}
+          {dashboardData.league.name}
         </Heading1>
       </LeagueBanner>
 
@@ -111,33 +135,41 @@ export default function LeagueDashboardFree({
         <div className="flex flex-row justify-center items-center gap-[50px]">
           <Paragraph>
             <PersonSVG className="w-[24px] h-[24px] fill-[var(--text)] inline-block align-text-top" />
-            {league.leagueOwner.username === user?.username
+            {dashboardData.league.leagueOwner.username === user?.username
               ? 'You'
-              : league.leagueOwner.username}
+              : dashboardData.league.leagueOwner.username}
           </Paragraph>
           <Paragraph>
-            {league.divisionsCount} division
-            {league.divisionsCount === 1 ? '' : 's'}
+            {dashboardData.league.divisionsCount} division
+            {dashboardData.league.divisionsCount === 1 ? '' : 's'}
           </Paragraph>
           <Paragraph>
             {teamsCount} team
             {teamsCount === 1 ? '' : 's'}
           </Paragraph>
           <Paragraph>
-            Season {league.currentSeason} Matchweek {league.currentMatchweek}
+            Season {dashboardData.league.currentSeason} Matchweek{' '}
+            {dashboardData.league.currentMatchweek}
           </Paragraph>
         </div>
         <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-[20px]">
-          <Upgrade league={league} />
-          <LatestResults results={dashboardData.results} />
+          <Upgrade league={dashboardData.league} />
+          <LatestResults
+            league={dashboardData.league}
+            results={dashboardData.results}
+          />
           <NextFixtures
+            league={dashboardData.league}
             userOwnsThisLeague={userOwnsThisLeague}
             fixtures={dashboardData.fixtures}
             setShowFixtureToResult={setShowFixtureToResult}
           />
 
           {userOwnsThisLeague ? (
-            <Controls league={league} fetchLatestData={fetchLatestData} />
+            <Controls
+              league={dashboardData.league}
+              fetchLatestData={fetchLatestData}
+            />
           ) : (
             <SeasonSummaryStats stats={dashboardData.seasonSummaryStats} />
           )}
@@ -145,7 +177,7 @@ export default function LeagueDashboardFree({
           <div></div>
           <TableWidget teams={dashboardData.teams} />
           <Stats
-            leagueType={league.leagueType}
+            leagueType={dashboardData.league.leagueType}
             divisionViewing={divisionViewing}
             stats={dashboardData.seasonStats}
           />
@@ -155,7 +187,7 @@ export default function LeagueDashboardFree({
       </div>
       {showFixtureToResult !== null && (
         <FixtureToResult
-          leagueType={league.leagueType}
+          leagueType={dashboardData.league.leagueType}
           fixtureObj={showFixtureToResult}
           setShowFixtureToResult={setShowFixtureToResult}
           fetchLatestData={fetchLatestData}

@@ -37,6 +37,7 @@ import {
   unfollowLeagueController,
 } from './controllers/user';
 import morgan from 'morgan';
+import { getResultByIdController } from './controllers/league/getResultByIdController';
 
 connectDB();
 
@@ -132,6 +133,7 @@ app.get(
 app.get('/api/leagues/:leagueId/fixtures/:fixtureId', getFixtureByIdController);
 app.get('/api/leagues/:id/fixtures', getFixturesController);
 
+app.get('/api/leagues/:leagueId/results/:resultId', getResultByIdController);
 app.get('/api/leagues/:id/results', getResultsController);
 
 app.get(

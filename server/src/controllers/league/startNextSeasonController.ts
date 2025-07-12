@@ -188,6 +188,12 @@ export async function startNextSeasonController(
       newLeague
     )) as IFixtureSchema[];
 
+    const finalMatchweek = fixtures.reduce((acc, fixture) => {
+      return Math.max(fixture.matchweek, acc);
+    }, 0);
+
+    newLeague.finalMatchweek = finalMatchweek;
+
     newLeague.fixtures.push(...fixtures.map((f) => f._id as Types.ObjectId));
 
     newLeague.currentMatchweek = 1;

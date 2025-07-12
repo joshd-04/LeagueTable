@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Fixture } from '@/util/definitions';
 import FixtureToResultAdvanced from './(advanced)/FixtureToResultAdvanced';
-import FixtureToResultBasic from './(advanced)/FixtureToResultBasic';
+import FixtureToResultBasic from './(basic)/FixtureToResultBasic';
 
 export default function FixtureToResult({
   leagueType,
@@ -12,7 +12,7 @@ export default function FixtureToResult({
   leagueType: 'basic' | 'advanced';
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  fetchLatestData: () => Promise<void>;
+  fetchLatestData?: () => Promise<void>;
 }) {
   if (leagueType === 'advanced') {
     return (

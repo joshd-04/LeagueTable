@@ -4,7 +4,6 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
 import { useContext, useState } from 'react';
-import Image from 'next/image';
 import Heading1 from '@/components/text/Heading1';
 import Label from '@/components/text/Label';
 import LinkButton from '@/components/text/LinkButton';
@@ -12,6 +11,7 @@ import Button from '@/components/text/Button';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import TeamForm from '@/components/teamForm/TeamForm';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
+import ordinal from 'ordinal';
 
 export default function FixtureClient({
   league,
@@ -34,8 +34,6 @@ export default function FixtureClient({
       userOwnsThisLeague = true;
     }
   }
-
-  const { colorTheme } = context.colorTheme;
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -168,6 +166,25 @@ function PreviewTable({ fixture }: { fixture: Fixture }) {
             <div className="place-self-start">
               <TeamForm form={fixture.awayTeamDetails.form} />
             </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <Paragraph style={{ textAlign: 'right' }}>
+              {ordinal(fixture.homeTeamDetails.position)}
+            </Paragraph>
+          </td>
+          <td>
+            <Paragraph
+              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            >
+              Position
+            </Paragraph>
+          </td>
+          <td>
+            <Paragraph style={{ textAlign: 'left' }}>
+              {ordinal(fixture.awayTeamDetails.position)}
+            </Paragraph>
           </td>
         </tr>
         <tr>

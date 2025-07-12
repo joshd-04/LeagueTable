@@ -13,6 +13,13 @@ export async function getResultsController(
   next: NextFunction
 ) {
   try {
+    /* 
+      query parameters:
+      - limit: number (controls the number of results to return) [default: returns all results]
+      - sort: 'matchweek' | anything else  [default: sorts by date of result (most recent first)]
+      
+      - season: [not implemented yet]
+    */
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
 
@@ -40,6 +47,11 @@ export async function getResultsController(
       );
     }
     let allResults = league.results as unknown as IResultSchema[];
+    // only keep the results for this season. remove previous season results
+    allResults = allResults.filter(
+      (result) => result.season === league.currentSeason
+    );
+
     if (sort === 'matchweek') {
       allResults.sort((a, b) => b.matchweek - a.matchweek);
     } else {

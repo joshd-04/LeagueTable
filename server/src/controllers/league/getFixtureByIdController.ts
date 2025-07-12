@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import League from '../../models/leagueModel';
-import { IFixtureSchema, ILeagueSchema } from '../../util/definitions';
+import {
+  IFixtureSchema,
+  ILeagueSchema,
+  ITeamsSchema,
+} from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
+import { isTeam, sortTeams } from '../../util/helpers';
 
 export async function getFixtureByIdController(
   req: Request,
@@ -16,10 +21,12 @@ export async function getFixtureByIdController(
 
     // Check if league exists
     try {
-      league = await League.findById(leagueId).populate({
-        path: 'fixtures',
-        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
-      });
+      league = await League.findById(leagueId)
+        .populate({ path: 'tables.teams' })
+        .populate({
+          path: 'fixtures',
+          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+        });
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -45,6 +52,47 @@ export async function getFixtureByIdController(
         })
       );
     }
+
+    let homeDetails = isTeam(fixture.homeTeamDetails)
+      ? fixture.homeTeamDetails
+      : null;
+    let awayDetails = isTeam(fixture.awayTeamDetails)
+      ? fixture.awayTeamDetails
+      : null;
+
+    if (homeDetails === null || awayDetails === null) {
+      return next(
+        new ErrorHandling(
+          500,
+          undefined,
+          'There was a serverside error checking if homedetails are ITeamsSchema in getfixturebyidcontroller'
+        )
+      );
+    }
+
+    const homeTeamPosition = sortTeams(
+      league.tables[homeDetails.division - 1].teams as ITeamsSchema[]
+    )
+      .map((team) => team.name)
+      .indexOf(homeDetails.name);
+
+    const awayTeamPosition = sortTeams(
+      league.tables[awayDetails.division - 1].teams as ITeamsSchema[]
+    )
+      .map((team) => team.name)
+      .indexOf(awayDetails.name);
+
+    homeDetails = {
+      ...homeDetails,
+      position: homeTeamPosition + 1,
+    } as ITeamsSchema;
+    awayDetails = {
+      ...awayDetails,
+      position: awayTeamPosition + 1,
+    } as ITeamsSchema;
+
+    fixture.homeTeamDetails = homeDetails;
+    fixture.awayTeamDetails = awayDetails;
 
     res.status(200).json({ status: 'success', data: { fixture: fixture } });
   } catch (e: any) {

@@ -1,24 +1,49 @@
+'use client';
 import EditSVG from '@/assets/svg components/Edit';
 import Button from '@/components/text/Button';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
-import { Fixture } from '@/util/definitions';
+import { Fixture, League } from '@/util/definitions';
 import { useParams, useRouter } from 'next/navigation';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
+import { motion } from 'motion/react';
 
 export default function NextFixtures({
+  league,
   userOwnsThisLeague,
   fixtures,
   setShowFixtureToResult,
 }: {
+  league: League;
   userOwnsThisLeague: boolean;
-  fixtures: Fixture[];
+  fixtures: {
+    totalFixtures: number;
+    fixturesReturned: number;
+    fixtures: Fixture[];
+  };
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
 }) {
-  const nextFixtures = fixtures.slice(0, 3);
+  const nextFixtures = fixtures.fixtures.slice(0, 3);
+  const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
+  const router = useRouter();
+
   return (
-    <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
-      <span>
+    <motion.div
+      className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 flex flex-col gap-1 hover:cursor-pointer
+    "
+      onMouseEnter={() => setIsHoveringOuterPanel(true)}
+      onMouseLeave={() => setIsHoveringOuterPanel(false)}
+      whileTap={{ scale: isHoveringOuterPanel ? 0.98 : 1 }}
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/leagues/${league._id}/fixtures`);
+      }}
+      style={{
+        background: isHoveringOuterPanel ? 'var(--bg-light)' : 'var(--bg)',
+        borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
+      }}
+    >
+      <div className="flex flex-row items-baseline gap-[4px]">
         <Paragraph
           style={{
             color: 'var(--text)',
@@ -26,17 +51,33 @@ export default function NextFixtures({
             display: 'inline',
           }}
         >
-          Fixtures
+          Fixtures{' '}
         </Paragraph>
-      </span>
+        {nextFixtures.length >= 3 && (
+          <Label
+            style={{
+              color: 'var(--text-muted)',
+              fontWeight: 'normal',
+              display: 'inline',
+            }}
+          >
+            - showing {nextFixtures.length} of {fixtures.totalFixtures}
+          </Label>
+        )}
+      </div>
       {nextFixtures.length > 0 ? (
         nextFixtures.map((f, i) => (
-          <FixtureRow
-            userOwnsThisLeague={userOwnsThisLeague}
-            fixtureObj={f}
-            setShowFixtureToResult={setShowFixtureToResult}
+          <div
             key={i}
-          />
+            onMouseEnter={() => setIsHoveringOuterPanel(false)}
+            onMouseLeave={() => setIsHoveringOuterPanel(true)}
+          >
+            <FixtureRow
+              userOwnsThisLeague={userOwnsThisLeague}
+              fixtureObj={f}
+              setShowFixtureToResult={setShowFixtureToResult}
+            />
+          </div>
         ))
       ) : (
         <Label
@@ -50,7 +91,7 @@ export default function NextFixtures({
           No outstanding fixtures
         </Label>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -65,13 +106,17 @@ function FixtureRow({
 }) {
   const router = useRouter();
   const { leagueId } = useParams();
-  function handleFixtureClick() {
+
+  function handleFixtureClick(e: MouseEvent) {
+    e.stopPropagation();
     router.push(`/leagues/${leagueId}/fixture/${fixtureObj._id}`);
   }
+
   return (
-    <span
+    <motion.div
       className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center"
-      onClick={handleFixtureClick}
+      onClick={(e) => handleFixtureClick(e)}
+      whileTap={{ scale: 0.98 }}
     >
       <Label
         style={{
@@ -137,6 +182,6 @@ function FixtureRow({
           <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
         </Button>
       )}
-    </span>
+    </motion.div>
   );
 }

@@ -9,6 +9,13 @@ export async function getFixturesController(
   next: NextFunction
 ) {
   try {
+    /* 
+      query parameters:
+      - limit: number (controls the number of results to return) [default: returns all results]
+      - all: boolean (if true, all fixtures in the season will be returned, otherwise just the fixtures to that matchweek) [default: false]
+      - reverse: boolean (if true, the highest matchweek games are returned first, otherwise md1 returned first then md2 etc) [default: false]
+      - season: [not implemented yet]
+    */
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
 
@@ -33,23 +40,33 @@ export async function getFixturesController(
         })
       );
     }
-    let allFixtures = league.fixtures as unknown as IFixtureSchema[];
-    allFixtures.reverse();
-
-    let fixturesStillToBePlayed = allFixtures.filter((fixture) => {
-      return fixture.matchweek <= league.currentMatchweek;
-    });
-
-    if (req.query.limit !== undefined && +req.query.limit > 0) {
-      fixturesStillToBePlayed = fixturesStillToBePlayed.slice(
-        0,
-        +req.query.limit
-      );
+    let fixtures = league.fixtures as unknown as IFixtureSchema[];
+    if (Boolean(req.query.reverse) === true) {
+      fixtures.reverse();
     }
 
-    res
-      .status(200)
-      .json({ status: 'success', data: { fixtures: fixturesStillToBePlayed } });
+    if (Boolean(req.query.all) === true) {
+      // do nothing
+    } else {
+      // If user does not specify they want all fixtures, then just return the fixtures up until the current matchweek
+      fixtures = fixtures.filter((fixture) => {
+        return fixture.matchweek <= league.currentMatchweek;
+      });
+    }
+
+    const totalFixtures = fixtures.length;
+    if (req.query.limit !== undefined && +req.query.limit > 0) {
+      fixtures = fixtures.slice(0, +req.query.limit);
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        totalFixtures: totalFixtures,
+        fixturesReturned: req.query.limit ? +req.query.limit : totalFixtures,
+        fixtures: fixtures,
+      },
+    });
   } catch (e: any) {
     console.error(e);
     return next(

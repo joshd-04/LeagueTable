@@ -165,15 +165,12 @@ export async function tablesAddingController(
       );
     }
 
-    const teamsInLargestTable = Math.max(...tables.map((t) => t.numberOfTeams));
     // Update setup flag
     await League.findByIdAndUpdate(leagueId, {
       $set: {
         'setup.tablesAdded': true,
-        finalMatchweek: (teamsInLargestTable - 1) * 2,
       },
     });
-    // Update the finalMatchweek attribute as we now know how many teams there will be
 
     const sanitizedLeague = {
       name: newLeague.name,

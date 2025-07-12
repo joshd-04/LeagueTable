@@ -22,7 +22,7 @@ export default function TeamForm({ form }: { form: string }) {
     colorTheme === 'dark' ? 'brightness(60%)' : 'brightness(100%)';
 
   return (
-    <div className="grid grid-cols-[repeat(5,3ch)] grid-rows-1 gap-[2px] text-sm">
+    <div className="grid grid-cols-[repeat(5,3ch)] grid-rows-1 gap-[2px] text-sm h-min items-baseline">
       {sanitizedForm.split('').map((letter, i) => (
         <Paragraph
           key={i}

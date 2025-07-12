@@ -24,7 +24,7 @@ function Table({ teams }: { teams: Team[] }) {
     <div className="max-h-[24rem] overflow-y-auto">
       <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">
         <thead>
-          <tr className="text-left">
+          <tr className="text-left z-10">
             <th className="w-[4rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[8rem] sticky top-0 bg-[var(--bg)]">
               <Paragraph>Team</Paragraph>
@@ -53,14 +53,14 @@ function Table({ teams }: { teams: Team[] }) {
             <th className="sticky top-0 bg-[var(--bg)]">
               <Paragraph style={{ fontWeight: 'bold' }}>Pts</Paragraph>
             </th>
-            <th className="w-[12rem] sticky top-0 bg-[var(--bg)]">
+            <th className="w-[12rem] sticky top-0 bg-[var(--bg)] z-10">
               <Paragraph>Form</Paragraph>
             </th>
           </tr>
         </thead>
         <tbody>
           {teams.map((team, i) => (
-            <TableRow key={i} team={team} i={i} />
+            <TableRow key={i} team={team} />
           ))}
         </tbody>
       </table>
@@ -68,7 +68,7 @@ function Table({ teams }: { teams: Team[] }) {
   );
 }
 
-function TableRow({ team, i }: { team: Team; i: number }) {
+function TableRow({ team }: { team: Team }) {
   const goalDifference = team.goalsFor - team.goalsAgainst;
   const points = 3 * team.wins + team.draws;
 
@@ -76,7 +76,7 @@ function TableRow({ team, i }: { team: Team; i: number }) {
     <tr>
       <td className="">
         <Paragraph style={{ textAlign: 'right', paddingRight: '10px' }}>
-          {i + 1}
+          {team.position || '?'}.
         </Paragraph>
       </td>
       <td>

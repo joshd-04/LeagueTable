@@ -1,11 +1,38 @@
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
-import { Result } from '@/util/definitions';
+import { League, Result } from '@/util/definitions';
+import { useRouter } from 'next/navigation';
+import { motion } from 'motion/react';
+import { MouseEvent, useState } from 'react';
 
-export default function LatestResults({ results }: { results: Result[] }) {
+export default function LatestResults({
+  league,
+  results,
+}: {
+  league: League;
+  results: Result[];
+}) {
+  const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
+
+  const router = useRouter();
+
   const mostRecentResults = results.slice(0, 3);
+
   return (
-    <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
+    <motion.div
+      className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 flex flex-col gap-1 hover:cursor-pointer"
+      onMouseEnter={() => setIsHoveringOuterPanel(true)}
+      onMouseLeave={() => setIsHoveringOuterPanel(false)}
+      whileTap={{ scale: isHoveringOuterPanel ? 0.98 : 1 }}
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/leagues/${league._id}/results`);
+      }}
+      style={{
+        background: isHoveringOuterPanel ? 'var(--bg-light)' : 'var(--bg)',
+        borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
+      }}
+    >
       <span>
         <Paragraph
           style={{
@@ -19,7 +46,13 @@ export default function LatestResults({ results }: { results: Result[] }) {
       </span>
       {mostRecentResults.length > 0 ? (
         mostRecentResults.map((result, i) => (
-          <ResultRow key={i} result={result} />
+          <div
+            key={i}
+            onMouseEnter={() => setIsHoveringOuterPanel(false)}
+            onMouseLeave={() => setIsHoveringOuterPanel(true)}
+          >
+            <ResultRow result={result} leagueId={league._id} />
+          </div>
         ))
       ) : (
         <Label
@@ -33,11 +66,18 @@ export default function LatestResults({ results }: { results: Result[] }) {
           No results yet
         </Label>
       )}
-    </div>
+    </motion.div>
   );
 }
 
-function ResultRow({ result }: { result: Result }) {
+function ResultRow({ leagueId, result }: { leagueId: string; result: Result }) {
+  const router = useRouter();
+
+  function handleResultClick(e: MouseEvent) {
+    e.stopPropagation();
+    router.push(`/leagues/${leagueId}/result/${result._id}`);
+  }
+
   const homeGoals = result.basicOutcome.reduce(
     (acc, cur) => (cur === 'home' ? acc + 1 : acc),
     0
@@ -46,27 +86,46 @@ function ResultRow({ result }: { result: Result }) {
     (acc, cur) => (cur === 'away' ? acc + 1 : acc),
     0
   );
+
   return (
-    <div className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center">
+    <motion.div
+      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center"
+      onClick={(e) => handleResultClick(e)}
+      whileTap={{ scale: 0.98 }}
+    >
       <Label
         style={{
           fontWeight: 'normal',
           color: 'var(--text-muted)',
           padding: '0 10px',
+          width: 'max-content',
+          height: 'min-content',
+          flex: 'none',
         }}
       >
         MD {result.matchweek}
       </Label>
-      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow">
+      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
         <Paragraph
           style={{
             width: '100%',
             textAlign: 'right',
+            textWrap: 'nowrap',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
           }}
         >
           {result.homeTeamDetails.name}
         </Paragraph>
-        <Paragraph style={{ width: '100%', textAlign: 'center' }}>
+        <Paragraph
+          style={{
+            width: '100%',
+            textAlign: 'center',
+            color: 'var(--text-muted)',
+            fontWeight: 'normal',
+          }}
+        >
           {homeGoals} <span className="text-[var(--text-muted)]">-</span>{' '}
           {awayGoals}
         </Paragraph>
@@ -74,6 +133,10 @@ function ResultRow({ result }: { result: Result }) {
           style={{
             width: '100%',
             textAlign: 'left',
+            textWrap: 'nowrap',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
           }}
         >
           {result.awayTeamDetails.name}
@@ -86,10 +149,15 @@ function ResultRow({ result }: { result: Result }) {
           borderlessButton={true}
           underlineEffect={false}
           shadowEffect={false}
+          style={{ padding: '10px' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowFixtureToResult(fixtureObj);
+          }}
         >
           <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
         </Button>
       )} */}
-    </div>
+    </motion.div>
   );
 }

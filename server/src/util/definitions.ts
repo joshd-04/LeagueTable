@@ -48,8 +48,8 @@ export interface IFixtureSchema extends Document {
   season: number;
   division: number;
   matchweek: number;
-  homeTeamDetails: Types.ObjectId;
-  awayTeamDetails: Types.ObjectId;
+  homeTeamDetails: Types.ObjectId | ITeamsSchema;
+  awayTeamDetails: Types.ObjectId | ITeamsSchema;
   neutralGround: boolean;
   kickoff?: Date;
 }
@@ -74,6 +74,7 @@ export interface IResultSchema extends Document {
 }
 
 export interface ITeamsSchema extends Document {
+  position?: number;
   name: string;
   leagueId: Types.ObjectId;
   division: number;

@@ -64,7 +64,12 @@ export default async function Page({ params }) {
           }),
         ]);
       const widgetData = {
-        fixtures: fixtures.data.fixtures as Fixture[],
+        league: league,
+        fixtures: {
+          totalFixtures: fixtures.data.totalFixtures,
+          fixturesReturned: fixtures.data.fixturesReturned,
+          fixtures: fixtures.data.fixtures as Fixture[],
+        },
         results: results.data.results as Result[],
         seasonSummaryStats: seasonSummaryStats.data
           .seasonSummaryStats as SeasonSummaryStatsInterface,
@@ -72,9 +77,7 @@ export default async function Page({ params }) {
         teams: teams.data.teams as Team[],
       };
 
-      return (
-        <LeagueDashboardStandard league={league} widgetData={widgetData} />
-      );
+      return <LeagueDashboardStandard widgetData={widgetData} />;
     } else {
       // free
       const [fixtures, results, seasonSummaryStats, stats, teams] =
@@ -96,7 +99,12 @@ export default async function Page({ params }) {
           }),
         ]);
       const widgetData = {
-        fixtures: fixtures.data.fixtures as Fixture[],
+        league: league,
+        fixtures: {
+          totalFixtures: fixtures.data.totalFixtures as number,
+          fixturesReturned: fixtures.data.fixturesReturned as number,
+          fixtures: fixtures.data.fixtures as Fixture[],
+        },
         results: results.data.results as Result[],
         seasonSummaryStats: seasonSummaryStats.data
           .seasonSummaryStats as SeasonSummaryStatsInterface,
@@ -104,7 +112,7 @@ export default async function Page({ params }) {
         teams: teams.data.teams as Team[],
       };
 
-      return <LeagueDashboardFree league={league} widgetData={widgetData} />;
+      return <LeagueDashboardFree widgetData={widgetData} />;
     }
   } else {
     return redirect('/');

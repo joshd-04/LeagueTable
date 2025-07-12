@@ -50,10 +50,12 @@ export async function getTeamsController(
     // Get the teams from the division specified for THIS SEASON ONLY for now! (update this later when season rewind implemented)
     const division = req.query.division || 1;
 
-    const teams = league.tables.filter(
+    let teams = league.tables.filter(
       (t) => t.season === league.currentSeason && t.division === +division
     )[0].teams as ITeamsSchema[];
-    sortTeams(teams);
+    teams = sortTeams(teams).map((team, i) => {
+      return { position: i + 1, ...team.toObject() } as ITeamsSchema;
+    });
 
     res.status(200).json({ status: 'success', data: { teams: teams } });
   } catch (e: any) {

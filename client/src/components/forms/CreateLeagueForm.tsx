@@ -72,7 +72,7 @@ export default function CreateLeagueForm() {
       errorsPresent = true;
     }
     if (+divisionsCount > 2) {
-      setDivisionsCount(
+      setDivisionsCountError(
         'free users cannot have more than 2 divisions per league'
       );
       errorsPresent = true;

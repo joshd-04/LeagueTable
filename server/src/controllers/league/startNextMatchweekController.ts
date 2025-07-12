@@ -43,15 +43,7 @@ export async function startNextMatchweek(
       );
     }
 
-    const maximumMatchweek =
-      league.tables.reduce(
-        (prev, table) => Math.max(table.numberOfTeams, prev),
-        0
-      ) *
-        2 -
-      2;
-
-    if (league.currentMatchweek >= maximumMatchweek) {
+    if (league.currentMatchweek >= league.finalMatchweek) {
       return next(
         new ErrorHandling(403, {
           message: `The season is over. Start a new one to continue.`,

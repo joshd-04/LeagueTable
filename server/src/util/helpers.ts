@@ -262,3 +262,12 @@ export function generateJWTToken(payload: any, nextFn: NextFunction) {
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '7d' });
   return token;
 }
+
+/**
+ *  Used to check if a team: ITeamsSchema | Types.ObjectId is a team under the ITeamsSchema interface.
+ *
+ *
+ */
+export function isTeam(doc: any): doc is ITeamsSchema {
+  return doc && typeof doc === 'object' && 'name' in doc && 'division' in doc;
+}

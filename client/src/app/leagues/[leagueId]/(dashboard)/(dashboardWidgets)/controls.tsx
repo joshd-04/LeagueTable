@@ -5,7 +5,7 @@ import Paragraph from '@/components/text/Paragraph';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Controls({
   league,
@@ -14,10 +14,18 @@ export default function Controls({
   league: League;
   fetchLatestData: () => Promise<void>;
 }) {
+  const [currentMatchweek, setCurrentMatchweek] = useState(
+    league.currentMatchweek
+  );
   const [matchweekButtonText, setMatchweekButtonText] = useState(
-    `Start matchweek ${league.currentMatchweek + 1}`
+    `Start matchweek ${currentMatchweek + 1}`
   );
   const [seasonButtonText, setSeasonButtonText] = useState('Start next season');
+
+  useEffect(() => {
+    setCurrentMatchweek(league.currentMatchweek);
+    setMatchweekButtonText(`Start matchweek ${league.currentMatchweek + 1}`);
+  }, [league]);
 
   async function handleStartNextMatchweek() {
     const response = await fetchAPI(
@@ -28,16 +36,11 @@ export default function Controls({
     if (response.status === 'success') {
       if (typeof window !== undefined) {
         await fetchLatestData();
-        setMatchweekButtonText(
-          `Start matchweek ${league.currentMatchweek + 1}`
-        );
       }
     } else {
       setMatchweekButtonText('Something went wrong');
       setTimeout(() => {
-        setMatchweekButtonText(
-          `Start matchweek ${league.currentMatchweek + 1}`
-        );
+        setMatchweekButtonText(`Start matchweek ${currentMatchweek + 1}`);
       }, 3000);
     }
   }

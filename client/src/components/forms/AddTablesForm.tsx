@@ -89,6 +89,9 @@ export default function AddTablesForm({
       if (+divisionInput.numberOfTeams <= 0) {
         freshErrors[i].numberOfTeams = 'this is required';
       }
+      if (+divisionInput.numberOfTeams > 24) {
+        freshErrors[i].numberOfTeams = 'too many teams (max. 24)';
+      }
       if (divisionInput.numberOfTeamsToBeRelegated.toString().length === 0) {
         divisionInput.numberOfTeamsToBeRelegated = 0;
       }
@@ -112,19 +115,21 @@ export default function AddTablesForm({
       return;
     }
 
+    setDivisionErrors(freshErrors);
+
     // true means there are errors
-    const errorsPresent = divisionErrors
-      .map((divisionErrorSet) => {
-        if (
-          divisionErrorSet.tableName !== '' ||
-          divisionErrorSet.numberOfTeams !== '' ||
-          divisionErrorSet.numberOfTeamsToBePromoted !== '' ||
-          divisionErrorSet.numberOfTeamsToBeRelegated !== ''
-        )
-          return true;
-        return false;
-      })
-      .some((b) => b === true);
+    const x = freshErrors.map((freshErrorSet) => {
+      if (
+        freshErrorSet.tableName !== '' ||
+        freshErrorSet.numberOfTeams !== '' ||
+        freshErrorSet.numberOfTeamsToBePromoted !== '' ||
+        freshErrorSet.numberOfTeamsToBeRelegated !== ''
+      )
+        return true;
+      return false;
+    });
+    const errorsPresent = x.some((b) => b === true);
+
     if (errorsPresent) return;
 
     setButtonText('...');

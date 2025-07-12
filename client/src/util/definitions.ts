@@ -51,6 +51,7 @@ export interface Fixture {
   matchweek: number;
   neutralGround: false;
   awayTeamDetails: {
+    position: number;
     division: number;
     draws: number;
     form: string;
@@ -64,6 +65,7 @@ export interface Fixture {
     _id: string;
   };
   homeTeamDetails: {
+    position: number;
     division: number;
     draws: number;
     form: string;
@@ -87,8 +89,9 @@ export interface Result {
   basicOutcome: ('home' | 'away')[];
   detailedOutcome?: {
     scorer: string;
-    assist: string | null;
+    assist: string | undefined;
     team: 'home' | 'away';
+    isOwnGoal: boolean;
     _id: string;
   }[];
   homeTeamDetails: {
@@ -136,6 +139,7 @@ export interface SeasonStats {
 }
 
 export interface Team {
+  position?: number;
   division: number;
   draws: number;
   form: string;
