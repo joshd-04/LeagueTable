@@ -8,7 +8,7 @@ import {
 import { ErrorHandling } from '../../util/errorChecking';
 import { Types } from 'mongoose';
 import Team from '../../models/teamModel';
-import { generateFixtures } from '../../util/helpers';
+import { generateFixtures, sortTeams } from '../../util/helpers';
 
 export async function startNextSeasonController(
   req: Request,
@@ -136,6 +136,17 @@ export async function startNextSeasonController(
         newLeague.tables
           .filter((table) => table.season === newLeague.currentSeason - 1)
           .map(async (table) => {
+            if (league.divisionsCount > 1) {
+              // If there are multiple teams
+              if (table.teams[0] instanceof Types.ObjectId) {
+                throw new ErrorHandling(
+                  500,
+                  undefined,
+                  'Team must be of instance ITeamSchema during starting of league season, did you forget to populate table.teams?'
+                );
+              }
+              sortTeams(table.teams as ITeamsSchema[]);
+            }
             const updatedTeams = await Promise.all(
               table.teams.map(async (team: ITeamsSchema | Types.ObjectId) => {
                 if (team instanceof Types.ObjectId) {

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import ResultClient from './resultClient';
 import { fetchAPI } from '@/util/api';
-import { API_URL } from '@/util/config';
+import { API_URL, WEBSITE_NAME } from '@/util/config';
 import SetupIncomplete from '../../setupIncomplete';
 import { redirect } from 'next/navigation';
 import { League, Result } from '@/util/definitions';
@@ -14,20 +14,29 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { leagueId, resultId } = params;
 
-  const result = await fetchAPI(
-    `${API_URL}/leagues/${leagueId}/results/${resultId}`,
-    {
+  const [result, league] = await Promise.all([
+    fetchAPI(`${API_URL}/leagues/${leagueId}/results/${resultId}`, {
       method: 'GET',
-    }
-  );
+    }),
+    fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+      method: 'GET',
+    }),
+  ]);
 
-  if (result.status !== 'success') {
+  if (league.status !== 'success') {
     return {
       title: 'League Not Found',
     };
   }
 
-  const resultObj = result.data.result as Result;
+  if (result.status !== 'success') {
+    return {
+      title: 'Result Not Found',
+    };
+  }
+
+  const leagueObj: League = league.data.league;
+  const resultObj: Result = result.data.result;
   const homeGoals = resultObj.basicOutcome.reduce(
     (acc, team) => (team === 'home' ? acc + 1 : acc),
     0
@@ -39,7 +48,7 @@ export async function generateMetadata({
   const resultName = `${resultObj.homeTeamDetails.name} ${homeGoals}-${awayGoals} ${resultObj.awayTeamDetails.name}`;
 
   return {
-    title: `${resultName} | League Table`,
+    title: `${resultName} • ${leagueObj.name} • ${WEBSITE_NAME}`,
     description: `Match overview for ${resultName}`,
   };
 }

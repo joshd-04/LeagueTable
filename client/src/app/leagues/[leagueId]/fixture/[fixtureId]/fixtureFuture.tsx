@@ -1,36 +1,23 @@
 'use client';
 import Paragraph from '@/components/text/Paragraph';
-import { GlobalContext } from '@/context/GlobalContextProvider';
-import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 import Label from '@/components/text/Label';
 import LinkButton from '@/components/text/LinkButton';
-import Button from '@/components/text/Button';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import PreviewTable from './(widgets)/previewTable';
 
-export default function FixtureClient({
+export default function FixtureFuture({
   league,
   fixture,
 }: {
   league: League;
   fixture: Fixture;
 }) {
-  const context = useContext(GlobalContext);
-  const { user } = context.account;
-  const { isLoggedIn } = useAccount();
   const [showFixtureToResult, setShowFixtureToResult] =
     useState<Fixture | null>(null);
-
-  let userOwnsThisLeague = false;
-  if (isLoggedIn && user !== undefined && user !== null) {
-    if (user.id === league.leagueOwner._id) {
-      userOwnsThisLeague = true;
-    }
-  }
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -85,25 +72,16 @@ export default function FixtureClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph>
-            {league.tables[fixture.division - 1].name} (Div {fixture.division})
-          </Paragraph>
+          <Paragraph>Division {fixture.division}</Paragraph>
           {fixture.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
-          {userOwnsThisLeague && (
-            <Button
-              color="var(--primary)"
-              bgHoverColor="var(--accent)"
-              borderlessButton={true}
-              underlineEffect={false}
-              onClick={() => setShowFixtureToResult(fixture)}
-            >
-              Upload result
-            </Button>
-          )}
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
             <Paragraph style={{ color: 'var(--info)' }}>AI insights</Paragraph>
+            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+              AI Insights not available yet. Come back when matchweek{' '}
+              {fixture.matchweek} starts!
+            </Label>
           </div>
           <div className="p-[20px] h-full w-full col-span-1 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
             <Paragraph>Match preview</Paragraph>

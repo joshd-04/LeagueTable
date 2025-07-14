@@ -1,19 +1,45 @@
 import TeamForm from '@/components/teamForm/TeamForm';
 import Paragraph from '@/components/text/Paragraph';
-import { Team } from '@/util/definitions';
+import { League, Team } from '@/util/definitions';
+import { Dispatch, SetStateAction } from 'react';
 
-export default function TableWidget({ teams }: { teams: Team[] }) {
+export default function TableWidget({
+  teams,
+  league,
+  divisionViewing,
+  setDivisionViewing,
+}: {
+  teams: Team[];
+  league: League;
+  divisionViewing: number;
+  setDivisionViewing: Dispatch<SetStateAction<number>>;
+}) {
   return (
     <div className="p-[20px] col-span-2 row-span-2 h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
-      <Paragraph
-        style={{
-          color: 'var(--text)',
-          verticalAlign: 'middle',
-          display: 'inline',
-        }}
-      >
-        Tables
-      </Paragraph>
+      <div className="flex flex-row gap-[10px] items-center">
+        <Paragraph
+          style={{
+            color: 'var(--text)',
+            verticalAlign: 'middle',
+            display: 'inline',
+          }}
+        >
+          Tables
+        </Paragraph>
+        <Paragraph>
+          <select
+            className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none"
+            value={divisionViewing}
+            onChange={(e) => setDivisionViewing(+e.target.value)}
+          >
+            {league.tables.map((table, i) => (
+              <option value={table.division} key={i}>
+                {table.name}
+              </option>
+            ))}
+          </select>
+        </Paragraph>
+      </div>
       <Table teams={teams} />
     </div>
   );

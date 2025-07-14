@@ -50,6 +50,14 @@ export async function getTeamsController(
     // Get the teams from the division specified for THIS SEASON ONLY for now! (update this later when season rewind implemented)
     const division = req.query.division || 1;
 
+    if (+division > league.divisionsCount) {
+      return next(
+        new ErrorHandling(400, {
+          message: `This league does not have ${division} divisions. Highest division is ${league.divisionsCount} divisions`,
+        })
+      );
+    }
+
     let teams = league.tables.filter(
       (t) => t.season === league.currentSeason && t.division === +division
     )[0].teams as ITeamsSchema[];

@@ -73,6 +73,7 @@ export function NavBar() {
   const buttonsLoggedIn = (
     <>
       {!pathname.startsWith('/leagues/') && (
+        // needs to be a button instead of linkbutton otherwise hydration error
         <Button
           onClick={() => {
             router.push('/create-league');

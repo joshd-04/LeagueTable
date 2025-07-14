@@ -104,6 +104,15 @@ export default function AddTablesForm({
       if (+divisionInput.numberOfTeamsToBePromoted < 0) {
         freshErrors[i].numberOfTeamsToBePromoted = 'must be a positive number';
       }
+      if (!Number.isInteger(+divisionInput.numberOfTeams)) {
+        freshErrors[i].numberOfTeams = 'must be an integer';
+      }
+      if (!Number.isInteger(+divisionInput.numberOfTeamsToBePromoted)) {
+        freshErrors[i].numberOfTeamsToBePromoted = 'must be an integer';
+      }
+      if (!Number.isInteger(+divisionInput.numberOfTeamsToBeRelegated)) {
+        freshErrors[i].numberOfTeamsToBeRelegated = 'must be an integer';
+      }
     });
 
     // Ensure each division name is unique
@@ -150,9 +159,11 @@ export default function AddTablesForm({
 
       if (response.status === 'fail') {
         setError(response.data.message);
+        setButtonText('Next');
       } else if (response.status === 'error') {
         const message = response.message as string;
         setError(message);
+        setButtonText('Next');
       } else {
         // success
         // Do a nice welcome animation

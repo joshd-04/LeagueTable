@@ -51,7 +51,7 @@ export default function LatestResults({
             onMouseEnter={() => setIsHoveringOuterPanel(false)}
             onMouseLeave={() => setIsHoveringOuterPanel(true)}
           >
-            <ResultRow result={result} leagueId={league._id} />
+            <ResultRow result={result} league={league} />
           </div>
         ))
       ) : (
@@ -70,12 +70,12 @@ export default function LatestResults({
   );
 }
 
-function ResultRow({ leagueId, result }: { leagueId: string; result: Result }) {
+function ResultRow({ league, result }: { league: League; result: Result }) {
   const router = useRouter();
 
   function handleResultClick(e: MouseEvent) {
     e.stopPropagation();
-    router.push(`/leagues/${leagueId}/result/${result._id}`);
+    router.push(`/leagues/${league._id}/result/${result._id}`);
   }
 
   const homeGoals = result.basicOutcome.reduce(

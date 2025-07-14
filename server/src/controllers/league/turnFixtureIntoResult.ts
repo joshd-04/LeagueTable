@@ -157,17 +157,15 @@ export async function turnFixtureIntoResult(
       );
     }
 
-    const homeTeamPosition = sortTeams(
-      league.tables[homeDetails.division - 1].teams as ITeamsSchema[]
-    )
-      .map((team) => team.name)
-      .indexOf(homeDetails.name);
+    const homeTeamPosition =
+      sortTeams(league.tables[homeDetails.division - 1].teams as ITeamsSchema[])
+        .map((team) => team.name)
+        .indexOf(homeDetails.name) + 1;
 
-    const awayTeamPosition = sortTeams(
-      league.tables[awayDetails.division - 1].teams as ITeamsSchema[]
-    )
-      .map((team) => team.name)
-      .indexOf(awayDetails.name);
+    const awayTeamPosition =
+      sortTeams(league.tables[awayDetails.division - 1].teams as ITeamsSchema[])
+        .map((team) => team.name)
+        .indexOf(awayDetails.name) + 1;
 
     const result = await Result.create({
       date: Date.now(),

@@ -49,7 +49,7 @@ export default function LeagueDashboardStandard({
   const context = useContext(GlobalContext);
   const { user } = context.account;
   const { isLoggedIn } = useAccount();
-  const [divisionViewing] = useState(1);
+  const [divisionViewing, setDivisionViewing] = useState(1);
   // The user can inspect element and change this value, so we need to render a completely different dashboard component for free and paid leagues
   // const [seasonViewing, setSeasonViewing] = useState(league.currentSeason);
 
@@ -178,7 +178,12 @@ export default function LeagueDashboardStandard({
             <SeasonSummaryStats stats={dashboardData.seasonSummaryStats} />
           )}
           <NewsFeed />
-          <TableWidget teams={dashboardData.teams} />
+          <TableWidget
+            teams={dashboardData.teams}
+            league={dashboardData.league}
+            divisionViewing={divisionViewing}
+            setDivisionViewing={setDivisionViewing}
+          />
           <Stats
             leagueType={dashboardData.league.leagueType}
             divisionViewing={divisionViewing}

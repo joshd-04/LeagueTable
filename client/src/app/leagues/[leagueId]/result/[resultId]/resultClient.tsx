@@ -41,7 +41,7 @@ export default function ResultClient({
   return (
     <div className="flex flex-col gap-[20px]">
       <LeagueBanner league={league}>
-        <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
+        <div className="absolute bottom-0 left-[50%] translate-x-[-50%] w-max">
           <div
             className={`w-full ${
               result.neutralGround ? 'hidden' : 'flex'

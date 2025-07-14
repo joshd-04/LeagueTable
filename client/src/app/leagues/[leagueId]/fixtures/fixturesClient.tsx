@@ -1,9 +1,6 @@
 'use client';
 import Paragraph from '@/components/text/Paragraph';
-import { GlobalContext } from '@/context/GlobalContextProvider';
-import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
-import { useContext } from 'react';
 import Heading1 from '@/components/text/Heading1';
 import Label from '@/components/text/Label';
 import LinkButton from '@/components/text/LinkButton';
@@ -12,6 +9,7 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import Subtitle from '@/components/text/Subtitle';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function FixturesClient({
   league,
@@ -20,27 +18,29 @@ export default function FixturesClient({
   league: League;
   fixtures: Fixture[];
 }) {
-  const context = useContext(GlobalContext);
-  const { user } = context.account;
-  const { isLoggedIn } = useAccount();
-
   const router = useRouter();
-
-  let userOwnsThisLeague = false;
-  if (isLoggedIn && user !== undefined && user !== null) {
-    if (user.id === league.leagueOwner._id) {
-      userOwnsThisLeague = true;
-    }
-  }
+  // 0 means all divsions, other numbers mean that specific division only
+  const [divisionFilter, setDivisionFilter] = useState(0);
+  // const [filteredFixtures, setFilteredFixtures]
 
   function handleClick(id: string) {
     router.push(`/leagues/${league._id}/fixture/${id}`);
   }
 
+  let filteredFixtures: Fixture[] = [];
+
+  if (divisionFilter === 0) {
+    filteredFixtures = fixtures;
+  } else {
+    filteredFixtures = fixtures.filter(
+      (fixture) => fixture.division === divisionFilter
+    );
+  }
+
   // Go through all the fixtures and put them into a dictionary based off matchweek
   const organisedFixtures: { [key: number]: Fixture[] } = {};
 
-  fixtures.forEach((fixture) => {
+  filteredFixtures.forEach((fixture) => {
     if (
       !Object.keys(organisedFixtures).includes(fixture.matchweek.toString())
     ) {
@@ -73,6 +73,20 @@ export default function FixturesClient({
           >
             {league.name}
           </LinkButton>
+          <Paragraph>
+            <select
+              className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none"
+              value={divisionFilter}
+              onChange={(e) => setDivisionFilter(+e.target.value)}
+            >
+              <option value={0}>All fixtures</option>
+              {league.tables.map((table, i) => (
+                <option value={table.division} key={i}>
+                  {table.name}
+                </option>
+              ))}
+            </select>
+          </Paragraph>
         </div>
       </div>
       <div className="w-[50%] place-self-center">
@@ -118,6 +132,10 @@ function FixtureRow({
   fixture: Fixture;
   handleClick: (id: string) => void;
 }) {
+  const homePoints =
+    fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws;
+  const awayPoints =
+    fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
   return (
     <motion.div
       className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline hover:bg-[var(--bg-light)] hover:cursor-pointer hover:border-transparent"
@@ -127,34 +145,18 @@ function FixtureRow({
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
         <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
-          {fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws} pts
+          {homePoints} pt{homePoints === 1 ? '' : 's'}
         </Paragraph>
-        <Subtitle>{fixture.homeTeamDetails.name}</Subtitle>
-      </div>
-      <Label style={{ color: 'var(--text-muted)', textAlign: 'center' }}>
-        vs
-      </Label>
-
-      <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
-        <Subtitle>{fixture.awayTeamDetails.name}</Subtitle>
-        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
-          {fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws} pts
-        </Paragraph>
-        <TeamForm form={fixture.awayTeamDetails.form} />
-      </div>
-    </motion.div>
-  );
-}
-
-function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
-  return (
-    <div className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline brightness-80">
-      <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
-        <TeamForm form={fixture.homeTeamDetails.form} />
-        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
-          {fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws} pts
-        </Paragraph>
-        <Subtitle style={{ color: 'var(--text-muted)' }}>
+        <Subtitle
+          style={{
+            textAlign: 'right',
+            textWrap: 'nowrap',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            width: '100%',
+          }}
+        >
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
@@ -163,11 +165,69 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
       </Label>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
-        <Subtitle style={{ color: 'var(--text-muted)' }}>
+        <Subtitle
+          style={{
+            textWrap: 'nowrap',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}
+        >
           {fixture.awayTeamDetails.name}
         </Subtitle>
         <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
-          {fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws} pts
+          {awayPoints} pt{awayPoints === 1 ? '' : 's'}
+        </Paragraph>
+        <TeamForm form={fixture.awayTeamDetails.form} />
+      </div>
+    </motion.div>
+  );
+}
+
+function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
+  const homePoints =
+    fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws;
+  const awayPoints =
+    fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
+  return (
+    <div className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline brightness-80">
+      <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
+        <TeamForm form={fixture.homeTeamDetails.form} />
+        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
+          {homePoints} pt{homePoints === 1 ? '' : 's'}
+        </Paragraph>
+        <Subtitle
+          style={{
+            color: 'var(--text-muted)',
+            textAlign: 'right',
+            textWrap: 'nowrap',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            width: '100%',
+          }}
+        >
+          {fixture.homeTeamDetails.name}
+        </Subtitle>
+      </div>
+      <Label style={{ color: 'var(--text-muted)', textAlign: 'center' }}>
+        vs
+      </Label>
+
+      <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
+        <Subtitle
+          style={{
+            color: 'var(--text-muted)',
+            textWrap: 'nowrap',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}
+        >
+          {fixture.awayTeamDetails.name}
+        </Subtitle>
+        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
+          {awayPoints} pt{awayPoints === 1 ? '' : 's'}
         </Paragraph>
         <TeamForm form={fixture.awayTeamDetails.form} />
       </div>

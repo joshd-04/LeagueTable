@@ -20,7 +20,7 @@ export default function Stats({
     <div className="p-[20px] h-full w-full row-span-2 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <Paragraph>
         <select
-          className="bg-[var(--bg-light)] p-2 rounded-[10px]"
+          className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none"
           value={view}
           onChange={(e) => setView(e.target.value)}
         >

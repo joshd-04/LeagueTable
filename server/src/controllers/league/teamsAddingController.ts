@@ -97,6 +97,7 @@ export async function teamsAddingController(
         pointer,
         pointer + table.numberOfTeams
       );
+      pointer += table.numberOfTeams;
 
       const createdTeams = await Promise.all(
         teamsForThisDivision.map(async (teamName) => {
@@ -123,7 +124,6 @@ export async function teamsAddingController(
 
       // @ts-ignore
       newTables[i].teams.push(...createdTeams);
-      pointer += table.numberOfTeams;
     })
   );
 

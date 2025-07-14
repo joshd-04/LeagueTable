@@ -11,7 +11,7 @@ import {
   SeasonSummaryStatsInterface,
   Team,
 } from '@/util/definitions';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Upgrade from './(dashboardWidgets)/upgrade';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
@@ -47,7 +47,7 @@ export default function LeagueDashboardFree({
   const context = useContext(GlobalContext);
   const { user } = context.account;
   const { isLoggedIn } = useAccount();
-  const [divisionViewing] = useState(1);
+  const [divisionViewing, setDivisionViewing] = useState(1);
   // The user can inspect element and change this value, so we need to render a completely different dashboard component for free and paid leagues
   const [dashboardData, setDashboardData] = useState(widgetData);
 
@@ -95,7 +95,7 @@ export default function LeagueDashboardFree({
           method: 'GET',
         }),
         fetchAPI(
-          `${API_URL}/leagues/${dashboardData.league._id}/teams?division=1`,
+          `${API_URL}/leagues/${dashboardData.league._id}/teams?division=${divisionViewing}`,
           {
             method: 'GET',
           }
@@ -114,8 +114,15 @@ export default function LeagueDashboardFree({
       seasonStats: stats.data.stats as SeasonStats,
       teams: teams.data.teams as Team[],
     };
+
     setDashboardData(newWidgetData);
   }
+
+  useEffect(() => {
+    fetchLatestData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [divisionViewing]);
+
   return (
     <div className="flex flex-col gap-[20px]">
       <LeagueBanner league={dashboardData.league}>
@@ -175,7 +182,12 @@ export default function LeagueDashboardFree({
           )}
           {/* <NewsFeed /> */}
           <div></div>
-          <TableWidget teams={dashboardData.teams} />
+          <TableWidget
+            teams={dashboardData.teams}
+            league={dashboardData.league}
+            divisionViewing={divisionViewing}
+            setDivisionViewing={setDivisionViewing}
+          />
           <Stats
             leagueType={dashboardData.league.leagueType}
             divisionViewing={divisionViewing}

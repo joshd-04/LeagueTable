@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers';
-import FixturesClient from './fixturesClient';
+import ResultsClient from './resultsClient';
 import { fetchAPI } from '@/util/api';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { redirect } from 'next/navigation';
-import { Fixture, League } from '@/util/definitions';
+import { Result, League } from '@/util/definitions';
 import SetupIncomplete from '../setupIncomplete';
 import { Metadata } from 'next';
 
@@ -32,8 +32,8 @@ export async function generateMetadata({
   const leagueObj: League = league.data.league;
 
   return {
-    title: `Fixtures • ${leagueObj.name} • ${WEBSITE_NAME}`,
-    description: `View all upcoming fixtures in ${leagueObj.name}`,
+    title: `Results • ${leagueObj.name} • ${WEBSITE_NAME}`,
+    description: `View all results in ${leagueObj.name}`,
   };
 }
 
@@ -42,7 +42,7 @@ export default async function Page({ params }) {
   const cookieStore = await cookies();
   const { leagueId } = await params;
 
-  const [league, fixtures] = await Promise.all([
+  const [league, results] = await Promise.all([
     fetchAPI(`${API_URL}/leagues/${leagueId}`, {
       method: 'GET',
       headers: {
@@ -50,7 +50,7 @@ export default async function Page({ params }) {
       },
       cache: 'no-store', // optional: prevent caching
     }),
-    fetchAPI(`${API_URL}/leagues/${leagueId}/fixtures?all=true`, {
+    fetchAPI(`${API_URL}/leagues/${leagueId}/results`, {
       method: 'GET',
     }),
   ]);
@@ -65,11 +65,10 @@ export default async function Page({ params }) {
       />
     );
   }
-  if (league.status !== 'success' || fixtures.status !== 'success') {
+  if (league.status !== 'success' || results.status !== 'success') {
     return redirect('/');
   }
   const l = league.data.league as League;
-  const f = fixtures.data.fixtures as Fixture[];
-  console.log(f);
-  return <FixturesClient league={l} fixtures={f} />;
+  const f = results.data.results as Result[];
+  return <ResultsClient league={l} results={f} />;
 }

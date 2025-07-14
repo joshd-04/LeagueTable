@@ -71,10 +71,16 @@ export default function CreateLeagueForm() {
       setDivisionsCountError('must be greater than zero');
       errorsPresent = true;
     }
-    if (+divisionsCount > 2) {
-      setDivisionsCountError(
-        'free users cannot have more than 2 divisions per league'
-      );
+    if (+maxSeasonCount <= 0) {
+      setMaxSeasonCountError('must be greater than zero');
+      errorsPresent = true;
+    }
+    if (!Number.isInteger(+maxSeasonCount)) {
+      setMaxSeasonCountError('must be an integer');
+      errorsPresent = true;
+    }
+    if (!Number.isInteger(+divisionsCount)) {
+      setDivisionsCountError('must be an integer');
       errorsPresent = true;
     }
 
@@ -231,7 +237,7 @@ function LeagueTypeSelection({
               setError('');
               setSelection('basic');
             }}
-            className="hidden"
+            className="sr-only"
           />
           <Button
             color="var(--text-muted)"
@@ -266,7 +272,7 @@ function LeagueTypeSelection({
               setError('');
               setSelection('advanced');
             }}
-            className="hidden"
+            className="sr-only"
           />
           <Button
             color="var(--text-muted)"

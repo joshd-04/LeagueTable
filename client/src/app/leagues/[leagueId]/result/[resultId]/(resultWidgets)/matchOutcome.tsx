@@ -17,8 +17,11 @@ export default function MatchOutcome({ result }: { result: Result }) {
     <div className="p-[20px] h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <Paragraph>Match outcome</Paragraph>
       <div
-        className="max-h-[24rem] overflow-y-auto  flex flex-col items-center  gap-2 "
-        style={{ scrollbarWidth: 'thin' }}
+        className="max-h-[24rem] overflow-y-auto flex flex-col items-center  gap-2 "
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'var(--border) transparent',
+        }}
       >
         <Label style={{ fontWeight: 'normal' }}>Match start. 0-0</Label>
         {result.detailedOutcome !== undefined &&
@@ -48,7 +51,7 @@ export default function MatchOutcome({ result }: { result: Result }) {
               );
             })}
         <Label style={{ fontWeight: 'normal' }}>
-          Full time. {calculateScore(result.basicOutcome.length - 1)}
+          Full time: {calculateScore(result.basicOutcome.length - 1)}
         </Label>
       </div>
     </div>
