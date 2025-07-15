@@ -48,18 +48,33 @@ export async function getTeamsController(
     }
 
     // Get the teams from the division specified for THIS SEASON ONLY for now! (update this later when season rewind implemented)
-    const division = req.query.division || 1;
+    const divisionRequested = req.query.division || 1;
 
-    if (+division > league.divisionsCount) {
+    if (+divisionRequested > league.divisionsCount) {
       return next(
         new ErrorHandling(400, {
-          message: `This league does not have ${division} divisions. Highest division is ${league.divisionsCount} divisions`,
+          message: `This league does not have ${divisionRequested} divisions. Highest division is ${league.divisionsCount} divisions`,
         })
       );
     }
 
+    let seasonRequested = league.currentSeason;
+
+    if (league.leagueLevel === 'free' || req.query.season === undefined) {
+      // do nothing
+    } else {
+      if (
+        req.query.season !== undefined &&
+        Number.isInteger(Number(req.query.season))
+      ) {
+        seasonRequested = +req.query.season;
+      } else {
+        // do nothing
+      }
+    }
+
     let teams = league.tables.filter(
-      (t) => t.season === league.currentSeason && t.division === +division
+      (t) => t.season === seasonRequested && t.division === +divisionRequested
     )[0].teams as ITeamsSchema[];
     teams = sortTeams(teams).map((team, i) => {
       return { position: i + 1, ...team.toObject() } as ITeamsSchema;

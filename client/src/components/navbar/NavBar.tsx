@@ -78,15 +78,17 @@ export function NavBar() {
           onClick={() => {
             router.push('/create-league');
           }}
-          color="var(--text)"
-          bgHoverColor="var(--bg)"
+          color="var(--primary)"
+          bgHoverColor="var(--accent)"
+          borderlessButton={true}
+          underlineEffect={false}
         >
           Create league
         </Button>
       )}
       <Button
         color="transparent"
-        bgHoverColor="var(--bg-light)"
+        bgHoverColor="var(--bg)"
         borderlessButton={true}
         underlineEffect={false}
         style={accountMenuButtonStyle}
@@ -195,7 +197,7 @@ export function NavBar() {
         <Button
           onClick={toggleTheme}
           color="transparent"
-          bgHoverColor="var(--bg-light)"
+          bgHoverColor="var(--bg)"
           borderlessButton={true}
           underlineEffect={false}
           style={{ padding: '0 10px' }}

@@ -18,7 +18,7 @@ export async function getResultsController(
       - limit: number (controls the number of results to return) [default: returns all results]
       - sort: 'matchweek' | anything else  [default: sorts by date of result (most recent first)]
       
-      - season: [not implemented yet]
+      - season: number (if not provided, just give the most recent season). if league is free level, then return error
     */
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
@@ -47,10 +47,6 @@ export async function getResultsController(
       );
     }
     let allResults = league.results as unknown as IResultSchema[];
-    // only keep the results for this season. remove previous season results
-    allResults = allResults.filter(
-      (result) => result.season === league.currentSeason
-    );
 
     if (sort === 'matchweek') {
       allResults.sort((a, b) => b.matchweek - a.matchweek);
@@ -59,6 +55,26 @@ export async function getResultsController(
       allResults.sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       );
+    }
+
+    if (league.leagueLevel === 'free' || req.query.season === undefined) {
+      // Get this seasons results
+      allResults = allResults.filter(
+        (result) => result.season === league.currentSeason
+      );
+    } else {
+      if (
+        req.query.season !== undefined &&
+        Number.isInteger(Number(req.query.season))
+      ) {
+        allResults = allResults.filter(
+          (result) => result.season === Number(req.query.season)
+        );
+      } else {
+        allResults = allResults.filter(
+          (result) => result.season === league.currentSeason
+        );
+      }
     }
 
     if (req.query.limit !== undefined && +req.query.limit > 0) {

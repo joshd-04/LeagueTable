@@ -1,4 +1,5 @@
 'use client';
+import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import { SeasonStats } from '@/util/definitions';
 import { useState } from 'react';
@@ -88,6 +89,19 @@ function StatsTablePlayerBased({
           ))}
         </tbody>
       </table>
+      {data?.length === 0 ||
+        (!data && (
+          <Label
+            style={{
+              placeSelf: 'center',
+              color: 'var(--text-muted)',
+              fontWeight: 'normal',
+              fontStyle: 'italic',
+            }}
+          >
+            No data yet
+          </Label>
+        ))}
     </div>
   );
 }
@@ -137,6 +151,7 @@ function TableRowPlayerBased({
     </tr>
   );
 }
+
 function StatsTableTeamBased({
   data,
 }: {
@@ -162,6 +177,19 @@ function StatsTableTeamBased({
           ))}
         </tbody>
       </table>
+      {data?.length === 0 ||
+        (!data && (
+          <Label
+            style={{
+              placeSelf: 'center',
+              color: 'var(--text-muted)',
+              fontWeight: 'normal',
+              fontStyle: 'italic',
+            }}
+          >
+            No data yet
+          </Label>
+        ))}
     </div>
   );
 }

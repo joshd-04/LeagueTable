@@ -14,7 +14,7 @@ export async function getFixturesController(
       - limit: number (controls the number of results to return) [default: returns all results]
       - all: boolean (if true, all fixtures in the season will be returned, otherwise just the fixtures to that matchweek) [default: false]
       - reverse: boolean (if true, the highest matchweek games are returned first, otherwise md1 returned first then md2 etc) [default: false]
-      - season: [not implemented yet]
+      - season: number (if not provided, just give the most recent season). if league is free level, then return error
     */
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
@@ -43,6 +43,26 @@ export async function getFixturesController(
     let fixtures = league.fixtures as unknown as IFixtureSchema[];
     if (Boolean(req.query.reverse) === true) {
       fixtures.reverse();
+    }
+
+    if (league.leagueLevel === 'free' || req.query.season === undefined) {
+      // Get this seasons fixtures
+      fixtures = fixtures.filter(
+        (fixture) => fixture.season === league.currentSeason
+      );
+    } else {
+      if (
+        req.query.season !== undefined &&
+        Number.isInteger(Number(req.query.season))
+      ) {
+        fixtures = fixtures.filter(
+          (fixture) => fixture.season === Number(req.query.season)
+        );
+      } else {
+        fixtures = fixtures.filter(
+          (fixture) => fixture.season === league.currentSeason
+        );
+      }
     }
 
     if (Boolean(req.query.all) === true) {

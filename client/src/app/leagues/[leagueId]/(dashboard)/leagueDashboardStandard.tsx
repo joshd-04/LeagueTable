@@ -11,7 +11,7 @@ import {
   SeasonSummaryStatsInterface,
   Team,
 } from '@/util/definitions';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Announcement from './(dashboardWidgets)/announcement';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
@@ -50,14 +50,15 @@ export default function LeagueDashboardStandard({
   const { user } = context.account;
   const { isLoggedIn } = useAccount();
   const [divisionViewing, setDivisionViewing] = useState(1);
-  // The user can inspect element and change this value, so we need to render a completely different dashboard component for free and paid leagues
-  // const [seasonViewing, setSeasonViewing] = useState(league.currentSeason);
 
   // Will store the string of the fixture to be turned into a result, otherwise null
   const [showFixtureToResult, setShowFixtureToResult] =
     useState<Fixture | null>(null);
 
   const [dashboardData, setDashboardData] = useState(widgetData);
+  const [seasonViewing, setSeasonViewing] = useState(
+    dashboardData.league.currentSeason
+  );
 
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
@@ -78,28 +79,31 @@ export default function LeagueDashboardStandard({
           credentials: 'include',
         }),
         fetchAPI(
-          `${API_URL}/leagues/${dashboardData.league._id}/fixtures?limit=3`,
+          `${API_URL}/leagues/${dashboardData.league._id}/fixtures?limit=3&season=${seasonViewing}`,
           {
             method: 'GET',
           }
         ),
         fetchAPI(
-          `${API_URL}/leagues/${dashboardData.league._id}/results?limit=3`,
+          `${API_URL}/leagues/${dashboardData.league._id}/results?limit=3&season=${seasonViewing}`,
           {
             method: 'GET',
           }
         ),
         fetchAPI(
-          `${API_URL}/leagues/${dashboardData.league._id}/season-summary-stats`,
+          `${API_URL}/leagues/${dashboardData.league._id}/season-summary-stats?season=${seasonViewing}`,
           {
             method: 'GET',
           }
         ),
-        fetchAPI(`${API_URL}/leagues/${dashboardData.league._id}/stats`, {
-          method: 'GET',
-        }),
         fetchAPI(
-          `${API_URL}/leagues/${dashboardData.league._id}/teams?division=1`,
+          `${API_URL}/leagues/${dashboardData.league._id}/stats?season=${seasonViewing}`,
+          {
+            method: 'GET',
+          }
+        ),
+        fetchAPI(
+          `${API_URL}/leagues/${dashboardData.league._id}/teams?division=${divisionViewing}&season=${seasonViewing}`,
           {
             method: 'GET',
           }
@@ -120,6 +124,11 @@ export default function LeagueDashboardStandard({
     };
     setDashboardData(newWidgetData);
   }
+
+  useEffect(() => {
+    fetchLatestData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [divisionViewing, seasonViewing]);
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -173,6 +182,7 @@ export default function LeagueDashboardStandard({
             <Controls
               league={dashboardData.league}
               fetchLatestData={fetchLatestData}
+              setSeasonViewing={setSeasonViewing}
             />
           ) : (
             <SeasonSummaryStats stats={dashboardData.seasonSummaryStats} />
@@ -189,7 +199,11 @@ export default function LeagueDashboardStandard({
             divisionViewing={divisionViewing}
             stats={dashboardData.seasonStats}
           />
-          <SeasonRewind />
+          <SeasonRewind
+            league={dashboardData.league}
+            seasonViewing={seasonViewing}
+            setSeasonViewing={setSeasonViewing}
+          />
         </div>
       </div>
       {showFixtureToResult !== null && (

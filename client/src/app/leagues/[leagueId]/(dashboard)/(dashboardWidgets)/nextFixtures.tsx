@@ -114,7 +114,7 @@ function FixtureRow({
 
   return (
     <motion.div
-      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center"
+      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px]  border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center"
       onClick={(e) => handleFixtureClick(e)}
       whileTap={{ scale: 0.98 }}
     >

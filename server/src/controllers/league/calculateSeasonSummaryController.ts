@@ -21,6 +21,11 @@ export async function calculateSeasonSummaryController(
   next: NextFunction
 ) {
   try {
+    /* 
+      query parameters:
+      
+      - season: number (if not provided, just give the most recent season). if league is free level, then return error
+    */
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
 
@@ -52,9 +57,27 @@ export async function calculateSeasonSummaryController(
     };
 
     const allResults = league.results as unknown as IResultSchema[];
-    const results = allResults.filter(
-      (result) => result.season === league.currentSeason
-    );
+
+    let results: IResultSchema[] = [];
+    if (league.leagueLevel === 'free' || req.query.season === undefined) {
+      // Get this seasons results
+      results = allResults.filter(
+        (result) => result.season === league.currentSeason
+      );
+    } else {
+      if (
+        req.query.season !== undefined &&
+        Number.isInteger(Number(req.query.season))
+      ) {
+        results = allResults.filter(
+          (result) => result.season === Number(req.query.season)
+        );
+      } else {
+        results = allResults.filter(
+          (result) => result.season === league.currentSeason
+        );
+      }
+    }
     // Get number of goals scored
     stats.goalsScored = results.reduce(
       (acc, cur) => acc + cur.basicOutcome.length,

@@ -5,14 +5,16 @@ import Paragraph from '@/components/text/Paragraph';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 export default function Controls({
   league,
   fetchLatestData,
+  setSeasonViewing,
 }: {
   league: League;
   fetchLatestData: () => Promise<void>;
+  setSeasonViewing?: Dispatch<SetStateAction<number>>;
 }) {
   const [currentMatchweek, setCurrentMatchweek] = useState(
     league.currentMatchweek
@@ -36,6 +38,9 @@ export default function Controls({
     if (response.status === 'success') {
       if (typeof window !== undefined) {
         await fetchLatestData();
+        if (setSeasonViewing !== undefined) {
+          setSeasonViewing((prev) => prev + 1);
+        }
       }
     } else {
       setMatchweekButtonText('Something went wrong');
