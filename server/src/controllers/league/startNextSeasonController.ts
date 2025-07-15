@@ -106,91 +106,93 @@ export async function startNextSeasonController(
     else {
       newLeague.currentSeason += 1;
 
-      /*
-      // Each array is a division
-      const nextSeasonTeams: string[][] = [];
-
-      // Handle promotion/relegation
-      // a. Get this seasons ordered tables
-      // b. Find the teams to be relegated
-      // c. Add these team names to
-      league.tables
-        .filter((table) => {
-          table.season === league.currentSeason;
-        })
-        .map((table) => {
-          // @ts-ignore
-          table.teams = sortTeams(table.teams) as ITeamsSchema[];
-          const promoted = table.teams.slice(
-            0,
-            table.numberOfTeamsToBePromoted
-          ).map(team => team.name)
-          const relegated = table.teams.slice(
-            table.numberOfTeams - table.numberOfTeamsToBeRelegated
-          ).map(team => team.name)
-        });*/
-
-      // Set up new tables
-
-      const newTables = await Promise.all(
-        newLeague.tables
-          .filter((table) => table.season === newLeague.currentSeason - 1)
-          .map(async (table) => {
-            if (league.divisionsCount > 1) {
-              // If there are multiple teams
-              if (table.teams[0] instanceof Types.ObjectId) {
-                throw new ErrorHandling(
-                  500,
-                  undefined,
-                  'Team must be of instance ITeamSchema during starting of league season, did you forget to populate table.teams?'
-                );
-              }
-              sortTeams(table.teams as ITeamsSchema[]);
-            }
-            const updatedTeams = await Promise.all(
-              table.teams.map(async (team: ITeamsSchema | Types.ObjectId) => {
-                if (team instanceof Types.ObjectId) {
-                  throw new ErrorHandling(
-                    500,
-                    undefined,
-                    'Team must be of instance ITeamSchema during starting of league season, did you forget to populate table.teams?'
-                  );
-                }
-
-                // Convert team to plain object and create a new team with reset stats
-                const updatedTeam = {
-                  ...team.toObject(),
-                  _id: new Types.ObjectId(), // Generate a new unique ObjectId
-                  division: team.division,
-                  leagueId: leagueId,
-                  matchesPlayed: 0,
-                  wins: 0,
-                  draws: 0,
-                  losses: 0,
-                  goalsFor: 0,
-                  goalsAgainst: 0,
-                  form: '-----',
-                } as ITeamsSchema;
-
-                // Insert the updated team into the database
-                const t = await Team.create(updatedTeam);
-                return t._id; // Return the new team's ObjectId
-              })
-            );
-
-            return {
-              season: table.season + 1,
-              division: table.division,
-              name: table.name,
-              numberOfTeams: table.numberOfTeams,
-              teams: updatedTeams, // Use the resolved array of new team ObjectIds
-              numberOfTeamsToBeRelegated: table.numberOfTeamsToBeRelegated,
-              numberOfTeamsToBePromoted: table.numberOfTeamsToBePromoted,
-            };
-          })
+      // 1. Gather previous season's tables (do not mutate them)
+      const prevSeason = newLeague.currentSeason - 1;
+      const prevSeasonTables = newLeague.tables.filter(
+        (table) => table.season === prevSeason
       );
 
-      // @ts-ignore
+      // 2. Sort teams in each division
+      const sortedTeamsByDivision: ITeamsSchema[][] = prevSeasonTables.map(
+        (table) => sortTeams(table.teams as ITeamsSchema[])
+      );
+
+      const divisionsCount = prevSeasonTables.length;
+      const newTeamsByDivision: ITeamsSchema[][] = Array.from(
+        { length: divisionsCount },
+        () => []
+      );
+
+      // 3. Promotion and relegation logic
+      for (let div = 0; div < divisionsCount; div++) {
+        const table = prevSeasonTables[div];
+        const teams = sortedTeamsByDivision[div];
+        const numPromote = table.numberOfTeamsToBePromoted;
+        const numRelegate = table.numberOfTeamsToBeRelegated;
+
+        // Start with teams that are neither promoted nor relegated
+        let stayingTeams = teams.slice(numPromote, teams.length - numRelegate);
+
+        // Add relegated teams from above (if not top division)
+        if (div > 0) {
+          const aboveTable = prevSeasonTables[div - 1];
+          const aboveTeams = sortedTeamsByDivision[div - 1];
+          const relegatedFromAbove = aboveTeams.slice(
+            aboveTeams.length - aboveTable.numberOfTeamsToBeRelegated
+          );
+          stayingTeams = [...relegatedFromAbove, ...stayingTeams];
+        }
+
+        // Add promoted teams from below (if not bottom division)
+        if (div < divisionsCount - 1) {
+          const belowTable = prevSeasonTables[div + 1];
+          const belowTeams = sortedTeamsByDivision[div + 1];
+          const promotedFromBelow = belowTeams.slice(
+            0,
+            belowTable.numberOfTeamsToBePromoted
+          );
+          stayingTeams = [...stayingTeams, ...promotedFromBelow];
+        }
+
+        newTeamsByDivision[div] = stayingTeams;
+      }
+
+      // 4. Create new tables for the new season, resetting team stats
+      const newTables = await Promise.all(
+        newTeamsByDivision.map(async (teams, divIdx) => {
+          const prevTable = prevSeasonTables[divIdx];
+          const updatedTeams = await Promise.all(
+            teams.map(async (team) => {
+              const updatedTeam = {
+                ...team.toObject(),
+                _id: new Types.ObjectId(),
+                division: prevTable.division,
+                leagueId: leagueId,
+                matchesPlayed: 0,
+                wins: 0,
+                draws: 0,
+                losses: 0,
+                goalsFor: 0,
+                goalsAgainst: 0,
+                form: '-----',
+              } as ITeamsSchema;
+              const t = await Team.create(updatedTeam);
+              return t._id as Types.ObjectId;
+            })
+          );
+          return {
+            season: newLeague.currentSeason,
+            division: prevTable.division,
+            name: prevTable.name,
+            numberOfTeams: prevTable.numberOfTeams,
+            teams: updatedTeams as Types.ObjectId[],
+            numberOfTeamsToBeRelegated: prevTable.numberOfTeamsToBeRelegated,
+            numberOfTeamsToBePromoted: prevTable.numberOfTeamsToBePromoted,
+          };
+        })
+      );
+
+      // 5. Append new tables for the new season (do not overwrite previous tables)
       newLeague.tables.push(...newTables);
     }
 

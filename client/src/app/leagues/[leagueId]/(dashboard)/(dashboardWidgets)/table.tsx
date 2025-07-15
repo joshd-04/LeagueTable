@@ -14,6 +14,7 @@ export default function TableWidget({
   divisionViewing: number;
   setDivisionViewing: Dispatch<SetStateAction<number>>;
 }) {
+  console.log(teams);
   return (
     <div className="p-[20px] col-span-2 row-span-2 h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
       <div className="flex flex-row gap-[10px] items-center">
@@ -32,11 +33,13 @@ export default function TableWidget({
             value={divisionViewing}
             onChange={(e) => setDivisionViewing(+e.target.value)}
           >
-            {league.tables.map((table, i) => (
-              <option value={table.division} key={i}>
-                {table.name}
-              </option>
-            ))}
+            {league.tables
+              .filter((table) => table.season === league.currentSeason)
+              .map((table, i) => (
+                <option value={table.division} key={i}>
+                  {table.name}
+                </option>
+              ))}
           </select>
         </Paragraph>
       </div>

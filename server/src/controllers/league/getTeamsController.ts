@@ -64,6 +64,7 @@ export async function getTeamsController(
     teams = sortTeams(teams).map((team, i) => {
       return { position: i + 1, ...team.toObject() } as ITeamsSchema;
     });
+    console.log(teams);
 
     res.status(200).json({ status: 'success', data: { teams: teams } });
   } catch (e: any) {
