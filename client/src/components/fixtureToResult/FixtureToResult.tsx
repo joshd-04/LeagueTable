@@ -7,19 +7,19 @@ export default function FixtureToResult({
   leagueType,
   fixtureObj,
   setShowFixtureToResult,
-  fetchLatestData,
+  invalidateDashboardQueries,
 }: {
   leagueType: 'basic' | 'advanced';
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  fetchLatestData?: () => Promise<void>;
+  invalidateDashboardQueries: () => void;
 }) {
   if (leagueType === 'advanced') {
     return (
       <FixtureToResultAdvanced
         fixtureObj={fixtureObj}
         setShowFixtureToResult={setShowFixtureToResult}
-        fetchLatestData={fetchLatestData}
+        invalidateDashboardQueries={invalidateDashboardQueries}
       />
     );
   }
@@ -27,7 +27,7 @@ export default function FixtureToResult({
     <FixtureToResultBasic
       fixtureObj={fixtureObj}
       setShowFixtureToResult={setShowFixtureToResult}
-      fetchLatestData={fetchLatestData}
+      invalidateDashboardQueries={invalidateDashboardQueries}
     />
   );
 }

@@ -118,13 +118,13 @@ app.post(
   teamsAddingController
 );
 
-app.get(
+app.post(
   '/api/leagues/:id/start-next-season',
   protectedRoute,
   startNextSeasonController
 );
 
-app.get(
+app.post(
   '/api/leagues/:id/start-next-matchweek',
   protectedRoute,
   startNextMatchweek

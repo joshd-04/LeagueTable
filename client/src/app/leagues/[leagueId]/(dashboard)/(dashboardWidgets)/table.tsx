@@ -1,20 +1,35 @@
 import TeamForm from '@/components/teamForm/TeamForm';
 import Paragraph from '@/components/text/Paragraph';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
+import { useQuery } from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 
 export default function TableWidget({
-  teams,
   league,
+  seasonViewing = league.currentSeason,
   divisionViewing,
   setDivisionViewing,
 }: {
-  teams: Team[];
   league: League;
+  seasonViewing?: number;
   divisionViewing: number;
   setDivisionViewing: Dispatch<SetStateAction<number>>;
 }) {
-  console.log(teams);
+  console.log(`szn ${seasonViewing}`);
+  const { data, isLoading } = useQuery({
+    queryFn: () =>
+      fetchAPI(
+        `${API_URL}/leagues/${league._id}/teams?division=${divisionViewing}&season=${seasonViewing}`,
+        {
+          method: 'GET',
+        }
+      ),
+    queryKey: ['table', divisionViewing, seasonViewing],
+  });
+
+  const teams: Team[] | undefined = data?.data.teams;
   return (
     <div className="p-[20px] col-span-2 row-span-2 h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
       <div className="flex flex-row gap-[10px] items-center">
@@ -43,12 +58,27 @@ export default function TableWidget({
           </select>
         </Paragraph>
       </div>
-      <Table teams={teams} />
+      <Table
+        teams={teams}
+        isLoading={isLoading}
+        league={league}
+        divisionViewing={divisionViewing}
+      />
     </div>
   );
 }
 
-function Table({ teams }: { teams: Team[] }) {
+function Table({
+  teams,
+  league,
+  divisionViewing,
+  isLoading,
+}: {
+  teams: Team[] | undefined;
+  league: League;
+  divisionViewing: number;
+  isLoading: boolean;
+}) {
   return (
     <div className="max-h-[24rem] overflow-y-auto">
       <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">
@@ -88,11 +118,16 @@ function Table({ teams }: { teams: Team[] }) {
           </tr>
         </thead>
         <tbody>
-          {teams.map((team, i) => (
-            <TableRow key={i} team={team} />
-          ))}
+          {teams !== undefined &&
+            !isLoading &&
+            teams.map((team, i) => <TableRow key={i} team={team} />)}
         </tbody>
       </table>
+      {isLoading && (
+        <TableRowSkeleton
+          numRows={league.tables[divisionViewing - 1].numberOfTeams}
+        />
+      )}
     </div>
   );
 }
@@ -212,5 +247,20 @@ function TableRow({ team }: { team: Team }) {
         <TeamForm form={team.form} />
       </td>
     </tr>
+  );
+}
+
+function TableRowSkeleton({ numRows }: { numRows: number }) {
+  return (
+    <div className="flex flex-col gap-[2px]">
+      {Array.from(Array(numRows).keys()).map((_x, i) => {
+        return (
+          <div
+            key={i}
+            className="w-full h-[30px] bg-[var(--bg-light)] animate-pulse rounded-[5px]"
+          ></div>
+        );
+      })}
+    </div>
   );
 }

@@ -5,14 +5,7 @@ import SetupIncomplete from '../setupIncomplete';
 import LeagueDashboardFree from './leagueDashboardFree';
 import LeagueDashboardStandard from './leagueDashboardStandard';
 
-import {
-  Fixture,
-  League,
-  Result,
-  SeasonStats,
-  SeasonSummaryStatsInterface,
-  Team,
-} from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 
@@ -108,74 +101,12 @@ export default async function Page({ params }) {
 
     if (league.leagueLevel === 'standard') {
       // paid features
-      const [fixtures, results, seasonSummaryStats, stats, teams] =
-        await Promise.all([
-          fetchAPI(`${API_URL}/leagues/${leagueId}/fixtures?limit=3`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/results?limit=3`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/season-summary-stats`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/stats`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/teams?division=1`, {
-            method: 'GET',
-          }),
-        ]);
-      const widgetData = {
-        league: league,
-        fixtures: {
-          totalFixtures: fixtures.data.totalFixtures,
-          fixturesReturned: fixtures.data.fixturesReturned,
-          fixtures: fixtures.data.fixtures as Fixture[],
-        },
-        results: results.data.results as Result[],
-        seasonSummaryStats: seasonSummaryStats.data
-          .seasonSummaryStats as SeasonSummaryStatsInterface,
-        seasonStats: stats.data.stats as SeasonStats,
-        teams: teams.data.teams as Team[],
-      };
 
-      return <LeagueDashboardStandard widgetData={widgetData} />;
+      return <LeagueDashboardStandard initialLeague={league} />;
     } else {
       // free
-      const [fixtures, results, seasonSummaryStats, stats, teams] =
-        await Promise.all([
-          fetchAPI(`${API_URL}/leagues/${leagueId}/fixtures?limit=3`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/results?limit=3`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/season-summary-stats`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/stats`, {
-            method: 'GET',
-          }),
-          fetchAPI(`${API_URL}/leagues/${leagueId}/teams?division=1`, {
-            method: 'GET',
-          }),
-        ]);
-      const widgetData = {
-        league: league,
-        fixtures: {
-          totalFixtures: fixtures.data.totalFixtures as number,
-          fixturesReturned: fixtures.data.fixturesReturned as number,
-          fixtures: fixtures.data.fixtures as Fixture[],
-        },
-        results: results.data.results as Result[],
-        seasonSummaryStats: seasonSummaryStats.data
-          .seasonSummaryStats as SeasonSummaryStatsInterface,
-        seasonStats: stats.data.stats as SeasonStats,
-        teams: teams.data.teams as Team[],
-      };
 
-      return <LeagueDashboardFree widgetData={widgetData} />;
+      return <LeagueDashboardFree initialLeague={league} />;
     }
   } else {
     return redirect('/');

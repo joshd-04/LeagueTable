@@ -1,21 +1,34 @@
 'use client';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
-import { SeasonStats } from '@/util/definitions';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
+import { League, SeasonStats } from '@/util/definitions';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 export default function Stats({
-  leagueType,
-  stats,
+  league,
+  seasonViewing = league.currentSeason,
   divisionViewing,
 }: {
-  leagueType: 'basic' | 'advanced';
-  stats: SeasonStats;
+  league: League;
+  seasonViewing?: number;
   divisionViewing: number;
 }) {
   const [view, setView] = useState(
-    leagueType === 'basic' ? 'cleansheets' : 'topScorers'
+    league.leagueType === 'basic' ? 'cleansheets' : 'topScorers'
   );
+  const { data, isLoading } = useQuery({
+    queryFn: () =>
+      fetchAPI(
+        `${API_URL}/leagues/${league._id}/stats?season=${seasonViewing}`,
+        { method: 'GET' }
+      ),
+    queryKey: ['stats', seasonViewing],
+  });
+
+  const stats: SeasonStats | undefined = data?.data.stats;
 
   return (
     <div className="p-[20px] h-full w-full row-span-2 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
@@ -25,35 +38,43 @@ export default function Stats({
           value={view}
           onChange={(e) => setView(e.target.value)}
         >
-          {leagueType === 'advanced' && (
+          {league.leagueType === 'advanced' && (
             <option value="topScorers">Top scorers</option>
           )}
-          {leagueType === 'advanced' && (
+          {league.leagueType === 'advanced' && (
             <option value="mostAssists">Most assists</option>
           )}
           <option value="cleansheets">Cleansheets</option>
         </select>
       </Paragraph>
-      {view === 'topScorers' && (
-        <StatsTablePlayerBased
-          data={
-            stats.topScorers.find((x) => x.division === divisionViewing)?.data
-          }
+      {stats === undefined || isLoading ? (
+        <TableRowSkeleton
+          numRows={league.tables[divisionViewing - 1].numberOfTeams}
         />
-      )}
-      {view === 'mostAssists' && (
-        <StatsTablePlayerBased
-          data={
-            stats.mostAssists.find((x) => x.division === divisionViewing)?.data
-          }
-        />
-      )}
-      {view === 'cleansheets' && (
-        <StatsTableTeamBased
-          data={
-            stats.cleansheets.find((x) => x.division === divisionViewing)?.data
-          }
-        />
+      ) : (
+        (view === 'topScorers' && (
+          <StatsTablePlayerBased
+            data={
+              stats.topScorers.find((x) => x.division === divisionViewing)?.data
+            }
+          />
+        )) ||
+        (view === 'mostAssists' && (
+          <StatsTablePlayerBased
+            data={
+              stats.mostAssists.find((x) => x.division === divisionViewing)
+                ?.data
+            }
+          />
+        )) ||
+        (view === 'cleansheets' && (
+          <StatsTableTeamBased
+            data={
+              stats.cleansheets.find((x) => x.division === divisionViewing)
+                ?.data
+            }
+          />
+        ))
       )}
     </div>
   );
@@ -89,19 +110,18 @@ function StatsTablePlayerBased({
           ))}
         </tbody>
       </table>
-      {data?.length === 0 ||
-        (!data && (
-          <Label
-            style={{
-              placeSelf: 'center',
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
-              fontStyle: 'italic',
-            }}
-          >
-            No data yet
-          </Label>
-        ))}
+      {(data?.length === 0 || !data) && (
+        <Label
+          style={{
+            placeSelf: 'center',
+            color: 'var(--text-muted)',
+            fontWeight: 'normal',
+            fontStyle: 'italic',
+          }}
+        >
+          No data yet
+        </Label>
+      )}
     </div>
   );
 }
@@ -157,6 +177,7 @@ function StatsTableTeamBased({
 }: {
   data: { position: number; team: string; value: number }[] | undefined;
 }) {
+  console.log(data);
   return (
     <div className="max-h-[21rem] overflow-y-auto">
       <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">
@@ -177,19 +198,18 @@ function StatsTableTeamBased({
           ))}
         </tbody>
       </table>
-      {data?.length === 0 ||
-        (!data && (
-          <Label
-            style={{
-              placeSelf: 'center',
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
-              fontStyle: 'italic',
-            }}
-          >
-            No data yet
-          </Label>
-        ))}
+      {(data?.length === 0 || !data) && (
+        <Label
+          style={{
+            placeSelf: 'center',
+            color: 'var(--text-muted)',
+            fontWeight: 'normal',
+            fontStyle: 'italic',
+          }}
+        >
+          No data yet
+        </Label>
+      )}
     </div>
   );
 }
@@ -222,5 +242,20 @@ function TableRowTeamBased({
         <Paragraph>{datapoint.value}</Paragraph>
       </td>
     </tr>
+  );
+}
+
+function TableRowSkeleton({ numRows }: { numRows: number }) {
+  return (
+    <div className="flex flex-col gap-[2px]">
+      {Array.from(Array(numRows).keys()).map((_x, i) => {
+        return (
+          <div
+            key={i}
+            className="w-full h-[30px] bg-[var(--bg-light)] animate-pulse rounded-[5px]"
+          ></div>
+        );
+      })}
+    </div>
   );
 }

@@ -12,11 +12,11 @@ import { API_URL } from '@/util/config';
 export default function FixtureToResultAdvanced({
   fixtureObj,
   setShowFixtureToResult,
-  fetchLatestData,
+  invalidateDashboardQueries,
 }: {
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  fetchLatestData?: () => Promise<void>;
+  invalidateDashboardQueries?: () => void;
 }) {
   const [matchStory, setMatchStory] = useState<GoalAdvanced[]>([]);
 
@@ -46,8 +46,8 @@ export default function FixtureToResultAdvanced({
       credentials: 'include',
     });
     setShowFixtureToResult(null);
-    if (fetchLatestData) {
-      await fetchLatestData();
+    if (invalidateDashboardQueries) {
+      await invalidateDashboardQueries();
     }
   }
 

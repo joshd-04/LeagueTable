@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import Paragraph from '../../text/Paragraph';
 import { AnimatePresence, motion } from 'motion/react';
 import Button from '../../text/Button';
@@ -7,17 +7,45 @@ import { Fixture } from '@/util/definitions';
 import Label from '../../text/Label';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
+import { useMutation } from '@tanstack/react-query';
+import { GlobalContext } from '@/context/GlobalContextProvider';
 
 export default function FixtureToResultBasic({
   fixtureObj,
   setShowFixtureToResult,
-  fetchLatestData,
+  invalidateDashboardQueries,
 }: {
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  fetchLatestData?: () => Promise<void>;
+  invalidateDashboardQueries: () => void;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
+  const { setError } = useContext(GlobalContext).errors;
+
+  function handleSubmit() {
+    const basicOutcome = matchStory;
+    const x = {
+      fixtureId: fixtureObj._id,
+      basicOutcome: basicOutcome,
+    };
+    return fetchAPI(`${API_URL}/result`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(x),
+      credentials: 'include',
+    });
+  }
+
+  const { mutateAsync: fixtureToResultBasicMutation, isPending } = useMutation({
+    mutationFn: handleSubmit,
+    onSuccess: () => {
+      invalidateDashboardQueries();
+      setShowFixtureToResult(null);
+    },
+    onError: (e) => {
+      setError(e.message);
+    },
+  });
 
   function calculateScore(index: number) {
     let homeGoals = 0;
@@ -28,24 +56,6 @@ export default function FixtureToResultBasic({
       if (goal === 'away') awayGoals += 1;
     });
     return `${homeGoals}-${awayGoals}`;
-  }
-
-  async function handleSubmit() {
-    const basicOutcome = matchStory;
-    const x = {
-      fixtureId: fixtureObj._id,
-      basicOutcome: basicOutcome,
-    };
-    await fetchAPI(`${API_URL}/result`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(x),
-      credentials: 'include',
-    });
-    setShowFixtureToResult(null);
-    if (fetchLatestData) {
-      await fetchLatestData();
-    }
   }
 
   return (
@@ -85,10 +95,10 @@ export default function FixtureToResultBasic({
             <Button
               color="var(--success)"
               bgHoverColor="var(--bg-light)"
-              style={{ fontSize: '1rem' }}
-              onClick={() => handleSubmit()}
+              style={{ fontSize: '1rem', minWidth: '100px' }}
+              onClick={() => fixtureToResultBasicMutation()}
             >
-              Submit
+              {isPending ? '...' : 'Submit'}
             </Button>
             <Button
               color="var(--text-muted)"

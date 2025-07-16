@@ -5,25 +5,55 @@ import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import { Fixture, League } from '@/util/definitions';
 import { useParams, useRouter } from 'next/navigation';
-import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
+import {
+  Dispatch,
+  MouseEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { motion } from 'motion/react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
 
 export default function NextFixtures({
   league,
+  seasonViewing = league.currentSeason,
   userOwnsThisLeague,
-  fixtures,
   setShowFixtureToResult,
 }: {
   league: League;
+  seasonViewing?: number;
   userOwnsThisLeague: boolean;
-  fixtures: {
-    totalFixtures: number;
-    fixturesReturned: number;
-    fixtures: Fixture[];
-  };
+
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
 }) {
-  const nextFixtures = fixtures.fixtures.slice(0, 3);
+  const { data, isLoading } = useQuery({
+    queryFn: () =>
+      fetchAPI(
+        `${API_URL}/leagues/${league._id}/fixtures?limit=3&season=${seasonViewing}`,
+        {
+          method: 'GET',
+        }
+      ),
+    queryKey: ['fixtures', seasonViewing],
+  });
+
+  const fixtures:
+    | {
+        totalFixtures: number;
+        fixturesReturned: number;
+        fixtures: Fixture[];
+      }
+    | undefined = data?.data;
+
+  const nextFixtures: Fixture[] | undefined = data?.data.fixtures.slice(0, 3);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
   const router = useRouter();
 
@@ -53,19 +83,28 @@ export default function NextFixtures({
         >
           Fixtures{' '}
         </Paragraph>
-        {nextFixtures.length >= 3 && (
-          <Label
-            style={{
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
-              display: 'inline',
-            }}
-          >
-            - showing {nextFixtures.length} of {fixtures.totalFixtures}
-          </Label>
-        )}
+        {fixtures !== undefined &&
+          nextFixtures !== undefined &&
+          nextFixtures.length >= 3 &&
+          !isLoading && (
+            <Label
+              style={{
+                color: 'var(--text-muted)',
+                fontWeight: 'normal',
+                display: 'inline',
+              }}
+            >
+              - showing {nextFixtures.length} of {fixtures.totalFixtures}
+            </Label>
+          )}
       </div>
-      {nextFixtures.length > 0 ? (
+      {isLoading || nextFixtures === undefined || fixtures === undefined ? (
+        <>
+          <FixtureRowSkeleton />
+          <FixtureRowSkeleton />
+          <FixtureRowSkeleton />
+        </>
+      ) : nextFixtures.length > 0 ? (
         nextFixtures.map((f, i) => (
           <div
             key={i}
@@ -183,5 +222,10 @@ function FixtureRow({
         </Button>
       )}
     </motion.div>
+  );
+}
+function FixtureRowSkeleton() {
+  return (
+    <div className="bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] flex flex-row justify-baseline items-center animate-pulse "></div>
   );
 }

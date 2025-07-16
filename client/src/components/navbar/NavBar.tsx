@@ -88,7 +88,7 @@ export function NavBar() {
       )}
       <Button
         color="transparent"
-        bgHoverColor="var(--bg)"
+        bgHoverColor="var(--bg-light)"
         borderlessButton={true}
         underlineEffect={false}
         style={accountMenuButtonStyle}
@@ -146,7 +146,7 @@ export function NavBar() {
   // }
 
   return (
-    <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] border-b-2 border-b-[var(--border)]">
+    <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)]  bg-[var(--bg)]">
       <LinkButton
         href="/"
         color="black"
@@ -197,7 +197,7 @@ export function NavBar() {
         <Button
           onClick={toggleTheme}
           color="transparent"
-          bgHoverColor="var(--bg)"
+          bgHoverColor="var(--bg-light)"
           borderlessButton={true}
           underlineEffect={false}
           style={{ padding: '0 10px' }}

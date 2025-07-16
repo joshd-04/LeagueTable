@@ -4,19 +4,32 @@ import { League, Result } from '@/util/definitions';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { MouseEvent, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { API_URL } from '@/util/config';
+import { fetchAPI } from '@/util/api';
 
 export default function LatestResults({
   league,
-  results,
+  seasonViewing = league.currentSeason,
 }: {
   league: League;
-  results: Result[];
+  seasonViewing?: number;
 }) {
   const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
 
   const router = useRouter();
+  const { data, isLoading } = useQuery({
+    queryFn: () =>
+      fetchAPI(
+        `${API_URL}/leagues/${league._id}/results?limit=3&season=${seasonViewing}`,
+        {
+          method: 'GET',
+        }
+      ),
+    queryKey: ['results', seasonViewing],
+  });
 
-  const mostRecentResults = results.slice(0, 3);
+  const mostRecentResults: Result[] = data?.data.results.slice(0, 3);
 
   return (
     <motion.div
@@ -44,7 +57,13 @@ export default function LatestResults({
           Latest Results
         </Paragraph>
       </span>
-      {mostRecentResults.length > 0 ? (
+      {isLoading ? (
+        <>
+          <ResultRowSkeleton />
+          <ResultRowSkeleton />
+          <ResultRowSkeleton />
+        </>
+      ) : mostRecentResults.length > 0 ? (
         mostRecentResults.map((result, i) => (
           <div
             key={i}
@@ -159,5 +178,11 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
         </Button>
       )} */}
     </motion.div>
+  );
+}
+
+function ResultRowSkeleton() {
+  return (
+    <div className="bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] flex flex-row justify-baseline items-center animate-pulse "></div>
   );
 }
