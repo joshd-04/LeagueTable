@@ -6,7 +6,7 @@ import {
   ITeamsSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { isTeam, sortTeams } from '../../util/helpers';
+import { findLeaguePosition, isTeam, sortTeams } from '../../util/helpers';
 
 export async function getFixtureByIdController(
   req: Request,
@@ -70,25 +70,26 @@ export async function getFixtureByIdController(
       );
     }
 
-    const homeTeamPosition = sortTeams(
-      league.tables[homeDetails.division - 1].teams as ITeamsSchema[]
-    )
-      .map((team) => team.name)
-      .indexOf(homeDetails.name);
-
-    const awayTeamPosition = sortTeams(
-      league.tables[awayDetails.division - 1].teams as ITeamsSchema[]
-    )
-      .map((team) => team.name)
-      .indexOf(awayDetails.name);
+    const homeTeamPosition = findLeaguePosition(
+      league,
+      homeDetails.division,
+      fixture.season,
+      homeDetails.name
+    );
+    const awayTeamPosition = findLeaguePosition(
+      league,
+      awayDetails.division,
+      fixture.season,
+      awayDetails.name
+    );
 
     homeDetails = {
       ...homeDetails,
-      position: homeTeamPosition + 1,
+      position: homeTeamPosition,
     } as ITeamsSchema;
     awayDetails = {
       ...awayDetails,
-      position: awayTeamPosition + 1,
+      position: awayTeamPosition,
     } as ITeamsSchema;
 
     fixture.homeTeamDetails = homeDetails;

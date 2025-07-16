@@ -3,7 +3,12 @@ import dotenv from 'dotenv';
 import { ErrorHandling } from './errorChecking';
 import jwt from 'jsonwebtoken';
 import { requiredFields as rF } from '..';
-import { IFixtureSchema, ILeagueSchema, ITeamsSchema } from './definitions';
+import {
+  IFixtureSchema,
+  ILeagueSchema,
+  ITable,
+  ITeamsSchema,
+} from './definitions';
 import { Types } from 'mongoose';
 import Fixture from '../models/fixtureModel';
 import { isDeepStrictEqual } from 'util';
@@ -261,6 +266,25 @@ export function generateJWTToken(payload: any, nextFn: NextFunction) {
 
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '7d' });
   return token;
+}
+
+export function findLeaguePosition(
+  league: ILeagueSchema,
+  division: number,
+  season: number,
+  teamName: string
+) {
+  return (
+    sortTeams(
+      (
+        league.tables.find(
+          (table) => table.division === division && table.season === season
+        ) as ITable
+      ).teams as ITeamsSchema[]
+    )
+      .map((team) => team.name)
+      .indexOf(teamName) + 1
+  );
 }
 
 /**

@@ -114,7 +114,10 @@ export default function LeagueDashboardStandard({
           </Paragraph>
         </div>
         <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-[20px]">
-          <Announcement />
+          <Announcement
+            league={league}
+            userOwnsThisLeague={userOwnsThisLeague}
+          />
           <LatestResults league={league} seasonViewing={seasonViewing} />
           <NextFixtures
             league={league}

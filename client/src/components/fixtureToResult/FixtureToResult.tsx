@@ -12,7 +12,7 @@ export default function FixtureToResult({
   leagueType: 'basic' | 'advanced';
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  invalidateDashboardQueries: () => void;
+  invalidateDashboardQueries?: () => void;
 }) {
   if (leagueType === 'advanced') {
     return (

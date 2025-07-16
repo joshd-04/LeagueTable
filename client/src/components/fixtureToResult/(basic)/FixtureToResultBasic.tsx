@@ -17,7 +17,7 @@ export default function FixtureToResultBasic({
 }: {
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
-  invalidateDashboardQueries: () => void;
+  invalidateDashboardQueries?: () => void;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
   const { setError } = useContext(GlobalContext).errors;
@@ -39,7 +39,7 @@ export default function FixtureToResultBasic({
   const { mutateAsync: fixtureToResultBasicMutation, isPending } = useMutation({
     mutationFn: handleSubmit,
     onSuccess: () => {
-      invalidateDashboardQueries();
+      if (invalidateDashboardQueries) invalidateDashboardQueries();
       setShowFixtureToResult(null);
     },
     onError: (e) => {

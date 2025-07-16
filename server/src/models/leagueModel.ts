@@ -5,7 +5,7 @@ const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
   name: { type: String, required: true },
   leagueLevel: { type: String, required: true },
   // 'Standard' league features only:
-  announcement: { type: String },
+  announcement: { text: { type: String }, date: { type: Date } },
   newsFeed: [
     {
       matchweek: { type: Number },

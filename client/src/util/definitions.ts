@@ -8,7 +8,7 @@ export interface User {
 export interface League {
   _id: string;
   leagueLevel: 'free' | 'standard';
-  announcement?: string;
+  announcement?: { text: string; date: Date };
   newsFeed?: { season: number; matchweek: number; news: string[] };
   setup: {
     tablesAdded: boolean;

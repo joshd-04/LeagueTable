@@ -3,11 +3,16 @@ import League from '../../models/leagueModel';
 import {
   IFixtureSchema,
   ILeagueSchema,
+  ITable,
   ITeamsSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
 import Team from '../../models/teamModel';
-import { calculateTeamPoints, sortTeams } from '../../util/helpers';
+import {
+  calculateTeamPoints,
+  findLeaguePosition,
+  sortTeams,
+} from '../../util/helpers';
 import Fixture from '../../models/fixtureModel';
 import Result from '../../models/resultModel';
 
@@ -157,15 +162,18 @@ export async function turnFixtureIntoResult(
       );
     }
 
-    const homeTeamPosition =
-      sortTeams(league.tables[homeDetails.division - 1].teams as ITeamsSchema[])
-        .map((team) => team.name)
-        .indexOf(homeDetails.name) + 1;
-
-    const awayTeamPosition =
-      sortTeams(league.tables[awayDetails.division - 1].teams as ITeamsSchema[])
-        .map((team) => team.name)
-        .indexOf(awayDetails.name) + 1;
+    const homeTeamPosition = findLeaguePosition(
+      league,
+      homeDetails.division,
+      fixture.season,
+      homeDetails.name
+    );
+    const awayTeamPosition = findLeaguePosition(
+      league,
+      awayDetails.division,
+      fixture.season,
+      awayDetails.name
+    );
 
     const result = await Result.create({
       date: Date.now(),

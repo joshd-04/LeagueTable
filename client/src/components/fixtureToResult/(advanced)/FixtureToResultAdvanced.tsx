@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import Paragraph from '../../text/Paragraph';
 import { AnimatePresence, motion } from 'motion/react';
 import Button from '../../text/Button';
@@ -8,6 +8,8 @@ import Label from '../../text/Label';
 import InputField from '../../form/InputField';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
+import { useMutation } from '@tanstack/react-query';
+import { GlobalContext } from '@/context/GlobalContextProvider';
 
 export default function FixtureToResultAdvanced({
   fixtureObj,
@@ -19,6 +21,7 @@ export default function FixtureToResultAdvanced({
   invalidateDashboardQueries?: () => void;
 }) {
   const [matchStory, setMatchStory] = useState<GoalAdvanced[]>([]);
+  const { setError } = useContext(GlobalContext).errors;
 
   function calculateScore(index: number) {
     let homeGoals = 0;
@@ -31,7 +34,7 @@ export default function FixtureToResultAdvanced({
     return `${homeGoals}-${awayGoals}`;
   }
 
-  async function handleSubmit() {
+  function handleSubmit() {
     const basicOutcome = matchStory.map((goal) => goal.team);
     const x = {
       fixtureId: fixtureObj._id,
@@ -39,17 +42,24 @@ export default function FixtureToResultAdvanced({
       detailedOutcome: matchStory,
     };
 
-    await fetchAPI(`${API_URL}/result`, {
+    return fetchAPI(`${API_URL}/result`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(x),
       credentials: 'include',
     });
-    setShowFixtureToResult(null);
-    if (invalidateDashboardQueries) {
-      await invalidateDashboardQueries();
-    }
   }
+  const { mutateAsync: fixtureToResultAdvancedMutation, isPending } =
+    useMutation({
+      mutationFn: handleSubmit,
+      onSuccess: () => {
+        if (invalidateDashboardQueries) invalidateDashboardQueries();
+        setShowFixtureToResult(null);
+      },
+      onError: (e) => {
+        setError(e.message);
+      },
+    });
 
   return (
     <div>
@@ -88,10 +98,10 @@ export default function FixtureToResultAdvanced({
             <Button
               color="var(--success)"
               bgHoverColor="var(--bg-light)"
-              style={{ fontSize: '1rem' }}
-              onClick={() => handleSubmit()}
+              style={{ fontSize: '1rem', minWidth: '100px' }}
+              onClick={() => fixtureToResultAdvancedMutation()}
             >
-              Submit
+              {isPending ? '...' : 'Submit'}
             </Button>
             <Button
               color="var(--text-muted)"

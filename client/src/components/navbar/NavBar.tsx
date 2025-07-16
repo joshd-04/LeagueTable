@@ -146,7 +146,7 @@ export function NavBar() {
   // }
 
   return (
-    <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)]  bg-[var(--bg)]">
+    <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] bg-[var(--bg)]">
       <LinkButton
         href="/"
         color="black"

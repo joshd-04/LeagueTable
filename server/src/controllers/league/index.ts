@@ -1,4 +1,6 @@
 export { getFixturesController } from './getFixturesController';
+export { getAnnouncementController } from './getAnnouncementController';
+export { setAnnouncementController } from './setAnnouncementController';
 export { getFixtureByIdController } from './getFixtureByIdController';
 export { getResultsController } from './getResultsController';
 export { calculateSeasonSummaryController } from './calculateSeasonSummaryController';

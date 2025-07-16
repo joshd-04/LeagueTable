@@ -3,7 +3,10 @@ import { Document, Types } from 'mongoose';
 export interface ILeagueSchema extends Document {
   name: string;
   leagueLevel: 'free' | 'standard';
-  announcement?: string;
+  announcement?: {
+    date: Date;
+    text: string;
+  };
   newsFeed?: { season: number; matchweek: number; news: string[] };
   leagueOwner: Types.ObjectId;
   currentSeason: number;

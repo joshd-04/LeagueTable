@@ -145,6 +145,8 @@ function FixtureRow({
 }) {
   const router = useRouter();
   const { leagueId } = useParams();
+  const [rowHover, setRowHover] = useState(false);
+  const [editHover, setEditHover] = useState(false);
 
   function handleFixtureClick(e: MouseEvent) {
     e.stopPropagation();
@@ -153,9 +155,20 @@ function FixtureRow({
 
   return (
     <motion.div
-      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center"
+      className={`bg-[var(--bg)]  rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center`}
       onClick={(e) => handleFixtureClick(e)}
       whileTap={{ scale: 0.98 }}
+      onMouseEnter={() => setRowHover(true)}
+      onMouseLeave={() => setRowHover(false)}
+      style={{
+        backgroundColor:
+          rowHover && editHover
+            ? 'var(--bg)'
+            : rowHover
+            ? 'var(--bg-light)'
+            : 'var(--bg)',
+        borderColor: rowHover && !editHover ? 'transparent' : 'var(--border)',
+      }}
     >
       <Label
         style={{
@@ -206,20 +219,25 @@ function FixtureRow({
         </Paragraph>
       </div>
       {userOwnsThisLeague && (
-        <Button
-          color="transparent"
-          bgHoverColor="var(--bg-dark)"
-          borderlessButton={true}
-          underlineEffect={false}
-          shadowEffect={false}
-          style={{ padding: '10px' }}
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowFixtureToResult(fixtureObj);
-          }}
+        <div
+          onMouseEnter={() => setEditHover(true)}
+          onMouseLeave={() => setEditHover(false)}
         >
-          <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
-        </Button>
+          <Button
+            color="transparent"
+            bgHoverColor="var(--bg-light)"
+            borderlessButton={true}
+            underlineEffect={false}
+            shadowEffect={false}
+            style={{ padding: '10px' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowFixtureToResult(fixtureObj);
+            }}
+          >
+            <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
+          </Button>
+        </div>
       )}
     </motion.div>
   );

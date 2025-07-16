@@ -15,6 +15,7 @@ import connectDB from './util/db';
 import {
   calculateSeasonStatsController,
   calculateSeasonSummaryController,
+  getAnnouncementController,
   getFixtureByIdController,
   getFixturesController,
   getResultsController,
@@ -22,6 +23,7 @@ import {
   leagueCreationController,
   leagueFetcherController,
   myAssociatedLeaguesFetcherController,
+  setAnnouncementController,
   startNextMatchweek,
   startNextSeasonController,
   tablesAddingController,
@@ -56,6 +58,7 @@ export const requiredFields: RequiredFields = {
   '/api/result': ['fixtureId', 'basicOutcome'],
   '/api/users/favourites': ['leagueId'],
   '/api/users/following': ['leagueId'],
+  '/api/leagues/:id/announcement': ['text'],
 };
 
 // Middlewares
@@ -101,6 +104,13 @@ app.get(
   '/api/leagues/associated',
   protectedRoute,
   myAssociatedLeaguesFetcherController
+);
+app.get('/api/leagues/:id/announcement', getAnnouncementController);
+app.patch(
+  '/api/leagues/:id/announcement',
+  protectedRoute,
+  enforceRequiredFields,
+  setAnnouncementController
 );
 app.get('/api/leagues/:id', leagueFetcherController);
 

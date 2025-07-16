@@ -85,7 +85,7 @@ export async function leagueCreationController(
       league = await League.create({
         name: name,
         leagueLevel: 'standard',
-        announcement: '',
+        announcement: { text: '', date: new Date() },
         leagueOwner: userId,
         currentSeason: 0,
         currentMatchweek: 0,
