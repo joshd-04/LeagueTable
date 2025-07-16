@@ -51,16 +51,16 @@ export default function SeasonRewind({
             color:
               seasonViewing === league.currentSeason
                 ? 'var(--text-muted)'
-                : 'var(--text)',
+                : 'black',
           }}
         >
-          {seasonViewing === league.currentSeason ? 'OFF' : 'active'}
+          {seasonViewing === league.currentSeason ? 'OFF' : 'ON'}
         </Label>
       </div>
       <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
         View results, tables & stats from previous seasons
       </Label>
-      <div className="mt-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center">
+      <div className="my-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center shadow-[var(--shadow)]">
         <Button
           color="transparent"
           bgHoverColor="var(--accent)"
@@ -68,6 +68,7 @@ export default function SeasonRewind({
           underlineEffect={false}
           onClick={decrementSeason}
           disabled={seasonViewing === 1}
+          shadowEffect={false}
         >
           <ArrowBackSVG
             className="w-[24px] h-[24px]"
@@ -78,11 +79,13 @@ export default function SeasonRewind({
         </Button>
         <Paragraph
           style={{
-            margin: '0 20px',
+            margin: '0 10px',
             color:
               seasonViewing === league.currentSeason
                 ? 'var(--text-muted)'
                 : 'var(--text)',
+            padding: '0 10px',
+            borderRadius: '10px',
           }}
         >
           Season {seasonViewing}
@@ -94,6 +97,7 @@ export default function SeasonRewind({
           underlineEffect={false}
           onClick={incrementSeason}
           disabled={seasonViewing === league.currentSeason}
+          shadowEffect={false}
         >
           <ArrowForwardSVG
             className="w-[24px] h-[24px]"
@@ -106,6 +110,9 @@ export default function SeasonRewind({
           />
         </Button>
       </div>
+      <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+        {league.name} is currently on season {league.currentSeason}
+      </Label>
     </div>
   );
 }
