@@ -70,6 +70,6 @@ export default async function Page({ params }) {
   }
   const l = league.data.league as League;
   const f = fixtures.data.fixtures as Fixture[];
-  console.log(f);
+  
   return <FixturesClient league={l} fixtures={f} />;
 }

@@ -13,6 +13,7 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import FavouriteSVG from '@/assets/svg components/Favourite';
 import FavouritedSVG from '@/assets/svg components/Favourited';
+import { useQuery } from '@tanstack/react-query';
 
 interface LeaguesInterface {
   created: LeagueInterface[];
@@ -23,17 +24,9 @@ interface LeaguesInterface {
 export default function DashboardClient({
   initialUser,
   initialError,
-
-  initialLeagues,
 }: {
   initialUser: User | null;
   initialError: string;
-
-  initialLeagues: {
-    created: LeagueInterface[];
-    favourites: LeagueInterface[];
-    following: LeagueInterface[];
-  };
 }) {
   const context = useContext(GlobalContext);
   const { user, setUser } = context.account;
@@ -45,12 +38,35 @@ export default function DashboardClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialUser, initialError]);
 
-  const [leagues, setLeagues] = useState<LeaguesInterface>(initialLeagues);
+  const [leagues, setLeagues] = useState<LeaguesInterface>({
+    created: [],
+    favourites: [],
+    following: [],
+  });
   const simplifiedLeagues = {
     created: leagues.created.map((l) => l._id),
     favourites: leagues.favourites.map((l) => l._id),
     following: leagues.following.map((l) => l._id),
   };
+
+  const { data: associatedLeaguesData, isLoading } = useQuery({
+    queryFn: () =>
+      fetchAPI(`${API_URL}/leagues/associated`, {
+        method: 'GET',
+        credentials: 'include',
+      }),
+    queryKey: ['associatedHomePage'],
+  });
+
+  useEffect(() => {
+    if (associatedLeaguesData !== undefined) {
+      setLeagues({
+        created: associatedLeaguesData.data.created as LeagueInterface[],
+        favourites: associatedLeaguesData.data.favourites as LeagueInterface[],
+        following: associatedLeaguesData.data.following as LeagueInterface[],
+      });
+    }
+  }, [associatedLeaguesData]);
 
   const router = useRouter();
 
@@ -129,30 +145,35 @@ export default function DashboardClient({
 
   return (
     <div className="w-full h-full flex flex-row justify-center items-baseline">
-      <div className="max-w-[960px] w-[960px] flex flex-col gap-4">
+      <div className="max-w-[960px] w-[960px] flex flex-col gap-4 mt-6">
         <Heading3>Welcome, {user?.username}</Heading3>
-
-        <LeagueSection
-          simplifiedLeagues={simplifiedLeagues}
-          title="Favourite Leagues"
-          leaguesList={leagues.favourites}
-          handleClick={handleClick}
-          handleFavClick={handleFavClick}
-        />
-        <LeagueSection
-          simplifiedLeagues={simplifiedLeagues}
-          title="Your Leagues"
-          leaguesList={leagues.created}
-          handleClick={handleClick}
-          handleFavClick={handleFavClick}
-        />
-        <LeagueSection
-          simplifiedLeagues={simplifiedLeagues}
-          title="Bookmarked Leagues"
-          leaguesList={leagues.following}
-          handleClick={handleClick}
-          handleFavClick={handleFavClick}
-        />
+        {isLoading ? (
+          <Subtitle>Loading...</Subtitle>
+        ) : (
+          <>
+            <LeagueSection
+              simplifiedLeagues={simplifiedLeagues}
+              title="Favourite Leagues"
+              leaguesList={leagues.favourites}
+              handleClick={handleClick}
+              handleFavClick={handleFavClick}
+            />
+            <LeagueSection
+              simplifiedLeagues={simplifiedLeagues}
+              title="Your Leagues"
+              leaguesList={leagues.created}
+              handleClick={handleClick}
+              handleFavClick={handleFavClick}
+            />
+            <LeagueSection
+              simplifiedLeagues={simplifiedLeagues}
+              title="Bookmarked Leagues"
+              leaguesList={leagues.following}
+              handleClick={handleClick}
+              handleFavClick={handleFavClick}
+            />
+          </>
+        )}
       </div>
     </div>
   );

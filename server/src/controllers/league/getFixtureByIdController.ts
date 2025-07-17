@@ -70,13 +70,13 @@ export async function getFixtureByIdController(
       );
     }
 
-    const homeTeamPosition = findLeaguePosition(
+    const homeTeamPosition = await findLeaguePosition(
       league,
       homeDetails.division,
       fixture.season,
       homeDetails.name
     );
-    const awayTeamPosition = findLeaguePosition(
+    const awayTeamPosition = await findLeaguePosition(
       league,
       awayDetails.division,
       fixture.season,

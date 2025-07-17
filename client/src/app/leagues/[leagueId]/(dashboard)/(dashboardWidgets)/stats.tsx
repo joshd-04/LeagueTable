@@ -177,7 +177,6 @@ function StatsTableTeamBased({
 }: {
   data: { position: number; team: string; value: number }[] | undefined;
 }) {
-  console.log(data);
   return (
     <div className="max-h-[21rem] overflow-y-auto">
       <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">

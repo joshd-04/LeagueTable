@@ -6,12 +6,14 @@ import { requiredFields as rF } from '..';
 import {
   IFixtureSchema,
   ILeagueSchema,
+  IResultSchema,
   ITable,
   ITeamsSchema,
 } from './definitions';
 import { Types } from 'mongoose';
 import Fixture from '../models/fixtureModel';
 import { isDeepStrictEqual } from 'util';
+import League from '../models/leagueModel';
 
 export type RequiredFields = { [key: string]: string[] };
 
@@ -118,7 +120,14 @@ export function calculateTeamPoints(team: ITeamsSchema) {
   return team.wins * 3 + team.draws * 1;
 }
 
-export function sortTeams(teams: ITeamsSchema[]) {
+export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
+  const league = await League.findById(leagueId).populate({
+    path: 'results',
+    populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+  });
+  if (league === null) return teams;
+  const allResults = league.results as unknown as IResultSchema[];
+
   /* compareFn: positive = swap, negative = dont swap, equal = equal
   descending order: b-a
 
@@ -150,12 +159,77 @@ export function sortTeams(teams: ITeamsSchema[]) {
       return teamB.goalsFor - teamA.goalsFor;
     }
     // this is temporary:
-    return teamB.goalsFor - teamA.goalsFor;
+    // return teamB.goalsFor - teamA.goalsFor;
 
     // 4. Team who got most points in the H2H of this season
     // TODO: finish tiebreaker system
+    // Taking teamA's perspective:
+    const homeResult = allResults.find(
+      (result) =>
+        result.homeTeamDetails.name === teamA.name &&
+        result.awayTeamDetails.name === teamB.name
+    );
+    const awayResult = allResults.find(
+      (result) =>
+        result.homeTeamDetails.name === teamB.name &&
+        result.awayTeamDetails.name === teamA.name
+    );
+    let teamAPoints = 0;
+    let teamBPoints = 0;
+    let teamAGoals = 0;
+    let teamBGoals = 0;
+
+    if (homeResult) {
+      const teamAGoalsResult = homeResult.basicOutcome.reduce(
+        (acc, goal) => (goal === 'home' ? acc + 1 : acc),
+        0
+      );
+      const teamBGoalsResult = homeResult.basicOutcome.reduce(
+        (acc, goal) => (goal === 'away' ? acc + 1 : acc),
+        0
+      );
+      teamAGoals += teamAGoalsResult;
+      teamBGoals += teamBGoalsResult;
+      if (teamAGoalsResult > teamBGoalsResult) {
+        teamAPoints += 3;
+      } else if (teamAGoalsResult < teamBGoalsResult) {
+        teamBPoints += 3;
+      } else {
+        teamAPoints += 1;
+        teamBPoints += 1;
+      }
+    }
+    if (awayResult) {
+      const teamBGoalsResult = awayResult.basicOutcome.reduce(
+        (acc, goal) => (goal === 'home' ? acc + 1 : acc),
+        0
+      );
+      const teamAGoalsResult = awayResult.basicOutcome.reduce(
+        (acc, goal) => (goal === 'away' ? acc + 1 : acc),
+        0
+      );
+      teamAGoals += teamAGoalsResult;
+      teamBGoals += teamBGoalsResult;
+      if (teamAGoalsResult > teamBGoalsResult) {
+        teamAPoints += 3;
+      } else if (teamAGoalsResult < teamBGoalsResult) {
+        teamBPoints += 3;
+      } else {
+        teamAPoints += 1;
+        teamBPoints += 1;
+      }
+    }
+    if (teamBPoints !== teamAPoints) {
+      return teamBPoints - teamAPoints;
+    }
 
     // 5. Team who scored most away goals in the H2H
+    if (teamBGoals !== teamAGoals) {
+      return teamBGoals - teamAGoals;
+    }
+
+    // Otherwise just return alphabetical order because the chances of getting here is very unlikely
+    return teamA.name.localeCompare(teamB.name);
   });
 
   return teams;
@@ -268,23 +342,21 @@ export function generateJWTToken(payload: any, nextFn: NextFunction) {
   return token;
 }
 
-export function findLeaguePosition(
+export async function findLeaguePosition(
   league: ILeagueSchema,
   division: number,
   season: number,
   teamName: string
 ) {
-  return (
-    sortTeams(
-      (
-        league.tables.find(
-          (table) => table.division === division && table.season === season
-        ) as ITable
-      ).teams as ITeamsSchema[]
-    )
-      .map((team) => team.name)
-      .indexOf(teamName) + 1
+  const teams = await sortTeams(
+    String(league._id),
+    (
+      league.tables.find(
+        (table) => table.division === division && table.season === season
+      ) as ITable
+    ).teams as ITeamsSchema[]
   );
+  return teams.map((team) => team.name).indexOf(teamName) + 1;
 }
 
 /**

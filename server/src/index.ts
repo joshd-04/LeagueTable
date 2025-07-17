@@ -18,6 +18,7 @@ import {
   getAnnouncementController,
   getFixtureByIdController,
   getFixturesController,
+  getHeadToHeadController,
   getResultsController,
   getTeamsController,
   leagueCreationController,
@@ -153,6 +154,7 @@ app.get(
 
 app.get('/api/leagues/:id/stats', calculateSeasonStatsController);
 app.get('/api/leagues/:id/teams', getTeamsController);
+app.get('/api/leagues/:id/headtohead/:teamA/:teamB', getHeadToHeadController);
 
 app.post(
   '/api/result',

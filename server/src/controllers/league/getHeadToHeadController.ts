@@ -17,7 +17,7 @@ interface statsInterface {
   soloGoals?: number;
 }
 
-export async function getTeamsController(
+export async function getHeadToHeadController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -25,11 +25,14 @@ export async function getTeamsController(
   try {
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
+    const teamAName = req.params.teamA;
+    const teamBName = req.params.teamB;
 
     // Check if league exists
     try {
       league = await League.findById(leagueId).populate({
-        path: 'tables.teams',
+        path: 'results',
+        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
       });
     } catch {
       return next(
@@ -47,41 +50,31 @@ export async function getTeamsController(
       );
     }
 
-    // Get the teams from the division specified for THIS SEASON ONLY for now! (update this later when season rewind implemented)
-    const divisionRequested = req.query.division || 1;
-
-    if (+divisionRequested > league.divisionsCount) {
+    if (league.leagueLevel === 'free') {
       return next(
-        new ErrorHandling(400, {
-          message: `This league does not have ${divisionRequested} divisions. Highest division is ${league.divisionsCount} divisions`,
+        new ErrorHandling(403, {
+          message: `Upgrade to standard level to unlock head-to-head history`,
         })
       );
     }
 
-    let seasonRequested = league.currentSeason;
+    // this endpoint assumes team names are unique
+    const allResults = league.results as unknown as IResultSchema[];
+    const lastFiveResults = allResults
+      .filter((result) => {
+        return (
+          (result.homeTeamDetails.name === teamAName &&
+            result.awayTeamDetails.name === teamBName) ||
+          (result.homeTeamDetails.name === teamBName &&
+            result.awayTeamDetails.name === teamAName)
+        );
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5);
 
-    if (league.leagueLevel === 'free' || req.query.season === undefined) {
-      // do nothing
-    } else {
-      if (
-        req.query.season !== undefined &&
-        Number.isInteger(Number(req.query.season))
-      ) {
-        seasonRequested = +req.query.season;
-      } else {
-        // do nothing
-      }
-    }
-
-    let teams = league.tables.filter(
-      (t) => t.season === seasonRequested && t.division === +divisionRequested
-    )[0].teams as ITeamsSchema[];
-    teams = await sortTeams(leagueId, teams)
-    teams = teams.map((team, i) => {
-      return { position: i + 1, ...team.toObject() } as ITeamsSchema;
-    });
-
-    res.status(200).json({ status: 'success', data: { teams: teams } });
+    res
+      .status(200)
+      .json({ status: 'success', data: { lastFiveResults: lastFiveResults } });
   } catch (e: any) {
     console.error(e);
     return next(

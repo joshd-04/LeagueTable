@@ -1,13 +1,16 @@
 'use client';
 import Paragraph from '@/components/text/Paragraph';
 import { Fixture, League } from '@/util/definitions';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 import Label from '@/components/text/Label';
 import LinkButton from '@/components/text/LinkButton';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
-import PreviewTable from './(widgets)/previewTable';
+import MatchPreview from './(widgets)/matchPreview';
+import HeadToHead from './(widgets)/headToHead';
+import { GlobalContext } from '@/context/GlobalContextProvider';
+import useAccount from '@/hooks/useAccount';
 
 export default function FixtureFuture({
   league,
@@ -16,9 +19,18 @@ export default function FixtureFuture({
   league: League;
   fixture: Fixture;
 }) {
+  const context = useContext(GlobalContext);
+  const { user } = context.account;
+  const { isLoggedIn } = useAccount();
   const [showFixtureToResult, setShowFixtureToResult] =
     useState<Fixture | null>(null);
 
+  let userOwnsThisLeague = false;
+  if (isLoggedIn && user !== undefined && user !== null) {
+    if (user.id === league.leagueOwner._id) {
+      userOwnsThisLeague = true;
+    }
+  }
   return (
     <div className="flex flex-col gap-[20px]">
       <LeagueBanner league={league}>
@@ -83,13 +95,12 @@ export default function FixtureFuture({
               {fixture.matchweek} starts!
             </Label>
           </div>
-          <div className="p-[20px] h-full w-full col-span-1 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <Paragraph>Match preview</Paragraph>
-            <PreviewTable fixture={fixture} />
-          </div>
-          <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <Paragraph>Head-to-head record</Paragraph>
-          </div>
+          <MatchPreview fixture={fixture} />
+          <HeadToHead
+            fixture={fixture}
+            league={league}
+            userOwnsThisLeague={userOwnsThisLeague}
+          />
         </div>
         {showFixtureToResult && (
           <FixtureToResult

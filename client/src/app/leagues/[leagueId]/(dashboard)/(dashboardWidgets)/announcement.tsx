@@ -6,8 +6,20 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useContext, useEffect, useRef, useState } from 'react';
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 export default function Announcement({
   league,
@@ -17,7 +29,7 @@ export default function Announcement({
   userOwnsThisLeague: boolean;
 }) {
   const [announcement, setAnnouncement] = useState(
-    league.announcement || { text: '', date: Date.now() }
+    league.announcement || { text: '', date: new Date() }
   );
   const [announcementEditingText, setAnnouncementEditingText] = useState(
     announcement.text
@@ -80,7 +92,7 @@ export default function Announcement({
         >
           Latest Announcement
         </Paragraph>
-        {userOwnsThisLeague && (
+        {userOwnsThisLeague && !isEditingAnnouncement && (
           <Button
             color="transparent"
             bgHoverColor="var(--bg-light)"
@@ -100,13 +112,21 @@ export default function Announcement({
 
       {!isEditingAnnouncement &&
         (league.announcement && league.announcement.text.length > 0 ? (
-          <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-            {announcement.text} <br />
-            {new Date(announcement.date).toLocaleTimeString(undefined, {
-              timeStyle: 'short',
-            })}{' '}
-            • {new Date(announcement.date).toLocaleDateString()}
-          </Label>
+          <div className="flex flex-col justify-between grow-1">
+            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+              {announcement.text}
+            </Label>
+            <div className="flex flex-row">
+              <Label
+                style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}
+              >
+                {new Date(announcement.date).toLocaleTimeString(undefined, {
+                  timeStyle: 'short',
+                })}{' '}
+                • {new Date(announcement.date).toLocaleDateString()}
+              </Label>
+            </div>
+          </div>
         ) : (
           <Label
             style={{
@@ -120,16 +140,68 @@ export default function Announcement({
         ))}
       {isEditingAnnouncement && (
         <Label
-          style={{ display: 'flex', flexDirection: 'column', flexGrow: '1' }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: '1',
+            color: 'var(--text  )',
+            fontWeight: 'normal',
+          }}
         >
-          <textarea
-            className="bg-[var(--bg-light)] w-full h-full flex-grow outline-none border-1 border-[var(--border)] rounded-[10px] p-[10px]"
-            value={announcementEditingText}
-            onChange={(e) => setAnnouncementEditingText(e.target.value)}
-            onBlur={() => handleEditAnnouncement()}
+          <TextAreaComponent
+            announcement={announcement}
+            announcementEditingText={announcementEditingText}
+            setAnnouncementEditingText={setAnnouncementEditingText}
+            setIsEditingAnnouncement={setIsEditingAnnouncement}
+            handleEditAnnouncement={handleEditAnnouncement}
           />
         </Label>
       )}
     </div>
+  );
+}
+
+function TextAreaComponent({
+  announcement,
+  announcementEditingText,
+  setAnnouncementEditingText,
+  setIsEditingAnnouncement,
+  handleEditAnnouncement,
+}: {
+  announcement: {
+    text: string;
+    date: Date;
+  };
+  announcementEditingText: string;
+  setAnnouncementEditingText: Dispatch<SetStateAction<string>>;
+  setIsEditingAnnouncement: Dispatch<SetStateAction<boolean>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleEditAnnouncement: UseMutateAsyncFunction<any, Error, void, unknown>;
+}) {
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    if (textAreaRef.current !== null) {
+      textAreaRef.current.focus();
+      textAreaRef.current.setSelectionRange(
+        announcementEditingText.length,
+        announcementEditingText.length
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <textarea
+      className="bg-[var(--bg-light)] w-full h-full flex-grow outline-none border-1 border-[var(--border)] rounded-[10px] p-[10px]"
+      value={announcementEditingText}
+      onChange={(e) => setAnnouncementEditingText(e.target.value)}
+      ref={textAreaRef}
+      onBlur={() => {
+        if (announcement.text !== announcementEditingText)
+          handleEditAnnouncement();
+        else setIsEditingAnnouncement(false);
+      }}
+      maxLength={150}
+      rows={3}
+    />
   );
 }

@@ -4,7 +4,6 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonSummaryStatsInterface } from '@/util/definitions';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 export default function SeasonSummaryStats({
   league,
@@ -25,10 +24,6 @@ export default function SeasonSummaryStats({
   });
   const stats: SeasonSummaryStatsInterface | undefined =
     data?.data.seasonSummaryStats;
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">

@@ -45,7 +45,6 @@ export default function LeagueDashboardStandard({
 
   useEffect(() => {
     if (leagueQueryData !== undefined && !leagueQueryIsLoading) {
-      console.log(leagueQueryData);
       setLeague(leagueQueryData.data.league);
     }
   }, [leagueQueryData, leagueQueryIsLoading]);

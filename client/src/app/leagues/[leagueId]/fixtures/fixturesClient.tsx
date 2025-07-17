@@ -80,11 +80,13 @@ export default function FixturesClient({
               onChange={(e) => setDivisionFilter(+e.target.value)}
             >
               <option value={0}>All fixtures</option>
-              {league.tables.map((table, i) => (
-                <option value={table.division} key={i}>
-                  {table.name}
-                </option>
-              ))}
+              {league.tables
+                .filter((table) => table.season === league.currentSeason)
+                .map((table, i) => (
+                  <option value={table.division} key={i}>
+                    {table.name}
+                  </option>
+                ))}
             </select>
           </Paragraph>
         </div>

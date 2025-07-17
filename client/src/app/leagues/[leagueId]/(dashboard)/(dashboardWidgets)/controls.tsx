@@ -44,7 +44,6 @@ export default function Controls({
   const { mutateAsync: matchweekMutation } = useMutation({
     mutationFn: handleStartNextMatchweek,
     onSuccess: () => {
-      console.log('successfully started next matchweek');
       invalidateDashboardQueries();
     },
     onError: (e) => {

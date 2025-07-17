@@ -3,7 +3,16 @@ import Paragraph from '@/components/text/Paragraph';
 import { Fixture } from '@/util/definitions';
 import ordinal from 'ordinal';
 
-export default function PreviewTable({ fixture }: { fixture: Fixture }) {
+export default function MatchPreview({ fixture }: { fixture: Fixture }) {
+  return (
+    <div className="p-[20px] h-full w-full col-span-1 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
+      <Paragraph>Match preview</Paragraph>
+      <PreviewTable fixture={fixture} />
+    </div>
+  );
+}
+
+function PreviewTable({ fixture }: { fixture: Fixture }) {
   const homeGD =
     fixture.homeTeamDetails.goalsFor - fixture.homeTeamDetails.goalsAgainst;
   const awayGD =

@@ -93,7 +93,9 @@ export default function ResultClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph>Division {result.division}</Paragraph>
+          <Paragraph>
+            {league.tables[result.division - 1].name} (div {result.division})
+          </Paragraph>
           {result.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">

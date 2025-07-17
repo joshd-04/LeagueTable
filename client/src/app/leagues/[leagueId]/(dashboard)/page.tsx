@@ -41,7 +41,6 @@ export async function generateMetadata({
   }
   const leagueObj = league.data.league as League;
   if (league.statusCode === 403) {
-    console.log(league);
     return {
       title: `Setup incomplete • ${leagueObj.name} • ${WEBSITE_NAME}`,
     };

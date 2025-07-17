@@ -9,7 +9,6 @@ import {
   Dispatch,
   MouseEvent,
   SetStateAction,
-  useEffect,
   useState,
 } from 'react';
 import { motion } from 'motion/react';
@@ -50,9 +49,6 @@ export default function NextFixtures({
 
   const nextFixtures: Fixture[] | undefined = data?.data.fixtures.slice(0, 3);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
   const router = useRouter();

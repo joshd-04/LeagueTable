@@ -17,7 +17,6 @@ export default function TableWidget({
   divisionViewing: number;
   setDivisionViewing: Dispatch<SetStateAction<number>>;
 }) {
-  console.log(`szn ${seasonViewing}`);
   const { data, isLoading } = useQuery({
     queryFn: () =>
       fetchAPI(
@@ -79,12 +78,13 @@ function Table({
   divisionViewing: number;
   isLoading: boolean;
 }) {
+  const table = league.tables[divisionViewing - 1];
   return (
     <div className="max-h-[24rem] overflow-y-auto">
-      <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">
+      <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-y-[2px]">
         <thead>
           <tr className="text-left z-10">
-            <th className="w-[4rem] sticky top-0 bg-[var(--bg)]"></th>
+            <th className="w-[3rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[8rem] sticky top-0 bg-[var(--bg)]">
               <Paragraph>Team</Paragraph>
             </th>
@@ -120,7 +120,9 @@ function Table({
         <tbody>
           {teams !== undefined &&
             !isLoading &&
-            teams.map((team, i) => <TableRow key={i} team={team} />)}
+            teams.map((team, i) => (
+              <TableRow key={i} team={team} table={table} />
+            ))}
         </tbody>
       </table>
       {isLoading && (
@@ -132,16 +134,65 @@ function Table({
   );
 }
 
-function TableRow({ team }: { team: Team }) {
+function TableRow({
+  team,
+  table,
+}: {
+  team: Team;
+  table: {
+    division: number;
+    name: string;
+    numberOfTeams: number;
+    numberOfTeamsToBePromoted: number;
+    numberOfTeamsToBeRelegated: number;
+    season: number;
+    teams: Team[];
+  };
+}) {
+  // config
+  const showIndicator = true;
+  const highlightBackground = true;
+
   const goalDifference = team.goalsFor - team.goalsAgainst;
   const points = 3 * team.wins + team.draws;
 
+  if (team.position === undefined) {
+    return <tr></tr>;
+  }
+
+  const inPromotionZone = table.numberOfTeamsToBePromoted >= team.position;
+  const inRelegationZone =
+    table.numberOfTeamsToBeRelegated - 1 >= table.numberOfTeams - team.position;
+
+  let indicatorColor = undefined;
+  if (showIndicator) {
+    if (inPromotionZone) indicatorColor = 'var(--success)';
+    if (inRelegationZone) indicatorColor = 'var(--danger)';
+  }
+
+  let highlightColor = undefined;
+  if (highlightBackground) {
+    if (inPromotionZone) highlightColor = 'bg-[var(--success)]/20';
+    if (inRelegationZone) highlightColor = 'bg-[var(--danger)]/20';
+  }
+
   return (
-    <tr>
-      <td className="">
-        <Paragraph style={{ textAlign: 'right', paddingRight: '10px' }}>
-          {team.position || '?'}.
-        </Paragraph>
+    <tr className={`${highlightColor}`}>
+      <td className="h-full">
+        <div className="w-full h-full flex flex-row justify-between items-stretch ">
+          <div
+            className="min-h-full my-[4px] w-[5px] rounded-[10px]"
+            style={{ backgroundColor: indicatorColor }}
+          ></div>
+          <Paragraph
+            style={{
+              textAlign: 'right',
+              paddingRight: '10px',
+            }}
+          >
+            {team.position}.
+          </Paragraph>
+        </div>
       </td>
       <td>
         <Paragraph

@@ -15,7 +15,6 @@ export async function setAnnouncementController(
 ) {
   try {
     const leagueId = req.params.id;
-    console.log(leagueId);
 
     let league: ILeagueSchema | null;
 

@@ -113,8 +113,10 @@ export async function startNextSeasonController(
       );
 
       // 2. Sort teams in each division
-      const sortedTeamsByDivision: ITeamsSchema[][] = prevSeasonTables.map(
-        (table) => sortTeams(table.teams as ITeamsSchema[])
+      const sortedTeamsByDivision: ITeamsSchema[][] = await Promise.all(
+        prevSeasonTables.map(
+          async (table) => await sortTeams(leagueId, table.teams as ITeamsSchema[])
+        )
       );
 
       const divisionsCount = prevSeasonTables.length;

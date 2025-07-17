@@ -43,7 +43,7 @@ export default function LeagueDashboardFree({
 
   useEffect(() => {
     if (leagueQueryData !== undefined && !leagueQueryIsLoading) {
-      console.log(leagueQueryData);
+      
       setLeague(leagueQueryData.data.league);
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
@@ -65,7 +65,7 @@ export default function LeagueDashboardFree({
 
   const queryClient = useQueryClient();
   function invalidateDashboardQueries() {
-    console.log('invaldiated');
+    
     queryClient.invalidateQueries({ queryKey: ['league'] });
     queryClient.invalidateQueries({ queryKey: ['fixtures'] });
     queryClient.invalidateQueries({ queryKey: ['results'] });

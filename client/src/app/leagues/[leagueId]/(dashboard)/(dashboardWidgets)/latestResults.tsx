@@ -108,7 +108,7 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
 
   return (
     <motion.div
-      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center"
+      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center px-[10px]"
       onClick={(e) => handleResultClick(e)}
       whileTap={{ scale: 0.98 }}
     >
@@ -116,7 +116,6 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
         style={{
           fontWeight: 'normal',
           color: 'var(--text-muted)',
-          padding: '0 10px',
           width: 'max-content',
           height: 'min-content',
           flex: 'none',

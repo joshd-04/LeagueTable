@@ -1,4 +1,5 @@
 export { getFixturesController } from './getFixturesController';
+export { getHeadToHeadController } from './getHeadToHeadController';
 export { getAnnouncementController } from './getAnnouncementController';
 export { setAnnouncementController } from './setAnnouncementController';
 export { getFixtureByIdController } from './getFixtureByIdController';

@@ -27,9 +27,13 @@ export default function SeasonRewind({
     }
   }
 
+  function resetSeason() {
+    setSeasonViewing(league.currentSeason);
+  }
+
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col">
-      <div className="flex flex-row justify-between ">
+      <div className="flex flex-row justify-between items-start">
         <Paragraph
           style={{
             color: 'var(--text)',
@@ -39,23 +43,45 @@ export default function SeasonRewind({
         >
           Season rewind
         </Paragraph>
-        <Label
-          style={{
-            backgroundColor:
-              seasonViewing === league.currentSeason
-                ? 'var(--border)'
-                : 'var(--success)',
-            height: 'min-content',
-            padding: '0 8px',
-            borderRadius: '10px',
-            color:
-              seasonViewing === league.currentSeason
-                ? 'var(--text-muted)'
-                : 'black',
-          }}
-        >
-          {seasonViewing === league.currentSeason ? 'OFF' : 'ON'}
-        </Label>
+        {seasonViewing === league.currentSeason ? (
+          <Label
+            style={{
+              backgroundColor: 'var(--border)',
+              height: 'min-content',
+              padding: '0 8px',
+              borderRadius: '10px',
+              color: 'var(--text-muted)',
+            }}
+          >
+            OFF
+          </Label>
+        ) : (
+          <Button
+            color="transparent"
+            bgHoverColor="transparent"
+            style={{ padding: 0, textAlign: 'start' }}
+            shadowEffect={false}
+            borderlessButton={true}
+            underlineEffect={false}
+            onClick={() => resetSeason()}
+          >
+            <Label
+              style={{
+                backgroundColor: 'var(--success)',
+                height: 'full',
+                display: 'flex',
+                flexGrow: '1',
+                padding: '0 8px',
+                borderRadius: '10px',
+                color: 'black',
+                margin: 0,
+                marginBlock: 0,
+              }}
+            >
+              ON
+            </Label>
+          </Button>
+        )}
       </div>
       <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
         View results, tables & stats from previous seasons
@@ -111,7 +137,9 @@ export default function SeasonRewind({
         </Button>
       </div>
       <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-        {league.name} is currently on season {league.currentSeason}
+        {league.currentSeason === seasonViewing
+          ? `You are viewing the current season`
+          : `${league.name} is currently on season ${league.currentSeason}`}
       </Label>
     </div>
   );
