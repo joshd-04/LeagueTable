@@ -2,7 +2,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { User } from '@/util/definitions';
 import { handleColorThemeToggle } from '@/util/helpers';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 interface GlobalContextInterface {
   account: {
@@ -50,8 +49,6 @@ export default function GlobalContextProvider({
   const [colorTheme, setColorTheme] = useState<'light' | 'dark'>('dark');
   const [error, setError] = useState(initialError);
 
-  const queryClient = new QueryClient();
-
   // On mount, set the color theme to the user's sytem theme
   // useEffect(() => {
   //   if (typeof window !== 'undefined') {
@@ -84,10 +81,8 @@ export default function GlobalContextProvider({
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GlobalContext.Provider value={{ ...context }}>
-        {children}
-      </GlobalContext.Provider>
-    </QueryClientProvider>
+    <GlobalContext.Provider value={{ ...context }}>
+      {children}
+    </GlobalContext.Provider>
   );
 }

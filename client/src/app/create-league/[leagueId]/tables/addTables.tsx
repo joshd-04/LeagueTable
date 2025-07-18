@@ -37,9 +37,7 @@ export default function AddTables({
                 Table names
               </Paragraph>
             </span>
-            <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-              Make sure the different table names are unique
-            </Label>
+            <Label>Make sure the different table names are unique</Label>
             <span>
               <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
               <Paragraph
@@ -52,7 +50,7 @@ export default function AddTables({
                 Promotion/relegation
               </Paragraph>
             </span>
-            <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
+            <Label>
               Make sure the promotion and relegation numbers match between
               adjacent leagues. First division promotions are automatically
               corrected to zero. Last division relegations are also corrected to

@@ -40,8 +40,8 @@ export default function FixtureFuture({
               fixture.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <Label style={{ fontWeight: 'normal' }}>Home</Label>
-            <Label style={{ fontWeight: 'normal' }}>Away</Label>
+            <Label style={{ color:'var(--text)' }}>Home</Label>
+            <Label style={{ color:'var(--text)' }}>Away</Label>
           </div>
           <div className="flex flex-row justify-between gap-[20px]">
             <LinkButton
@@ -90,7 +90,7 @@ export default function FixtureFuture({
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
             <Paragraph style={{ color: 'var(--info)' }}>AI insights</Paragraph>
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+            <Label>
               AI Insights not available yet. Come back when matchweek{' '}
               {fixture.matchweek} starts!
             </Label>

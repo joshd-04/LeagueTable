@@ -113,13 +113,9 @@ export default function Announcement({
       {!isEditingAnnouncement &&
         (league.announcement && league.announcement.text.length > 0 ? (
           <div className="flex flex-col justify-between grow-1">
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-              {announcement.text}
-            </Label>
+            <Label>{announcement.text}</Label>
             <div className="flex flex-row">
-              <Label
-                style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}
-              >
+              <Label>
                 {new Date(announcement.date).toLocaleTimeString(undefined, {
                   timeStyle: 'short',
                 })}{' '}
@@ -130,8 +126,6 @@ export default function Announcement({
         ) : (
           <Label
             style={{
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
               fontStyle: 'italic',
             }}
           >
@@ -144,8 +138,7 @@ export default function Announcement({
             display: 'flex',
             flexDirection: 'column',
             flexGrow: '1',
-            color: 'var(--text  )',
-            fontWeight: 'normal',
+            color: 'var(--text)',
           }}
         >
           <TextAreaComponent

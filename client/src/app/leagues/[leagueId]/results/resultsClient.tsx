@@ -113,7 +113,7 @@ function ResultRow({
       </div>
       <Label
         style={{
-          color: 'var(--text-muted)',
+          fontWeight: 'bold',
           textAlign: 'center',
           alignItems: 'baseline',
           verticalAlign: 'middle',
@@ -156,7 +156,7 @@ function ResultsByMostRecent({
         <div key={i}>
           <Label
             style={{
-              color: 'var(--text-muted)',
+              fontWeight: 'bold',
               marginBottom: '10px',
               placeSelf: 'center',
             }}
@@ -205,8 +205,7 @@ function ResultsByMatchweek({
         .map(([matchweek, results], i) => (
           <div key={i}>
             <Label
-              style={{
-                color: 'var(--text-muted)',
+              style={{fontWeight:'bold',
                 marginBottom: '10px',
                 placeSelf: 'center',
               }}

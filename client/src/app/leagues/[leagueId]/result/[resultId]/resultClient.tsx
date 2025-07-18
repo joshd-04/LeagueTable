@@ -47,8 +47,8 @@ export default function ResultClient({
               result.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <Label style={{ fontWeight: 'normal' }}>Home</Label>
-            <Label style={{ fontWeight: 'normal' }}>Away</Label>
+            <Label style={{ color:'var(--text)' }}>Home</Label>
+            <Label style={{ color:'var(--text)' }}>Away</Label>
           </div>
           <div className="flex flex-row justify-between gap-[20px]">
             <LinkButton

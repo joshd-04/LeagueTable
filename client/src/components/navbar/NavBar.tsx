@@ -11,6 +11,7 @@ import Logo from '../logo/logo';
 import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
 import AccountCircleSVG from '@/assets/svg components/AccountCircle';
+import { useNotifier } from '@/hooks/useNotifier';
 
 export function NavBar() {
   const pathname = usePathname();
@@ -21,8 +22,15 @@ export function NavBar() {
   const { isLoggedIn } = useAccount();
 
   const router = useRouter();
+  const noti = useNotifier({
+    type: 'error',
+    title: 'Changed colour theme!',
+    // description: 'Colour theme is now set to dark mode',
+    duration: 5000,
+  });
 
   function toggleTheme() {
+    noti?.fire();
     if (colorTheme === 'dark') {
       setColorTheme('light');
     } else {

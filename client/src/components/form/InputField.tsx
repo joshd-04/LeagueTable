@@ -27,7 +27,7 @@ export default function InputField({
   // font details taken from <Paragraph />
   return (
     <div className="flex flex-col justify-baseline items-baseline w-full">
-      <Label style={{ color: 'var(--text-muted)' }}>
+      <Label style={{ fontWeight: 'bold' }}>
         {options.label}
         {options.labelCaption && (
           <span className="font-normal"> - {options.labelCaption}</span>
@@ -49,6 +49,7 @@ export default function InputField({
       />
       <Label
         style={{
+          fontWeight: 'normal',
           color: 'var(--danger)',
           width: '100%',
           opacity: error ? undefined : '0',

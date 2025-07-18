@@ -37,35 +37,25 @@ export default function Upgrade({ league }: { league: League }) {
         >
           {titleText}
         </Paragraph>
-        <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+        <Label>
           {warningLevel === 'light' ? '' : 'This is a free league.'} Upgrade to
           standard level to unlock:
         </Label>
         <ul className="list-disc pl-[20px] text-[var(--text-muted)]">
           <li>
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-              More seasons
-            </Label>
+            <Label>More seasons</Label>
           </li>
           <li>
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-              Custom league banner
-            </Label>
+            <Label>Custom league banner</Label>
           </li>
           <li>
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-              Custom league announcements
-            </Label>
+            <Label>Custom league announcements</Label>
           </li>
           <li>
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-              Auto-generated news feed
-            </Label>
+            <Label>Auto-generated news feed</Label>
           </li>
           <li>
-            <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-              Season rewind
-            </Label>
+            <Label>Season rewind</Label>
           </li>
         </ul>
       </span>

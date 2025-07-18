@@ -37,9 +37,7 @@ export default function AddTeams({
                 Table names
               </Paragraph>
             </span>
-            <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-              Make sure the different table names are unique
-            </Label>
+            <Label>Make sure the different table names are unique</Label>
           </div>
         </div>
       </div>

@@ -56,8 +56,6 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
         </Paragraph>{' '}
         <Label
           style={{
-            color: 'var(--text-muted)',
-            fontWeight: 'normal',
             display: 'inline-block',
           }}
         >
@@ -70,8 +68,6 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
         </Paragraph>{' '}
         <Label
           style={{
-            color: 'var(--text-muted)',
-            fontWeight: 'normal',
             display: 'inline-block',
           }}
         >
@@ -85,8 +81,6 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
           </Paragraph>{' '}
           <Label
             style={{
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
               display: 'inline-block',
             }}
           >
@@ -101,8 +95,6 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
           </Paragraph>{' '}
           <Label
             style={{
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
               display: 'inline-block',
             }}
           >
@@ -117,8 +109,6 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
           </Paragraph>{' '}
           <Label
             style={{
-              color: 'var(--text-muted)',
-              fontWeight: 'normal',
               display: 'inline-block',
             }}
           >

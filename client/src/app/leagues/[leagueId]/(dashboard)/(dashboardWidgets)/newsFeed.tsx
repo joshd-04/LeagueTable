@@ -15,7 +15,7 @@ export default function NewsFeed() {
       </Paragraph>
       <div className="overflow-y-auto max-h-[12rem] flex flex-col gap-[20px]">
         <div className="flex flex-col gap-[10px]">
-          <Label style={{ color: 'var(--text-muted)' }}>MD27</Label>
+          <Label style={{ color: 'var(--text)' }}>MD27</Label>
           <Label
             style={{
               textWrap: 'nowrap',
@@ -48,12 +48,12 @@ export default function NewsFeed() {
           </Label>
         </div>
         <div className="flex flex-col gap-[10px]">
-          <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+          <Label style={{ color: 'var(--text)', fontWeight: 'normal' }}>
             MD26
           </Label>
           <Label
             style={{
-              fontWeight: 'normal',
+              color: 'var(--text)',
               textWrap: 'nowrap',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -75,7 +75,7 @@ export default function NewsFeed() {
           </Label>
           <Label
             style={{
-              fontWeight: 'normal',
+              color: 'var(--text)',
               textWrap: 'nowrap',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -86,12 +86,10 @@ export default function NewsFeed() {
           </Label>
         </div>
         <div className="flex flex-col gap-[10px]">
-          <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-            MD25
-          </Label>
+          <Label style={{ color: 'var(--text)' }}>MD25</Label>
           <Label
             style={{
-              fontWeight: 'normal',
+              color: 'var(--text)',
               textWrap: 'nowrap',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -102,7 +100,7 @@ export default function NewsFeed() {
           </Label>
           <Label
             style={{
-              fontWeight: 'normal',
+              color: 'var(--text)',
               textWrap: 'nowrap',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -113,7 +111,7 @@ export default function NewsFeed() {
           </Label>
           <Label
             style={{
-              fontWeight: 'normal',
+              color: 'var(--text)',
               textWrap: 'nowrap',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',

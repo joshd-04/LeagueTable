@@ -149,7 +149,7 @@ function ResultFormBasic({
       <div className="max-h-[300px] min-h-[300px] overflow-auto ">
         <div className="flex flex-col gap-[8px] p-[8px] ">
           {matchStory.length === 0 ? (
-            <Label style={{ placeSelf: 'center', color: 'var(--text-muted)' }}>
+            <Label style={{ placeSelf: 'center', fontWeight: 'bold' }}>
               No events
             </Label>
           ) : (
@@ -164,7 +164,7 @@ function ResultFormBasic({
                   } `}
                 >
                   <div>
-                    <Label>
+                    <Label style={{ fontWeight: 'bold', color: 'var(--text)' }}>
                       {goal === 'home'
                         ? fixture.homeTeamDetails.name
                         : fixture.awayTeamDetails.name}{' '}

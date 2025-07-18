@@ -232,7 +232,7 @@ function FormSection({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label style={{ color: 'var(--text-muted)' }}>Table name</Label>
+        <Label style={{ fontWeight: 'bold' }}>Table name</Label>
         <input
           type="text"
           required
@@ -256,6 +256,7 @@ function FormSection({
         <Label
           style={{
             color: 'var(--danger)',
+            fontWeight: 'bold',
             width: '100%',
             opacity: divisionErrors[divisionIndex].tableName ? undefined : '0',
           }}
@@ -268,7 +269,13 @@ function FormSection({
         </Label>
       </div>
       <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label style={{ color: 'var(--text-muted)' }}>Number of teams</Label>
+        <Label
+          style={{
+            fontWeight: 'bold',
+          }}
+        >
+          Number of teams
+        </Label>
         <input
           type="number"
           step={1}
@@ -293,6 +300,7 @@ function FormSection({
         <Label
           style={{
             color: 'var(--danger)',
+            fontWeight: 'bold',
             width: '100%',
             opacity: divisionErrors[divisionIndex].numberOfTeams
               ? undefined
@@ -307,7 +315,11 @@ function FormSection({
         </Label>
       </div>
       <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label style={{ color: 'var(--text-muted)' }}>
+        <Label
+          style={{
+            fontWeight: 'bold',
+          }}
+        >
           Number of teams to be promoted
         </Label>
         <input
@@ -332,6 +344,7 @@ function FormSection({
         />
         <Label
           style={{
+            fontWeight: 'bold',
             color: 'var(--danger)',
             width: '100%',
             opacity: divisionErrors[divisionIndex].numberOfTeamsToBePromoted
@@ -347,7 +360,11 @@ function FormSection({
         </Label>
       </div>
       <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label style={{ color: 'var(--text-muted)' }}>
+        <Label
+          style={{
+            fontWeight: 'bold',
+          }}
+        >
           Number of teams to be relegated
         </Label>
         <input
@@ -374,6 +391,7 @@ function FormSection({
         <Label
           style={{
             color: 'var(--danger)',
+            fontWeight: 'bold',
             width: '100%',
             opacity: divisionErrors[divisionIndex].numberOfTeamsToBeRelegated
               ? undefined

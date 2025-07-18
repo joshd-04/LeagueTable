@@ -30,25 +30,17 @@ export default function ClientPage() {
                 League type
               </Paragraph>
             </span>
-            <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
+            <Label>
               Basic leagues are simplified for a more streamlined experience.
               Advanced leagues contain more features & stats. <br /> Currently
               advanced leagues feature:
             </Label>
             <ul className="list-disc pl-[20px] text-[var(--text-muted)]">
               <li className="">
-                <Label
-                  style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}
-                >
-                  Goal scorers
-                </Label>
+                <Label>Goal scorers</Label>
               </li>
               <li className="">
-                <Label
-                  style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}
-                >
-                  Assist makers
-                </Label>
+                <Label>Assist makers</Label>
               </li>
             </ul>
           </div>

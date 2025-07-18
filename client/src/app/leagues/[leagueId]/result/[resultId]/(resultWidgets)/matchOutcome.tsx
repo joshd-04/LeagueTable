@@ -23,7 +23,7 @@ export default function MatchOutcome({ result }: { result: Result }) {
           scrollbarColor: 'var(--border) transparent',
         }}
       >
-        <Label style={{ fontWeight: 'normal' }}>Match start. 0-0</Label>
+        <Label style={{ color: 'var(--text)' }}>Match start. 0-0</Label>
         {result.detailedOutcome !== undefined &&
         result.detailedOutcome.length !== 0
           ? result.detailedOutcome.map((goal, i) => {
@@ -50,7 +50,7 @@ export default function MatchOutcome({ result }: { result: Result }) {
                 />
               );
             })}
-        <Label style={{ fontWeight: 'normal' }}>
+        <Label style={{ color: 'var(--text)' }}>
           Full time: {calculateScore(result.basicOutcome.length - 1)}
         </Label>
       </div>
@@ -91,7 +91,7 @@ function MatchOutcomeRowBasic({
     <div className="grid grid-cols-[1fr_max-content_1fr] bg-[var(--bg-light)] px-4 py-2 rounded-[10px] w-full">
       {goal === 'home' ? (
         <div className="flex flex-col justify-center ">
-          <Label style={{ fontWeight: 'normal' }}>
+          <Label style={{ color: 'var(--text)' }}>
             Goal: {homeTeamDetails.name}
           </Label>
         </div>
@@ -113,7 +113,7 @@ function MatchOutcomeRowBasic({
       </div>
       {goal === 'away' ? (
         <div className="flex flex-col justify-center items-end">
-          <Label style={{ fontWeight: 'normal' }}>
+          <Label style={{ color: 'var(--text)' }}>
             Goal: {awayTeamDetails.name}
           </Label>
         </div>
@@ -162,17 +162,11 @@ function MatchOutcomeRowAdvanced({
     <div className="grid grid-cols-[1fr_max-content_1fr] bg-[var(--bg-light)] px-4 py-2 rounded-[10px] w-full">
       {goal.team === 'home' ? (
         <div className="place-self-start  flex flex-col items-start ">
-          <Label style={{ fontWeight: 'normal' }}>
+          <Label style={{ color: 'var(--text)' }}>
             Goal: {homeTeamDetails.name}
           </Label>
-          <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-            ⚽ {goal.scorer}
-          </Label>
-          {goal.assist && (
-            <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-              👟 {goal.assist}
-            </Label>
-          )}
+          <Label>⚽ {goal.scorer}</Label>
+          {goal.assist && <Label>👟 {goal.assist}</Label>}
         </div>
       ) : (
         <div></div>
@@ -192,17 +186,11 @@ function MatchOutcomeRowAdvanced({
       </div>
       {goal.team === 'away' ? (
         <div className="place-self-end flex flex-col items-end">
-          <Label style={{ fontWeight: 'normal' }}>
+          <Label style={{ color: 'var(--text)' }}>
             Goal: {awayTeamDetails.name}
           </Label>
-          <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-            ⚽ {goal.scorer}
-          </Label>
-          {goal.assist && (
-            <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-              👟 {goal.assist}
-            </Label>
-          )}
+          <Label>⚽ {goal.scorer}</Label>
+          {goal.assist && <Label>👟 {goal.assist}</Label>}
         </div>
       ) : (
         <div></div>

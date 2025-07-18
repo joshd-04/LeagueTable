@@ -152,3 +152,12 @@ export interface Team {
   wins: number;
   _id: string;
 }
+
+export interface NotificationInterface {
+  id: number;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  description?: string;
+  manualDismiss?: boolean;
+  duration: number;
+}

@@ -50,7 +50,7 @@ export default function SeasonRewind({
               height: 'min-content',
               padding: '0 8px',
               borderRadius: '10px',
-              color: 'var(--text-muted)',
+              fontWeight: 'bold',
             }}
           >
             OFF
@@ -83,9 +83,7 @@ export default function SeasonRewind({
           </Button>
         )}
       </div>
-      <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
-        View results, tables & stats from previous seasons
-      </Label>
+      <Label>View results, tables & stats from previous seasons</Label>
       <div className="my-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center shadow-[var(--shadow)]">
         <Button
           color="transparent"
@@ -136,7 +134,7 @@ export default function SeasonRewind({
           />
         </Button>
       </div>
-      <Label style={{ color: 'var(--text-muted)', fontWeight: 'normal' }}>
+      <Label>
         {league.currentSeason === seasonViewing
           ? `You are viewing the current season`
           : `${league.name} is currently on season ${league.currentSeason}`}

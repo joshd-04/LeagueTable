@@ -38,21 +38,17 @@ function HeadToHeadLocked({
   if (userOwnsThisLeague) {
     return (
       <div>
-        <Label style={{ fontWeight: 'normal', color: 'var(--warning)' }}>
+        <Label style={{ color: 'var(--warning)' }}>
           Head-to-head is not available for free leagues.
         </Label>
-        <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-          Upgrade to standard level to unlock.
-        </Label>
+        <Label>Upgrade to standard level to unlock.</Label>
       </div>
     );
   }
 
   return (
     <div>
-      <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-        Head-to-head is not available for this league.
-      </Label>
+      <Label>Head-to-head is not available for this league.</Label>
     </div>
   );
 }
@@ -82,9 +78,7 @@ function HeadToHeadBody({
         <Label>Loading...</Label>
       ) : results.length > 0 ? (
         <>
-          <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-            Last 5 meetings:
-          </Label>
+          <Label>Last 5 meetings:</Label>
           <div>
             <div className="w-[70%] flex flex-col gap-1">
               {results.map((result, i) => (
@@ -94,9 +88,7 @@ function HeadToHeadBody({
           </div>
         </>
       ) : (
-        <Label style={{ fontWeight: 'normal', color: 'var(--text-muted)' }}>
-          No history found
-        </Label>
+        <Label>No history found</Label>
       )}
     </div>
   );
@@ -127,8 +119,6 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
     >
       <Label
         style={{
-          fontWeight: 'normal',
-          color: 'var(--text-muted)',
           width: 'max-content',
           height: 'min-content',
           flex: 'none',
@@ -153,8 +143,6 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
           style={{
             width: '100%',
             textAlign: 'center',
-            color: 'var(--text-muted)',
-            fontWeight: 'normal',
           }}
         >
           {homeGoals} <span className="text-[var(--text-muted)]">-</span>{' '}

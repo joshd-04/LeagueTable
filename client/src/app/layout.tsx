@@ -9,6 +9,8 @@ import { cookies } from 'next/headers';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { fetchAPI } from '@/util/api';
 import { User } from '@/util/definitions';
+import TanstackQueryContextProvider from '@/context/TanstackQueryContextProvider';
+import { NotificationContextProvider } from '@/context/NotificationContextProvider';
 
 const instrumentSans = Instrument_Sans({
   variable: '--font-instrument-sans',
@@ -80,12 +82,16 @@ export default async function RootLayout({
       <body
         className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative transition-colors duration-250 overflow-x-clip overflow-y-auto`}
       >
-        <GlobalContextProvider initialUser={user} initialError={error}>
-          <NavBar />
-          {children}
-          <Footer />
-          <ErrorMessage />
-        </GlobalContextProvider>
+        <TanstackQueryContextProvider>
+          <GlobalContextProvider initialUser={user} initialError={error}>
+            <NotificationContextProvider>
+              <NavBar />
+              {children}
+              <Footer />
+              <ErrorMessage />
+            </NotificationContextProvider>
+          </GlobalContextProvider>
+        </TanstackQueryContextProvider>
       </body>
     </html>
   );

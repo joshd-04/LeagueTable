@@ -76,9 +76,7 @@ export default function LatestResults({
       ) : (
         <Label
           style={{
-            color: 'var(--text-muted)',
             fontStyle: 'italic',
-            fontWeight: 'normal',
             placeSelf: 'center',
           }}
         >
@@ -114,8 +112,6 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
     >
       <Label
         style={{
-          fontWeight: 'normal',
-          color: 'var(--text-muted)',
           width: 'max-content',
           height: 'min-content',
           flex: 'none',

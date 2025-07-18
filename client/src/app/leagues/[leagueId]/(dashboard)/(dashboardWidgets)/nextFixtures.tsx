@@ -5,12 +5,7 @@ import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import { Fixture, League } from '@/util/definitions';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  Dispatch,
-  MouseEvent,
-  SetStateAction,
-  useState,
-} from 'react';
+import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
@@ -49,7 +44,6 @@ export default function NextFixtures({
 
   const nextFixtures: Fixture[] | undefined = data?.data.fixtures.slice(0, 3);
 
-
   const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
   const router = useRouter();
 
@@ -85,8 +79,6 @@ export default function NextFixtures({
           !isLoading && (
             <Label
               style={{
-                color: 'var(--text-muted)',
-                fontWeight: 'normal',
                 display: 'inline',
               }}
             >
@@ -117,9 +109,7 @@ export default function NextFixtures({
       ) : (
         <Label
           style={{
-            color: 'var(--text-muted)',
             fontStyle: 'italic',
-            fontWeight: 'normal',
             placeSelf: 'center',
           }}
         >
@@ -168,8 +158,6 @@ function FixtureRow({
     >
       <Label
         style={{
-          fontWeight: 'normal',
-          color: 'var(--text-muted)',
           padding: '0 10px',
           width: 'max-content',
           height: 'min-content',
@@ -195,8 +183,6 @@ function FixtureRow({
           style={{
             width: '100%',
             textAlign: 'center',
-            color: 'var(--text-muted)',
-            fontWeight: 'normal',
           }}
         >
           vs

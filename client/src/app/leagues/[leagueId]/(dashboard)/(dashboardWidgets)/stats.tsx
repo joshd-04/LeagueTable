@@ -114,8 +114,6 @@ function StatsTablePlayerBased({
         <Label
           style={{
             placeSelf: 'center',
-            color: 'var(--text-muted)',
-            fontWeight: 'normal',
             fontStyle: 'italic',
           }}
         >
@@ -201,8 +199,6 @@ function StatsTableTeamBased({
         <Label
           style={{
             placeSelf: 'center',
-            color: 'var(--text-muted)',
-            fontWeight: 'normal',
             fontStyle: 'italic',
           }}
         >

@@ -97,7 +97,7 @@ export default function FixturesClient({
             <div key={i}>
               <Label
                 style={{
-                  color: 'var(--text-muted)',
+                  fontWeight: 'bold',
                   marginBottom: '10px',
                   placeSelf: 'center',
                 }}
@@ -162,9 +162,7 @@ function FixtureRow({
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
-      <Label style={{ color: 'var(--text-muted)', textAlign: 'center' }}>
-        vs
-      </Label>
+      <Label style={{ fontWeight: 'bold', textAlign: 'center' }}>vs</Label>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
         <Subtitle
@@ -212,9 +210,7 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
-      <Label style={{ color: 'var(--text-muted)', textAlign: 'center' }}>
-        vs
-      </Label>
+      <Label style={{ fontWeight: 'bold', textAlign: 'center' }}>vs</Label>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
         <Subtitle

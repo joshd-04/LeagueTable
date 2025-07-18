@@ -293,22 +293,18 @@ function LeagueRow({
       <div className="flex flex-col justify-center items-start">
         <Subtitle>{league.name}</Subtitle>
         <div className="flex flex-row w-full justify-start items-center gap-[40px]">
-          <Label style={{ color: 'var(--text-muted)' }}>
-            {league.owner.name}
-          </Label>
-          <Label style={{ color: 'var(--text-muted)' }}>
+          <Label style={{ fontWeight: 'bold' }}>{league.owner.name}</Label>
+          <Label style={{ fontWeight: 'bold' }}>
             {league.actions?.length > 0 ? (
               <span className="text-[var(--warning)]">action required</span>
             ) : (
               `Season ${league.currentSeason} matchweek ${league.currentMatchweek}`
             )}
           </Label>
-          <Label style={{ color: 'var(--text-muted)' }}>
+          <Label style={{ fontWeight: 'bold' }}>
             {league.numDivisions} division{league.numDivisions > 1 ? 's' : ''}
           </Label>
-          <Label style={{ color: 'var(--text-muted)' }}>
-            {league.numTeams} teams
-          </Label>
+          <Label style={{ fontWeight: 'bold' }}>{league.numTeams} teams</Label>
         </div>
       </div>
     </motion.button>

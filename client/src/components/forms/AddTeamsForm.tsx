@@ -193,7 +193,11 @@ function FormSection({
               className="flex flex-col justify-baseline items-baseline w-full"
               key={i + 1}
             >
-              <Label style={{ color: 'var(--text-muted)' }}>
+              <Label
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
                 Team {i + 1} name
               </Label>
               <input
@@ -220,6 +224,7 @@ function FormSection({
               />
               <Label
                 style={{
+                  fontWeight: 'bold',
                   color: 'var(--danger)',
                   width: '100%',
                   opacity: teamErrors[division.divisionNumber - 1][i].name
