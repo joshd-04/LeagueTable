@@ -5,12 +5,14 @@ import { Notifier } from '@/lib/Notifier';
 import { useNotification } from '@/context/NotificationContextProvider';
 import { NotificationInterface } from '@/util/definitions';
 
-export function useNotifier(config: Omit<NotificationInterface, 'id'>) {
+export function useNotifier(
+  config: Omit<NotificationInterface, 'id' | 'resetCount'>
+) {
   const notify = useNotification();
   const [notifier, setNotifier] = useState<Notifier | null>(null);
 
   useEffect(() => {
-    const n = new Notifier(config, (opts) => {
+    const n = new Notifier({ ...config, resetCount: 0 }, (opts) => {
       notify.show({
         ...opts,
       });

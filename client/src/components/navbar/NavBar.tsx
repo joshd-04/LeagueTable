@@ -25,7 +25,13 @@ export function NavBar() {
   const noti = useNotifier({
     type: 'error',
     title: 'Changed colour theme!',
-    // description: 'Colour theme is now set to dark mode',
+    description: 'Colour theme is now set to dark mode',
+    duration: 5000,
+  });
+  const notiButtons = useNotifier({
+    type: 'warning',
+    title: 'This button is unavailable',
+    description: 'Functionality for this button is still missing.',
     duration: 5000,
   });
 
@@ -65,6 +71,9 @@ export function NavBar() {
         href="/login"
         color="var(--text)"
         bgHoverColor="var(--bg-light)"
+        style={{ fontSize: '1rem', padding: '8px 20px' }}
+        borderlessButton={true}
+        underlineEffect={false}
       >
         Log in
       </LinkButton>
@@ -72,6 +81,7 @@ export function NavBar() {
         href="/register"
         color="var(--primary)"
         bgHoverColor="var(--accent)"
+        style={{ fontSize: '1rem', padding: '8px 20px', height: ' ' }}
       >
         Sign up
       </LinkButton>
@@ -154,7 +164,7 @@ export function NavBar() {
   // }
 
   return (
-    <div className="flex flex-row justify-between w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] bg-[var(--bg)]">
+    <div className="flex flex-row justify-between items-center w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] bg-[var(--bg)]">
       <LinkButton
         href="/"
         color="black"
@@ -167,7 +177,9 @@ export function NavBar() {
       {pathname === '/' && !isLoggedIn && (
         <div>
           <Button
-            onClick={() => {}}
+            onClick={() => {
+              notiButtons?.fire();
+            }}
             borderlessButton={true}
             shadowEffect={false}
             color="var(--text)"
@@ -176,7 +188,9 @@ export function NavBar() {
             Features
           </Button>
           <Button
-            onClick={() => {}}
+            onClick={() => {
+              notiButtons?.fire();
+            }}
             borderlessButton={true}
             shadowEffect={false}
             color="var(--text)"
@@ -185,7 +199,9 @@ export function NavBar() {
             Use cases
           </Button>
           <Button
-            onClick={() => {}}
+            onClick={() => {
+              notiButtons?.fire();
+            }}
             borderlessButton={true}
             shadowEffect={false}
             color="var(--text)"
@@ -200,7 +216,7 @@ export function NavBar() {
           <Subtitle>Florian Wirtz Universal</Subtitle>
         </div>
       )} */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-stretch">
         {isLoggedIn ? buttonsLoggedIn : buttonsLoggedOut}
         <Button
           onClick={toggleTheme}

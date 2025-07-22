@@ -1,20 +1,22 @@
 import { NotificationInterface } from '@/util/definitions';
 import Paragraph from '../text/Paragraph';
 import InfoSVG from '@/assets/svg components/Info';
-import { AnimatePresence, motion } from 'motion/react';
-import Subtitle from '../text/Subtitle';
+import { AnimatePresence, motion, useAnimation } from 'motion/react';
 import { useEffect, useState } from 'react';
 import WarningSVG from '@/assets/svg components/Warning';
 import ErrorSVG from '@/assets/svg components/Error';
 import SuccessSVG from '@/assets/svg components/Success';
 import Label from '../text/Label';
+import { useNotification } from '@/context/NotificationContextProvider';
 
 export default function Notification({
   notification,
 }: {
   notification: NotificationInterface;
 }) {
-  console.log(notification);
+  // console.log(notification);
+
+  //  Handles the fade in / fade out animation
   const [display, setDisplay] = useState(true);
   useEffect(() => {
     setTimeout(() => {
@@ -22,6 +24,31 @@ export default function Notification({
     }, notification.duration);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Remove the notification early
+  const { setNotifications } = useNotification();
+
+  function removeNotification() {
+    setDisplay(false);
+    setTimeout(() => {
+      setNotifications((prev) => {
+        return prev.filter((noti) => noti.id !== notification.id);
+      });
+    }, 400);
+  }
+
+  // Vibration
+  const controls = useAnimation();
+  console.log(notification.resetCount);
+
+  useEffect(() => {
+    if (notification.resetCount !== 0) {
+      controls.start({
+        x: [0, -5, 5, -5, 5, 0],
+        transition: { duration: 0.3 },
+      });
+    }
+  }, [notification.resetCount, controls]);
 
   let icon = (
     <InfoSVG className="w-[24px] h-[24px] fill-[var(--info)] inline align-middle  " />
@@ -65,11 +92,13 @@ export default function Notification({
       {display && (
         <motion.div
           key="dropping-box"
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -100, opacity: 0 }}
+          initial={{ x: 200, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 200, opacity: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          className={`w-[440px] bg-[var(--bg)] left-[50%]  translate-x-[-50%] rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px] z-10 relative  shadow overflow-hidden hover:bg-[var(--bg-light)]`}
+          className={`w-[440px] bg-[var(--bg)] rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px] z-10 relative  shadow overflow-hidden hover:bg-[var(--bg-light)] hover:cursor-pointer`}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => removeNotification()}
         >
           <span>
             {icon}{' '}

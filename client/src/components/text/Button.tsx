@@ -31,7 +31,7 @@ export default function Button({
   const [isHovering, setIsHovering] = useState(false);
   const border = !borderlessButton
     ? `border-2 border-solid border-[${disabled ? 'var(--border)' : color}]`
-    : '';
+    : 'border-2 border-solid border-transparent';
   const shadow = shadowEffect ? 'shadow-[var(--shadow)]' : '';
   let bg = 'transparent';
   if (isHovering && !disabled) {

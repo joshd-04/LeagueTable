@@ -160,4 +160,5 @@ export interface NotificationInterface {
   description?: string;
   manualDismiss?: boolean;
   duration: number;
+  resetCount: number;
 }
