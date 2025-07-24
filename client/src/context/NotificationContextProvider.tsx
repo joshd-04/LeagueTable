@@ -26,6 +26,7 @@ export function useNotification() {
 }
 
 let idCounter = 0;
+const maxNotifications = 5;
 
 export function NotificationContextProvider({
   children,
@@ -57,7 +58,10 @@ export function NotificationContextProvider({
         ];
       }
 
-      return [...prev, { ...notification, id }];
+      if (prev.length === maxNotifications) {
+        return [{ ...notification, id }, ...prev.slice(0, 4)];
+      }
+      return [{ ...notification, id }, ...prev];
     });
 
     if (!notification.manualDismiss) {
