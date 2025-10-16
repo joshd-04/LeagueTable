@@ -28,6 +28,18 @@ export default function Notification({
   // Remove the notification early
   const { setNotifications } = useNotification();
 
+  const titleText =
+    typeof notification.title === 'string'
+      ? notification.title
+      : notification.title();
+
+  const descriptionText =
+    notification.description === undefined
+      ? undefined
+      : typeof notification.description === 'string'
+      ? notification.description
+      : notification.description();
+
   function removeNotification() {
     setDisplay(false);
     setTimeout(() => {
@@ -96,13 +108,11 @@ export default function Notification({
                 verticalAlign: 'middle',
               }}
             >
-              {notification.title}
+              {titleText}
             </Paragraph>
           </span>
           {notification.description !== undefined && (
-            <Label style={{ fontSize: '1rem' }}>
-              {notification.description}
-            </Label>
+            <Label style={{ fontSize: '1rem' }}>{descriptionText}</Label>
           )}
 
           <SwipeBackground color={colour} duration={notification.duration} />

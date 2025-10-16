@@ -23,11 +23,16 @@ export function NavBar() {
 
   const router = useRouter();
 
+  function makeTime() {
+    const date = new Date();
+    return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+  }
+
   const notiButtons = useNotifier({
     id: 'btn',
     type: 'warning',
     title: 'This button is unavailable',
-    description: 'Functionality for this button is still missing.',
+    description: makeTime,
     duration: 5000,
   });
 
