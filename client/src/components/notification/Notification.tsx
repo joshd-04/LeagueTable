@@ -1,7 +1,7 @@
 import { NotificationInterface } from '@/util/definitions';
 import Paragraph from '../text/Paragraph';
 import InfoSVG from '@/assets/svg components/Info';
-import { AnimatePresence, motion, useAnimation } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import WarningSVG from '@/assets/svg components/Warning';
 import ErrorSVG from '@/assets/svg components/Error';
@@ -36,19 +36,6 @@ export default function Notification({
       });
     }, 400);
   }
-
-  // Vibration
-  const controls = useAnimation();
-  console.log(notification.resetCount);
-
-  useEffect(() => {
-    if (notification.resetCount !== 0) {
-      controls.start({
-        x: [0, -5, 5, -5, 5, 0],
-        transition: { duration: 0.3 },
-      });
-    }
-  }, [notification.resetCount, controls]);
 
   let icon = (
     <InfoSVG className="w-[24px] h-[24px] fill-[var(--info)] inline align-middle  " />

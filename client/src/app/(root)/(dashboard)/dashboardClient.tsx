@@ -24,9 +24,15 @@ interface LeaguesInterface {
 export default function DashboardClient({
   initialUser,
   initialError,
+  initialLeagues,
 }: {
   initialUser: User | null;
   initialError: string;
+  initialLeagues: {
+    created: LeagueInterface[];
+    favourites: LeagueInterface[];
+    following: LeagueInterface[];
+  };
 }) {
   const context = useContext(GlobalContext);
   const { user, setUser } = context.account;
@@ -38,11 +44,7 @@ export default function DashboardClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialUser, initialError]);
 
-  const [leagues, setLeagues] = useState<LeaguesInterface>({
-    created: [],
-    favourites: [],
-    following: [],
-  });
+  const [leagues, setLeagues] = useState<LeaguesInterface>(initialLeagues);
   const simplifiedLeagues = {
     created: leagues.created.map((l) => l._id),
     favourites: leagues.favourites.map((l) => l._id),

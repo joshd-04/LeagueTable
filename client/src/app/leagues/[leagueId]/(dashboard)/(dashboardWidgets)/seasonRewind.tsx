@@ -44,22 +44,39 @@ export default function SeasonRewind({
           Season rewind
         </Paragraph>
         {seasonViewing === league.currentSeason ? (
-          <Label
+          <Button
+            color="transparent"
+            bgHoverColor="transparent"
             style={{
-              backgroundColor: 'var(--border)',
-              height: 'min-content',
-              padding: '0 8px',
-              borderRadius: '10px',
-              fontWeight: 'bold',
+              padding: 0,
+              textAlign: 'start',
             }}
+            shadowEffect={false}
+            borderlessButton={true}
+            underlineEffect={false}
+            onClick={() => {}}
+            disabled
           >
-            OFF
-          </Label>
+            <Label
+              style={{
+                backgroundColor: 'var(--border)',
+                height: 'min-content',
+                padding: '0 8px',
+                borderRadius: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              OFF
+            </Label>
+          </Button>
         ) : (
           <Button
             color="transparent"
             bgHoverColor="transparent"
-            style={{ padding: 0, textAlign: 'start' }}
+            style={{
+              padding: 0,
+              textAlign: 'start',
+            }}
             shadowEffect={false}
             borderlessButton={true}
             underlineEffect={false}
@@ -68,14 +85,11 @@ export default function SeasonRewind({
             <Label
               style={{
                 backgroundColor: 'var(--success)',
-                height: 'full',
-                display: 'flex',
-                flexGrow: '1',
+                color: 'black',
+                height: 'min-content',
                 padding: '0 8px',
                 borderRadius: '10px',
-                color: 'black',
-                margin: 0,
-                marginBlock: 0,
+                fontWeight: 'bold',
               }}
             >
               ON

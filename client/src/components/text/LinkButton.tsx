@@ -68,12 +68,14 @@ export default function LinkButton({
       >
         {/* If its a borderless button show the underline effect */}
         {underlineEffect ? (
-          <span
-            className={`relative after:content-[''] after:h-[3px] after:left-[0px] after:bottom-[-5px] after:block underline-container-bg w-full after:absolute ${
-              isHovering ? 'after:w-full' : 'after:w-0'
-            } after:transition-all`}
-          >
+          <span className={`relative`}>
             {children}
+            <span
+              className={`h-[3px] left-[0px] bottom-[-5px] block  absolute ${
+                isHovering ? 'w-full' : 'w-0'
+              } transition-all`}
+              style={{ backgroundColor: color }}
+            ></span>
           </span>
         ) : (
           <>{children}</>

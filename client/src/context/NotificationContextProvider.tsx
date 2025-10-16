@@ -9,11 +9,13 @@ import {
   ReactNode,
   SetStateAction,
   Dispatch,
+  useRef,
+  useEffect,
 } from 'react';
 
 type NotificationContextType = {
   setNotifications: Dispatch<SetStateAction<NotificationInterface[]>>;
-  show: (notification: Omit<NotificationInterface, 'id'>) => void;
+  show: (notification: NotificationInterface) => void;
 };
 
 const NotificationContext = createContext<NotificationContextType | null>(null);
@@ -25,7 +27,6 @@ export function useNotification() {
   return ctx;
 }
 
-let idCounter = 0;
 const maxNotifications = 5;
 
 export function NotificationContextProvider({
@@ -36,43 +37,53 @@ export function NotificationContextProvider({
   const [notifications, setNotifications] = useState<NotificationInterface[]>(
     []
   );
+  const notificationsRef = useRef<NotificationInterface[]>([]);
 
-  function show(notification: Omit<NotificationInterface, 'id'>) {
-    // if notification already shown, restart it
-    const id = idCounter++;
+  useEffect(() => {
+    notificationsRef.current = notifications;
+  }, [notifications]);
+
+  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+
+  function show(notification: NotificationInterface) {
+    const alreadyExists = notificationsRef.current.some(
+      (n) => n.id === notification.id
+    );
+
+    if (alreadyExists) {
+      // Clear existing timer and dismiss
+      dismiss(notification.id);
+
+      // Re-add after a short delay to trigger visual re-entry or shake
+      setTimeout(() => {
+        show(notification);
+      }, 50); // small delay to force re-render / animation
+      return;
+    }
+
+    // Show new notification
     setNotifications((prev) => {
-      const exists = prev.filter((noti) => {
-        return (
-          noti.title === notification.title &&
-          noti.description === notification.description &&
-          noti.type === notification.type &&
-          noti.duration === notification.duration
-        );
-      });
-
-      if (exists.length > 0) {
-        const existingNoti = exists[0];
-        return [
-          ...prev.filter((noti) => noti.id !== existingNoti.id),
-          { ...existingNoti, resetCount: existingNoti.resetCount + 1 },
-        ];
-      }
-
       if (prev.length === maxNotifications) {
-        return [{ ...notification, id }, ...prev.slice(0, 4)];
+        return [{ ...notification }, ...prev.slice(0, maxNotifications - 1)];
       }
-      return [{ ...notification, id }, ...prev];
+      return [{ ...notification }, ...prev];
     });
 
-    if (!notification.manualDismiss) {
-      setTimeout(() => {
-        setNotifications((prev) =>
-          prev.filter((n) => {
-            return n.id !== id;
-          })
-        );
-      }, notification.duration + 400);
-    }
+    const t: ReturnType<typeof setTimeout> = setTimeout(() => {
+      dismiss(notification.id);
+    }, notification.duration + 400);
+
+    timers.current.set(notification.id, t);
+  }
+
+  function dismiss(id: string) {
+    clearTimeout(timers.current.get(id));
+    timers.current.delete(id);
+    setNotifications((prev) =>
+      prev.filter((n) => {
+        return n.id !== id;
+      })
+    );
   }
 
   return (

@@ -154,11 +154,10 @@ export interface Team {
 }
 
 export interface NotificationInterface {
-  id: number;
+  id: string;
   type: 'info' | 'success' | 'warning' | 'error';
   title: string;
   description?: string;
   manualDismiss?: boolean;
   duration: number;
-  resetCount: number;
 }

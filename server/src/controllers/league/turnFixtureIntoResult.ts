@@ -3,7 +3,6 @@ import League from '../../models/leagueModel';
 import {
   IFixtureSchema,
   ILeagueSchema,
-  ITable,
   ITeamsSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
@@ -162,13 +161,13 @@ export async function turnFixtureIntoResult(
       );
     }
 
-    const homeTeamPosition = findLeaguePosition(
+    const homeTeamPosition = await findLeaguePosition(
       league,
       homeDetails.division,
       fixture.season,
       homeDetails.name
     );
-    const awayTeamPosition = findLeaguePosition(
+    const awayTeamPosition = await findLeaguePosition(
       league,
       awayDetails.division,
       fixture.season,

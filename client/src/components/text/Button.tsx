@@ -1,7 +1,6 @@
 'use client';
 import React, { CSSProperties, useState } from 'react';
 import { motion } from 'motion/react';
-import './effects.css';
 
 interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
@@ -49,7 +48,7 @@ export default function Button({
 
   return (
     <motion.button
-      className={`font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem]  py-[5px] px-[20px]  rounded-[10px] ${border} ${shadow} ${
+      className={`h-full font-[family-name:var(--font-instrument-sans)] font-semibold text-[1rem] md:text-[1.125rem] xl:text-[1.25rem]  py-[5px] px-[20px]  rounded-[10px] ${border} ${shadow} ${
         !disabled && 'hover:border-transparent'
       } transition-colors duration-250 text-center`}
       onClick={onClick}
@@ -69,12 +68,14 @@ export default function Button({
     >
       {/* If its a borderless button show the underline effect */}
       {underlineEffect ? (
-        <span
-          className={`relative after:content-[''] after:h-[3px] after:left-[0px] after:bottom-[-5px] after:block  after:absolute underline-container-bg ${
-            isHovering ? 'after:w-full' : 'after:w-0'
-          } after:transition-all `}
-        >
+        <span className={`relative`}>
           {children}
+          <span
+            className={`h-[3px] left-[0px] bottom-[-5px] block  absolute ${
+              isHovering ? 'w-full' : 'w-0'
+            } transition-all`}
+            style={{ backgroundColor: color }}
+          ></span>
         </span>
       ) : (
         <>{children}</>

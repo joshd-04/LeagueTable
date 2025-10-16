@@ -22,13 +22,9 @@ export function NavBar() {
   const { isLoggedIn } = useAccount();
 
   const router = useRouter();
-  const noti = useNotifier({
-    type: 'error',
-    title: 'Changed colour theme!',
-    description: 'Colour theme is now set to dark mode',
-    duration: 5000,
-  });
+
   const notiButtons = useNotifier({
+    id: 'btn',
     type: 'warning',
     title: 'This button is unavailable',
     description: 'Functionality for this button is still missing.',
@@ -36,7 +32,6 @@ export function NavBar() {
   });
 
   function toggleTheme() {
-    noti?.fire();
     if (colorTheme === 'dark') {
       setColorTheme('light');
     } else {
@@ -72,8 +67,8 @@ export function NavBar() {
         color="var(--text)"
         bgHoverColor="var(--bg-light)"
         style={{ fontSize: '1rem', padding: '8px 20px' }}
-        borderlessButton={true}
         underlineEffect={false}
+        borderlessButton={true}
       >
         Log in
       </LinkButton>
@@ -119,9 +114,9 @@ export function NavBar() {
       </Button>
       {isAccountMenuOpen && (
         <>
-          <div className="absolute top-[4.5rem] right-[14rem] bg-[var(--bg)] rounded-[10px] z-20 shadow-[var(--shadow)]">
-            <ul className="flex flex-col gap-1">
-              <li>
+          <div className="absolute top-[3.5rem] right-[0] bg-[var(--bg)] rounded-[10px] z-20 shadow-[var(--shadow)] border-1 border-[var(--border)]">
+            <ul className="flex flex-col justify-center items-stretch w-full gap-1">
+              <li className="">
                 <Button
                   // onClick={handleSignOut}
                   color="var(--text)"
@@ -129,9 +124,32 @@ export function NavBar() {
                   borderlessButton={true}
                   underlineEffect={false}
                   shadowEffect={false}
-                  style={{ fontSize: '1rem' }}
+                  style={{ fontSize: '1rem', width: '100%' }}
                 >
                   option 2
+                </Button>
+              </li>
+              <li>
+                <Button
+                  onClick={toggleTheme}
+                  color="var(--text)"
+                  bgHoverColor="var(--bg-light)"
+                  borderlessButton={true}
+                  underlineEffect={false}
+                  shadowEffect={false}
+                  style={{ fontSize: '1rem', width: '100%' }}
+                >
+                  {colorTheme === 'light' ? (
+                    <span className="flex flex-row gap-2 items-center">
+                      <DarkModeSVG className="w-[16px] h-[16px] fill-[var(--text)] inline" />
+                      Dark mode
+                    </span>
+                  ) : (
+                    <span className="flex flex-row gap-2 items-center">
+                      <LightModeSVG className="w-[16px] h-[16px] fill-[var(--text)] inline" />
+                      Light mode
+                    </span>
+                  )}
                 </Button>
               </li>
               <li>
@@ -143,7 +161,7 @@ export function NavBar() {
                   color="var(--danger)"
                   bgHoverColor="var(--bg-light)"
                   shadowEffect={false}
-                  style={{ fontSize: '1rem' }}
+                  style={{ fontSize: '1rem', width: '100%' }}
                 >
                   Sign out
                 </Button>
@@ -164,74 +182,77 @@ export function NavBar() {
   // }
 
   return (
-    <div className="flex flex-row justify-between items-center w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] bg-[var(--bg)]">
-      <LinkButton
-        href="/"
-        color="black"
-        borderlessButton={true}
-        shadowEffect={false}
-        bgHoverColor="transparent"
-      >
-        <Logo />
-      </LinkButton>
-      {pathname === '/' && !isLoggedIn && (
-        <div>
-          <Button
-            onClick={() => {
-              notiButtons?.fire();
-            }}
-            borderlessButton={true}
-            shadowEffect={false}
-            color="var(--text)"
-            bgHoverColor="transparent"
-          >
-            Features
-          </Button>
-          <Button
-            onClick={() => {
-              notiButtons?.fire();
-            }}
-            borderlessButton={true}
-            shadowEffect={false}
-            color="var(--text)"
-            bgHoverColor="transparent"
-          >
-            Use cases
-          </Button>
-          <Button
-            onClick={() => {
-              notiButtons?.fire();
-            }}
-            borderlessButton={true}
-            shadowEffect={false}
-            color="var(--text)"
-            bgHoverColor="transparent"
-          >
-            FAQ
-          </Button>
-        </div>
-      )}
-      {/* {pathname.startsWith('/leagues/') && (
-        <div className="flex flex-col justify-center">
-          <Subtitle>Florian Wirtz Universal</Subtitle>
-        </div>
-      )} */}
-      <div className="flex gap-2 items-stretch">
-        {isLoggedIn ? buttonsLoggedIn : buttonsLoggedOut}
-        <Button
-          onClick={toggleTheme}
-          color="transparent"
-          bgHoverColor="var(--bg-light)"
+    <div className="flex h-full relative flex-row justify-center items-center grow-1 max-w-full w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] bg-[var(--bg)]">
+      <div className="flex h-full relative flex-row justify-between w-full items-stretch bg-[var(--bg)]">
+        <LinkButton
+          href="/"
+          color="var(--text)"
           borderlessButton={true}
-          underlineEffect={false}
-          style={{ padding: '0 10px' }}
+          shadowEffect={false}
+          underlineEffect={true}
+          bgHoverColor="transparent"
         >
-          {colorTheme === 'light' ? (
-            <DarkModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
-          ) : (
-            <LightModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
-          )}
-        </Button>
+          <Logo />
+        </LinkButton>
+        {pathname === '/' && !isLoggedIn && (
+          <div>
+            <Button
+              onClick={() => {
+                notiButtons?.fire();
+              }}
+              borderlessButton={true}
+              shadowEffect={false}
+              color="var(--text-muted)"
+              bgHoverColor="transparent"
+            >
+              Features
+            </Button>
+            <Button
+              onClick={() => {
+                notiButtons?.fire();
+              }}
+              borderlessButton={true}
+              shadowEffect={false}
+              color="var(--text-muted)"
+              bgHoverColor="transparent"
+            >
+              Use cases
+            </Button>
+            <Button
+              onClick={() => {
+                notiButtons?.fire();
+              }}
+              borderlessButton={true}
+              shadowEffect={false}
+              color="var(--text-muted)"
+              bgHoverColor="transparent"
+            >
+              FAQ
+            </Button>
+          </div>
+        )}
+        {/* {pathname.startsWith('/leagues/') && (
+        <div className="flex flex-col justify-center">
+        <Subtitle>Florian Wirtz Universal</Subtitle>
+        </div>
+        )} */}
+        <div className="flex flex-row gap-2 ">
+          {isLoggedIn ? buttonsLoggedIn : buttonsLoggedOut}
+          {/* <Button
+            onClick={toggleTheme}
+            color="transparent"
+            bgHoverColor="var(--bg-light)"
+            borderlessButton={true}
+            underlineEffect={false}
+            style={{ padding: '0 10px', height: '100%' }}
+          >
+            {colorTheme === 'light' ? (
+              <DarkModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
+            ) : (
+              <LightModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
+            )}
+          </Button> */}
+        </div>
       </div>
     </div>
   );

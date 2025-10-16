@@ -1,6 +1,6 @@
 import { NotificationInterface } from '@/util/definitions';
 
-type NotificationOptions = Omit<NotificationInterface, 'id'>;
+type NotificationOptions = NotificationInterface;
 
 export class Notifier {
   private options: NotificationOptions;

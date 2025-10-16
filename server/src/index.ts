@@ -41,12 +41,13 @@ import {
 } from './controllers/user';
 import morgan from 'morgan';
 import { getResultByIdController } from './controllers/league/getResultByIdController';
+import { BACKEND_PORT, FRONTEND_URL } from './config';
 
 connectDB();
 
 const app = express();
 
-const port = 3000;
+const port = BACKEND_PORT;
 
 // This object contains the REQUIRED fields to be sent by the client. If any required fields are absent, the request is rejected.
 
@@ -66,7 +67,7 @@ export const requiredFields: RequiredFields = {
 // Convert incoming data into json
 app.use(
   cors({
-    origin: 'http://localhost:3001', // allow your frontend
+    origin: FRONTEND_URL, // allow your frontend
     credentials: true,
   })
 );

@@ -3,6 +3,7 @@ import Button from '@/components/text/Button';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import { GlobalContext } from '@/context/GlobalContextProvider';
+import { useNotifier } from '@/hooks/useNotifier';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
@@ -34,6 +35,21 @@ export default function Controls({
 
   const { setError } = useContext(GlobalContext).errors;
 
+  const notiMatchweekSuccess = useNotifier({
+    id: 'matchweek',
+    type: 'success',
+    title: 'Next matchweek is underway',
+    duration: 3000,
+  });
+
+  const notiMatchweekError = useNotifier({
+    id: 'matchweek',
+    type: 'error',
+    title: 'Matchweek Error',
+    description: 'There was an error starting the next matchweek :(',
+    duration: 3000,
+  });
+
   function handleStartNextMatchweek() {
     return fetchAPI(`${API_URL}/leagues/${league._id}/start-next-matchweek`, {
       method: 'POST',
@@ -45,14 +61,30 @@ export default function Controls({
     mutationFn: handleStartNextMatchweek,
     onSuccess: () => {
       invalidateDashboardQueries();
+      notiMatchweekSuccess?.fire();
     },
     onError: (e) => {
       setMatchweekButtonText('Something went wrong');
+      notiMatchweekError?.fire();
       setError(e.message);
       setTimeout(() => {
         setMatchweekButtonText(`Start matchweek ${currentMatchweek + 1}`);
       }, 3000);
     },
+  });
+
+  const notiSeasonSuccess = useNotifier({
+    id: 'season',
+    type: 'success',
+    title: 'Next Season is underway',
+    duration: 3000,
+  });
+  const notiSeasonError = useNotifier({
+    id: 'season',
+    type: 'error',
+    title: 'Season Error',
+    description: 'There was an error starting the next season :(',
+    duration: 3000,
   });
 
   function handleStartNextSeason() {
