@@ -38,6 +38,11 @@ export default async function Page({ params }) {
         leagueId={leagueId}
       />
     );
+  } else if (
+    response.statusCode === 403 &&
+    response.data.property === 'tables'
+  ) {
+    redirect(`/create-league/${leagueId}/tables`);
   }
 
   return redirect('/');

@@ -8,10 +8,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export default function Page() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/'; // fallback
-  const {isLoggedIn} = useAccount()
-  const router = useRouter()
-  if (isLoggedIn){
-    router.replace('/')
+
+  const { isLoggedIn } = useAccount();
+  const router = useRouter();
+  if (isLoggedIn) {
+    router.replace('/');
   }
 
   return (

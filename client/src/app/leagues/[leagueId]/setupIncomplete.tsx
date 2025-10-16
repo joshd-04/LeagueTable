@@ -76,7 +76,7 @@ export default function SetupIncomplete({
   return (
     <div className="flex flex-col justify-center items-center w-full pt-[100px]">
       <div
-        className={`w-[440px] bg-[var(--bg)]  rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px]`}
+        className={`w-[440px] bg-[var(--bg)]  rounded-[10px] border-1 border-solid border-[var(--border)] py-[20px] px-[20px]`}
       >
         {userOwnsThisLeague ? (
           <div className="flex flex-col justify-center">

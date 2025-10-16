@@ -1,3 +1,5 @@
+import Subtitle from '@/components/text/Subtitle';
+
 export default function LandingPage() {
-  return <></>;
+  return <Subtitle>This is the LandingPage</Subtitle>;
 }

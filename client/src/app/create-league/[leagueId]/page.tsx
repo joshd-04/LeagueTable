@@ -1,9 +1,9 @@
 // this is the data fetcher.
 
+import UnexpectedError from '@/components/unexpectedError/unexpectedError';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { cookies } from 'next/headers';
-import AddTables from './addTables';
 import { redirect } from 'next/navigation';
 
 // @ts-expect-error idk
@@ -21,20 +21,14 @@ export default async function Page({ params }) {
 
   if (response.status === 'success') return redirect(`/leagues/${leagueId}`);
 
-  if (response.statusCode === 403 && response.data.property === 'tables') {
-    return (
-      <AddTables
-        divisionsCount={response.data.league.divisionsCount}
-        leagueName={response.data.league.name}
-        leagueId={leagueId}
-      />
-    );
+  if (response.statusCode === 403 && response.data.property === 'teams') {
+    redirect(`/create-league/${leagueId}/teams`);
   } else if (
     response.statusCode === 403 &&
-    response.data.property === 'teams'
+    response.data.property === 'tables'
   ) {
-    redirect(`/create-league/${leagueId}/teams`);
+    redirect(`/create-league/${leagueId}/tables`);
   }
 
-  return redirect('/login');
+  return <UnexpectedError />;
 }
