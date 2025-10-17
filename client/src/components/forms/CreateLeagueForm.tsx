@@ -146,6 +146,11 @@ export default function CreateLeagueForm() {
         setValue={setLeagueName}
         error={leagueNameError}
         setError={setLeagueNameError}
+        validatorFn={(x) =>
+          x === 'red'
+            ? { pass: true }
+            : { pass: false, message: 'should be red' }
+        }
         options={{
           label: 'League Name',
           labelCaption: 'visible to others',
@@ -213,8 +218,13 @@ function LeagueTypeSelection({
 
   return (
     <div className="flex flex-col justify-baseline items-baseline w-full">
-      <Label style={{ 
-            fontWeight:'bold', }}>League Type</Label>
+      <Label
+        style={{
+          fontWeight: 'bold',
+        }}
+      >
+        League Type
+      </Label>
 
       <fieldset
         className="rounded-[10px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] w-full grid grid-rows-1 grid-cols-2 gap-[10px] relative
@@ -295,7 +305,7 @@ function LeagueTypeSelection({
       </fieldset>
       <Label
         style={{
-            fontWeight:'bold',
+          fontWeight: 'bold',
           color: 'var(--danger)',
           width: '100%',
           opacity: error ? undefined : '0',

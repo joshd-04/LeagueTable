@@ -121,8 +121,16 @@ export function NavBar() {
         style={accountMenuButtonStyle}
         onClick={() => setIsAccountMenuOpen((prev) => !prev)}
       >
-        <span className="text-[var(--text)] flex flex-row gap-[10px] justify-center items-center">
-          {user?.username}{' '}
+        <span
+          className=" flex flex-row gap-[10px] justify-center items-center"
+          style={{
+            color:
+              user?.accountType === 'pro' ? 'var(--warning)' : 'var(--text)',
+          }}
+        >
+          {user?.accountType === 'pro'
+            ? `👑 ${user?.username}`
+            : user?.username}{' '}
           <AccountCircleSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
         </span>
       </Button>
