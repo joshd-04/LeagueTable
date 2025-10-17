@@ -51,14 +51,15 @@ export default function DashboardClient({
     following: leagues.following.map((l) => l._id),
   };
 
-  const { data: associatedLeaguesData, isLoading } = useQuery({
-    queryFn: () =>
-      fetchAPI(`${API_URL}/leagues/associated`, {
-        method: 'GET',
-        credentials: 'include',
-      }),
-    queryKey: ['associatedHomePage'],
-  });
+  const { data: associatedLeaguesData, isLoading: associatedLeaguesIsLoading } =
+    useQuery({
+      queryFn: () =>
+        fetchAPI(`${API_URL}/leagues/associated`, {
+          method: 'GET',
+          credentials: 'include',
+        }),
+      queryKey: ['associatedHomePage'],
+    });
 
   useEffect(() => {
     if (associatedLeaguesData !== undefined) {
@@ -149,8 +150,12 @@ export default function DashboardClient({
     <div className="w-full h-full flex flex-row justify-center items-baseline">
       <div className="max-w-[960px] w-[960px] flex flex-col gap-4 mt-6">
         <Heading3>Welcome, {user?.username}</Heading3>
-        {isLoading ? (
-          <Subtitle>Loading...</Subtitle>
+        {associatedLeaguesIsLoading ? (
+          <>
+            <LeagueSectionSkeleton title="Favourite Leagues" />
+            <LeagueSectionSkeleton title="Your Leagues" />
+            <LeagueSectionSkeleton title="Bookmarked Leagues" />
+          </>
         ) : (
           <>
             <LeagueSection
@@ -176,6 +181,19 @@ export default function DashboardClient({
             />
           </>
         )}
+      </div>
+    </div>
+  );
+}
+
+function LeagueSectionSkeleton({ title }: { title: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Paragraph>{title}</Paragraph>
+      <div className=" animate-pulse">
+        <NoLeaguesFound>
+          <i>Loading...</i>
+        </NoLeaguesFound>
       </div>
     </div>
   );

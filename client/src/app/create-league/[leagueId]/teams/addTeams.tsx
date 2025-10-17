@@ -24,7 +24,7 @@ export default function AddTeams({
         <div className="grid grid-cols-3 grid-rows-1 w-[96vw] gap-[40px] pt-[40px]">
           <div></div>
           <AddTeamsForm divisions={divisions} leagueId={leagueId} />
-          <div className="p-[20px] max-w-[80%] h-min w-fit bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
+          <div className="sticky top-8 self-start p-[20px] max-w-[80%] h-min w-fit bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
             <span>
               <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
               <Paragraph

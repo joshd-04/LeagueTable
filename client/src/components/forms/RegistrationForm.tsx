@@ -6,6 +6,7 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import { User } from '@/util/definitions';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
+import { useMutation } from '@tanstack/react-query';
 
 export default function RegistrationForm() {
   // Values
@@ -28,7 +29,64 @@ export default function RegistrationForm() {
   const setUser = globalContext.account.setUser;
   const setError = globalContext.errors.setError;
 
+  const [buttonColor, setButtonColor] = useState('var(--primary)');
+  const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
   const router = useRouter();
+
+  function handleSendRequest() {
+    return fetchAPI(`${API_URL}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password,
+      }),
+      credentials: 'include',
+    });
+  }
+
+  const { mutateAsync: handleRequestMutation, isPending } = useMutation({
+    mutationFn: handleSendRequest,
+    onSuccess: (result) => {
+      if (result.status === 'success') {
+        const user: User = {
+          id: result.data.userId,
+          username: result.data.username,
+          email: result.data.email,
+          accountType: result.data.accountType,
+        };
+        setUser(user);
+        router.push('/');
+      } else if (result.status === 'fail') {
+        if (result.statusCode === 409) {
+          const message = result.data.message as string;
+          if (message.includes('email')) {
+            setEmailError(message);
+          } else if (message.includes('username')) {
+            setUsernameError(message);
+          }
+        }
+
+        setButtonText('There was a problem, try again');
+        setButtonColor('var(--warning)');
+        setButtonHoverColor('var(--bg-light)');
+
+        setTimeout(() => {
+          setButtonColor('var(--primary)');
+          setButtonHoverColor('var(--accent)');
+          setButtonText('Let me in!');
+        }, 2000);
+      } else {
+        setError(result.message);
+      }
+    },
+    onError: (e) => {
+      setError(e.message);
+    },
+  });
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
@@ -84,50 +142,10 @@ export default function RegistrationForm() {
 
     if (errorsPresent) return;
 
-    setButtonText('...');
-
     // p.s password hashing will be done on server side. much safer that way.
     try {
-      const response = await fetchAPI(`${API_URL}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
-        }),
-        credentials: 'include',
-      });
-
-      setButtonText("Let's go");
-
-      if (response.status === 'fail') {
-        if (response.statusCode === 409) {
-          const message = response.data.message as string;
-          if (message.includes('email')) {
-            setEmailError(message);
-          } else if (message.includes('username')) {
-            setUsernameError(message);
-          }
-        }
-      } else if (response.status === 'error') {
-        const message = response.data.message as string;
-        setError(message);
-      } else {
-        // success
-        const user: User = {
-          id: response.data.userId,
-          username: response.data.username,
-          email: response.data.email,
-          accountType: response.data.accountType,
-        };
-        setUser(user);
-        router.push('/');
-      }
-    } catch (err) {
-      const e = await err;
+      handleRequestMutation();
+    } catch (e) {
       console.error(e);
     }
   }
@@ -183,12 +201,11 @@ export default function RegistrationForm() {
       />
       <Button
         type="submit"
-        color="var(--primary)"
-        bgHoverColor="var(--accent)"
-        onClick={() => {}}
+        color={buttonColor}
+        bgHoverColor={buttonHoverColor}
         style={{ width: '100%' }}
       >
-        {buttonText}
+        {isPending ? '...' : buttonText}
       </Button>
     </form>
   );

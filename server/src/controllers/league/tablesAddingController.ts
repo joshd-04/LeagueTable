@@ -106,6 +106,14 @@ export async function tablesAddingController(
     // Make sure that the promotion/relegation division maths adds up correctly
     tables.forEach((table, i) => {
       if (!errors.table) {
+        // Make sure that tail tables don't promote or relegate into thin air
+        if (i === 0) {
+          table.numberOfTeamsToBePromoted = 0;
+        } else if (i === tables.length - 1) {
+          table.numberOfTeamsToBeRelegated = 0;
+        }
+
+        // Make sure that a fair amount of teams are being promoted/relegated
         if (
           table.numberOfTeamsToBePromoted > 0.5 * table.numberOfTeams ||
           table.numberOfTeamsToBeRelegated > 0.5 * table.numberOfTeams
@@ -113,11 +121,8 @@ export async function tablesAddingController(
           errors.table =
             'You cannot promote or relegate more than half the teams in the table.';
         }
-        if (i === 0) {
-          table.numberOfTeamsToBePromoted = 0;
-        } else if (i === tables.length) {
-          table.numberOfTeamsToBeRelegated = 0;
-        }
+
+        // Make sure promotion / relegation numbers match up
         if (i > 0) {
           const previousTable = tables[i - 1];
           if (

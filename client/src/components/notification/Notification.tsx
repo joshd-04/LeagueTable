@@ -2,7 +2,7 @@ import { NotificationInterface } from '@/util/definitions';
 import Paragraph from '../text/Paragraph';
 import InfoSVG from '@/assets/svg components/Info';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import WarningSVG from '@/assets/svg components/Warning';
 import ErrorSVG from '@/assets/svg components/Error';
 import SuccessSVG from '@/assets/svg components/Success';
@@ -15,25 +15,33 @@ export default function Notification({
   notification: NotificationInterface;
 }) {
   // console.log(notification);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   //  Handles the fade in / fade out animation
   const [display, setDisplay] = useState(true);
   useEffect(() => {
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setDisplay(false);
     }, notification.duration);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Remove the notification early
-  const { setNotifications } = useNotification();
+  const { setNotifications, dismiss } = useNotification();
 
-  const titleText =
+  const title: string =
     typeof notification.title === 'string'
       ? notification.title
       : notification.title();
 
-  const descriptionText =
+  const description: string | undefined =
     notification.description === undefined
       ? undefined
       : typeof notification.description === 'string'
@@ -42,10 +50,17 @@ export default function Notification({
 
   function removeNotification() {
     setDisplay(false);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
     setTimeout(() => {
       setNotifications((prev) => {
         return prev.filter((noti) => noti.id !== notification.id);
       });
+      dismiss(notification.id);
     }, 400);
   }
 
@@ -95,7 +110,7 @@ export default function Notification({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 200, opacity: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          className={`w-[440px] bg-[var(--bg)] rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px] z-10 relative  shadow overflow-hidden hover:bg-[var(--bg-light)] hover:cursor-pointer`}
+          className={`w-[440px] bg-[var(--bg)] rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px] z-10 relative shadow overflow-hidden hover:bg-[var(--bg-light)] hover:cursor-pointer flex flex-col gap-1 `}
           whileTap={{ scale: 0.98 }}
           onClick={() => removeNotification()}
         >
@@ -108,11 +123,13 @@ export default function Notification({
                 verticalAlign: 'middle',
               }}
             >
-              {titleText}
+              {title}
             </Paragraph>
           </span>
           {notification.description !== undefined && (
-            <Label style={{ fontSize: '1rem' }}>{descriptionText}</Label>
+            <Label style={{ fontSize: '1rem', lineHeight: 1.25 }}>
+              {description}
+            </Label>
           )}
 
           <SwipeBackground color={colour} duration={notification.duration} />

@@ -14,6 +14,8 @@ import { fetchAPI } from '@/util/api';
 import Label from '../text/Label';
 import useAccount from '@/hooks/useAccount';
 import Subtitle from '../text/Subtitle';
+import { useMutation } from '@tanstack/react-query';
+import { useNotifier } from '@/hooks/useNotifier';
 
 interface DivisionInputsInterface {
   tableName: string;
@@ -76,6 +78,59 @@ export default function AddTablesForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const uniqueNamesNotification = useNotifier({
+    id: 'uniqueTableName',
+    title: 'Table names must be unique',
+    description:
+      'Just double check that your table names are different from each other',
+    type: 'warning',
+    duration: 5000,
+  });
+
+  function handleSendRequest() {
+    return fetchAPI(`${API_URL}/leagues/${leagueId}/tables`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tables: divisionInputs.map((x, i) => {
+          return { ...x, division: i + 1, name: x.tableName };
+        }),
+      }),
+      credentials: 'include',
+    });
+  }
+
+  const { mutateAsync: handleRequestMutation, isPending } = useMutation({
+    mutationFn: handleSendRequest,
+    onSuccess: (result) => {
+      if (result.status === 'success') {
+        setButtonText('Success!');
+        setButtonColor('var(--success)');
+        setButtonHoverColor('var(--bg-light)');
+        setTimeout(() => {
+          router.push(`/leagues/${leagueId}`);
+        }, 300);
+      } else if (result.status === 'fail') {
+        setButtonText('There was an error');
+        setButtonColor('var(--danger)');
+        setButtonHoverColor('var(--bg-light)');
+
+        setTimeout(() => {
+          setButtonColor('var(--primary)');
+          setButtonHoverColor('var(--accent)');
+          setButtonText('Next');
+        }, 2000);
+      } else {
+        setError(result.message);
+      }
+    },
+    onError: (e) => {
+      setError(e.message);
+    },
+  });
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
@@ -120,13 +175,14 @@ export default function AddTablesForm({
       divisionInputs.map((divisionInput) => divisionInput.tableName)
     ).size;
     if (uniqueCount !== divisionInputs.length) {
-      setError('Table names must be unique');
+      uniqueNamesNotification?.fire();
       return;
     }
 
     setDivisionErrors(freshErrors);
 
     // true means there are errors
+
     const x = freshErrors.map((freshErrorSet) => {
       if (
         freshErrorSet.tableName !== '' ||
@@ -141,39 +197,8 @@ export default function AddTablesForm({
 
     if (errorsPresent) return;
 
-    setButtonText('...');
-
     try {
-      const response = await fetchAPI(`${API_URL}/leagues/${leagueId}/tables`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tables: divisionInputs.map((x, i) => {
-            return { ...x, division: i + 1, name: x.tableName };
-          }),
-        }),
-        credentials: 'include',
-      });
-
-      if (response.status === 'fail') {
-        setError(response.data.message);
-        setButtonText('Next');
-      } else if (response.status === 'error') {
-        const message = response.message as string;
-        setError(message);
-        setButtonText('Next');
-      } else {
-        // success
-        // Do a nice welcome animation
-        setButtonText('Success!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
-        setTimeout(() => {
-          router.push(`/leagues/${leagueId}`);
-        }, 300);
-      }
+      handleRequestMutation();
     } catch (e) {
       console.error(e);
     }
@@ -207,7 +232,7 @@ export default function AddTablesForm({
         onClick={() => {}}
         style={{ width: '100%' }}
       >
-        {buttonText}
+        {isPending ? '...' : buttonText}
       </Button>
     </form>
   );

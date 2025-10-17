@@ -14,8 +14,10 @@ export default async function Home() {
     },
     cache: 'no-store', // optional: prevent caching
   });
+
   let user: User | null;
   let error: string = '';
+
   if (response.status === 'success') {
     user = {
       id: response.data._id,

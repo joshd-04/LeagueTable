@@ -13,6 +13,7 @@ import {
   SetStateAction,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -35,18 +36,28 @@ export default function Controls({
 
   const { setError } = useContext(GlobalContext).errors;
 
+  const currentMatchweekRef = useRef(league.currentMatchweek);
+  useEffect(() => {
+    currentMatchweekRef.current = league.currentMatchweek;
+    setCurrentMatchweek(league.currentMatchweek);
+    setMatchweekButtonText(`Start matchweek ${league.currentMatchweek + 1}`);
+  }, [league.currentMatchweek]);
+
   const notiMatchweekSuccess = useNotifier({
     id: 'matchweek',
     type: 'success',
-    title: 'Next matchweek is underway',
+    // use the ref so the generator reads the latest value when fired
+    title: () => `Matchweek ${currentMatchweekRef.current + 1} is underway!`,
     duration: 3000,
   });
-
   const notiMatchweekError = useNotifier({
     id: 'matchweek',
     type: 'error',
     title: 'Matchweek Error',
-    description: 'There was an error starting the next matchweek :(',
+    description: () =>
+      `There was a problem starting matchweek ${
+        currentMatchweekRef.current + 1
+      } :(`,
     duration: 3000,
   });
 
@@ -102,20 +113,17 @@ export default function Controls({
       if (setSeasonViewing) {
         setSeasonViewing((prev) => prev + 1);
       }
+      notiSeasonSuccess?.fire();
     },
     onError: (e) => {
       setSeasonButtonText('Something went wrong');
+      notiSeasonError?.fire();
       setError(e.message);
       setTimeout(() => {
         setSeasonButtonText(`Start next season`);
       }, 3000);
     },
   });
-
-  useEffect(() => {
-    setCurrentMatchweek(league.currentMatchweek);
-    setMatchweekButtonText(`Start matchweek ${league.currentMatchweek + 1}`);
-  }, [league]);
 
   return (
     <div className="p-[20px]  h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">

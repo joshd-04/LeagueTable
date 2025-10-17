@@ -5,6 +5,8 @@ import { API_URL } from '@/util/config';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
+import { useMutation } from '@tanstack/react-query';
+import { useNotifier } from '@/hooks/useNotifier';
 
 export default function LoginForm({
   callbackUrl = '/',
@@ -29,6 +31,59 @@ export default function LoginForm({
   const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
   const router = useRouter();
 
+  const invalidCredentialsNotification = useNotifier({
+    title: 'Invalid credentials',
+    description: 'Make sure your username and password were entered correctly',
+    id: 'invalid-login',
+    type: 'error',
+    duration: 5000,
+  });
+
+  function handleSendRequest() {
+    return fetchAPI(`${API_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        email: null,
+        password: password,
+      }),
+      credentials: 'include',
+    });
+  }
+
+  const { mutateAsync: handleRequestMutation, isPending } = useMutation({
+    mutationFn: handleSendRequest,
+    onSuccess: (result) => {
+      if (result.status === 'success') {
+        setButtonText('Welcome!');
+        setButtonColor('var(--success)');
+        setButtonHoverColor('var(--bg-light)');
+        setTimeout(() => {
+          router.push(callbackUrl);
+        }, 300);
+      } else if (result.status === 'fail') {
+        setButtonText('Invalid credentials');
+        setButtonColor('var(--danger)');
+        setButtonHoverColor('var(--bg-light)');
+        invalidCredentialsNotification?.fire();
+
+        setTimeout(() => {
+          setButtonColor('var(--primary)');
+          setButtonHoverColor('var(--accent)');
+          setButtonText('Let me in!');
+        }, 2000);
+      } else {
+        setError(result.message);
+      }
+    },
+    onError: (e) => {
+      setError(e.message);
+    },
+  });
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
@@ -45,42 +100,10 @@ export default function LoginForm({
 
     if (errorsPresent) return;
 
-    setButtonText('...');
-
-    // p.s password hashing will be done on server side. much safer that way.
+    // p.s password hashing will be done on server side.
     try {
-      const response = await fetchAPI(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          email: null,
-          password: password,
-        }),
-        credentials: 'include',
-      });
-      setButtonText("Let's go");
-
-      if (response.status === 'fail') {
-        const message = response.data.message as string;
-        setError(message);
-      } else if (response.status === 'error') {
-        const message = response.data.message as string;
-        setError(message);
-      } else {
-        // success
-        // Do a nice welcome animation
-        setButtonText('Welcome!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
-        setTimeout(() => {
-          router.push(callbackUrl);
-        }, 300);
-      }
-    } catch (err) {
-      const e = await err;
+      handleRequestMutation();
+    } catch (e) {
       console.error(e);
     }
   }
@@ -97,7 +120,6 @@ export default function LoginForm({
         setError={setUsernameError}
         options={{
           label: 'Username',
-          labelCaption: 'visible to others',
           placeholder: 'Username',
         }}
       />
@@ -116,10 +138,9 @@ export default function LoginForm({
         type="submit"
         color={buttonColor}
         bgHoverColor={buttonHoverColor}
-        onClick={() => {}}
         style={{ width: '100%' }}
       >
-        {buttonText}
+        {isPending ? '...' : buttonText}
       </Button>
     </form>
   );

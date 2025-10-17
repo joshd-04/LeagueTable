@@ -12,6 +12,7 @@ import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
 import AccountCircleSVG from '@/assets/svg components/AccountCircle';
 import { useNotifier } from '@/hooks/useNotifier';
+import { useQuery } from '@tanstack/react-query';
 
 export function NavBar() {
   const pathname = usePathname();
@@ -44,13 +45,21 @@ export function NavBar() {
     }
   }
 
+  const { refetch: sendSignoutRequest } = useQuery({
+    queryFn: () =>
+      fetchAPI(`${API_URL}/signout`, {
+        method: 'GET',
+        credentials: 'include',
+      }),
+
+    queryKey: ['signout'],
+    enabled: false,
+  });
+
   async function handleSignOut() {
-    await fetchAPI(`${API_URL}/signout`, {
-      method: 'GET',
-      credentials: 'include',
-    });
+    await sendSignoutRequest();
     setUser(null);
-    router.push('/');
+    router.push('/login');
   }
 
   let accountMenuButtonStyle: CSSProperties = {
@@ -112,7 +121,7 @@ export function NavBar() {
         style={accountMenuButtonStyle}
         onClick={() => setIsAccountMenuOpen((prev) => !prev)}
       >
-        <span className="text-[var(--text)] flex flex-row gap-[10px]">
+        <span className="text-[var(--text)] flex flex-row gap-[10px] justify-center items-center">
           {user?.username}{' '}
           <AccountCircleSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
         </span>
