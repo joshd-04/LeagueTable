@@ -146,11 +146,6 @@ export default function CreateLeagueForm() {
         setValue={setLeagueName}
         error={leagueNameError}
         setError={setLeagueNameError}
-        validatorFn={(x) =>
-          x === 'red'
-            ? { pass: true }
-            : { pass: false, message: 'should be red' }
-        }
         options={{
           label: 'League Name',
           labelCaption: 'visible to others',

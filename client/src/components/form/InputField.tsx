@@ -8,10 +8,7 @@ interface InputFieldProps {
   setValue?: (newValue: string | number) => void;
   error?: string;
   setError?: (newError: string) => void;
-  validatorFn?: (inputText: string | number) => {
-    pass: boolean;
-    message?: string;
-  };
+
   options: {
     label: string;
     labelCaption?: string;
@@ -26,16 +23,9 @@ export default function InputField({
   setValue,
   error,
   setError,
-  validatorFn,
+
   options,
 }: InputFieldProps) {
-  if (validatorFn && value && setError) {
-    const result = validatorFn(value);
-    if (result.pass === false && result.message) {
-      setError(result.message);
-    }
-  }
-
   // font details taken from <Paragraph />
   return (
     <div className="flex flex-col justify-baseline items-baseline w-full">
