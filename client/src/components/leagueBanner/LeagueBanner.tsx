@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { League } from '@/util/definitions';
 import { useContext } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
+import DotGrid from '@/assets/reactbits/DotGrid';
 
 export default function LeagueBanner({
   league,
@@ -18,22 +19,40 @@ export default function LeagueBanner({
 }
 
 function LeagueBannerFree({ children }: { children: React.ReactNode }) {
-  const { colorTheme } = useContext(GlobalContext).colorTheme;
+  // const { colorTheme } = useContext(GlobalContext).colorTheme;
+  // return (
+  //   <div className="relative">
+  //     <div
+  //       className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-2 border-[var(--border)]"
+  //       style={{
+  //         backgroundImage: `radial-gradient(${
+  //           colorTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.4)'
+  //         } 2px, transparent 2px)`,
+  //         backgroundSize: '32px 32px',
+  //         backgroundRepeat: 'repeat',
+  //         maskImage:
+  //           'radial-gradient(circle at 50% 100%, white 0%, transparent 100%)',
+  //       }}
+  //     ></div>
+  //     {children}
+  //   </div>
+  // );
+
   return (
     <div className="relative">
-      <div
-        className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-2 border-[var(--border)]"
-        style={{
-          backgroundImage: `radial-gradient(${
-            colorTheme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.4)'
-          } 2px, transparent 2px)`,
-          backgroundSize: '32px 32px',
-          backgroundRepeat: 'repeat',
-          maskImage:
-            'radial-gradient(circle at 50% 100%, white 0%, transparent 100%)',
-        }}
-      ></div>
-
+      <div className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-2 border-[var(--border)]">
+        <DotGrid
+          dotSize={6}
+          gap={24}
+          baseColor="#5227FF"
+          activeColor="#5227FF"
+          proximity={120}
+          shockRadius={0}
+          shockStrength={5}
+          resistance={750}
+          returnDuration={1.5}
+        />
+      </div>
       {children}
     </div>
   );
