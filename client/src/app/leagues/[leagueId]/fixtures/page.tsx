@@ -42,18 +42,22 @@ export default async function Page({ params }) {
   const cookieStore = await cookies();
   const { leagueId } = await params;
 
-  const [league, fixtures] = await Promise.all([
-    fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+  const league = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+    method: 'GET',
+    headers: {
+      Cookie: cookieStore.toString(), // pass request cookies
+    },
+    cache: 'no-store', // optional: prevent caching
+  });
+
+  console.log(league.data.league.currentMatchweek);
+
+  const fixtures = await fetchAPI(
+    `${API_URL}/leagues/${leagueId}/fixtures?matchweek=${league.data.league.currentMatchweek}`,
+    {
       method: 'GET',
-      headers: {
-        Cookie: cookieStore.toString(), // pass request cookies
-      },
-      cache: 'no-store', // optional: prevent caching
-    }),
-    fetchAPI(`${API_URL}/leagues/${leagueId}/fixtures?all=true`, {
-      method: 'GET',
-    }),
-  ]);
+    }
+  );
 
   if (league.statusCode === 403) {
     return (
@@ -70,6 +74,6 @@ export default async function Page({ params }) {
   }
   const l = league.data.league as League;
   const f = fixtures.data.fixtures as Fixture[];
-  
+
   return <FixturesClient league={l} fixtures={f} />;
 }
