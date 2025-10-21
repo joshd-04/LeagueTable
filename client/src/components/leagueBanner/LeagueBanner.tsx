@@ -3,7 +3,6 @@ import Image from 'next/image';
 import { League } from '@/util/definitions';
 import { useContext } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import DotGrid from '@/assets/reactbits/backgrounds/DotGrid';
 import Particles from '@/assets/reactbits/backgrounds/Particles';
 
 export default function LeagueBanner({

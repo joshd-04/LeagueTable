@@ -5,6 +5,7 @@ import {
   SetStateAction,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { API_URL } from '@/util/config';
@@ -69,6 +70,8 @@ export default function AddTablesForm({
   const [buttonColor, setButtonColor] = useState('var(--primary)');
   const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
 
+  const failMessageRef = useRef('');
+
   const router = useRouter();
 
   const { isLoggedIn } = useAccount();
@@ -85,6 +88,14 @@ export default function AddTablesForm({
       'Just double check that your table names are different from each other',
     type: 'warning',
     duration: 5000,
+  });
+
+  const errorNotification = useNotifier({
+    title: 'There was a problem!',
+    description: () => failMessageRef.current,
+    duration: 5000,
+    id: 'tables-creation-error',
+    type: 'error',
   });
 
   function handleSendRequest() {
@@ -116,6 +127,9 @@ export default function AddTablesForm({
         setButtonText('There was an error');
         setButtonColor('var(--danger)');
         setButtonHoverColor('var(--bg-light)');
+
+        failMessageRef.current = result.data.message;
+        errorNotification?.fire();
 
         setTimeout(() => {
           setButtonColor('var(--primary)');

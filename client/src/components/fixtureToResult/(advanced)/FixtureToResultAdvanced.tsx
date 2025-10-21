@@ -121,6 +121,7 @@ export default function FixtureToResultAdvanced({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className="w-[100vw] h-[100vh] fixed top-0 left-0 bg-black/60 z-40"
+          onClick={() => setShowFixtureToResult(null)}
         ></motion.div>
       </AnimatePresence>
     </div>

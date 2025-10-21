@@ -31,6 +31,7 @@ export default function ResultClient({
     0
   );
 
+  // so the user can edit the result
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
     if (user.id === league.leagueOwner._id) {
@@ -47,8 +48,8 @@ export default function ResultClient({
               result.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <Label style={{ color:'var(--text)' }}>Home</Label>
-            <Label style={{ color:'var(--text)' }}>Away</Label>
+            <Label style={{ color: 'var(--text)' }}>Home</Label>
+            <Label style={{ color: 'var(--text)' }}>Away</Label>
           </div>
           <div className="flex flex-row justify-between gap-[20px]">
             <LinkButton
@@ -58,7 +59,6 @@ export default function ResultClient({
               underlineEffect={true}
               shadowEffect={false}
               href={'/'}
-              style={{ padding: 0 }}
             >
               <Heading1>{result.homeTeamDetails.name}</Heading1>
             </LinkButton>
@@ -72,7 +72,7 @@ export default function ResultClient({
               underlineEffect={true}
               shadowEffect={false}
               href={'/'}
-              style={{ padding: 0 }}
+              style={{ padding: 0, width: 'max-content' }}
             >
               <Heading1>{result.awayTeamDetails.name}</Heading1>
             </LinkButton>
@@ -80,8 +80,8 @@ export default function ResultClient({
         </div>
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px]">
-          <Paragraph>
+        <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
+          <Paragraph style={{ justifySelf: 'end' }}>
             Season {result.season} Matchweek {result.matchweek}
           </Paragraph>
           <LinkButton
@@ -93,7 +93,7 @@ export default function ResultClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph>
+          <Paragraph style={{ justifySelf: 'start' }}>
             {league.tables[result.division - 1].name} (div {result.division})
           </Paragraph>
           {result.neutralGround && <Paragraph>Neutral Ground</Paragraph>}

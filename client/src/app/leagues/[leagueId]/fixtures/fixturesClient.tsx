@@ -60,8 +60,8 @@ export default function FixturesClient({
         </div>
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px]">
-          <Paragraph>
+        <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
+          <Paragraph style={{ justifySelf: 'end' }}>
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
           </Paragraph>
           <LinkButton
@@ -73,7 +73,7 @@ export default function FixturesClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph>
+          <Paragraph style={{ justifySelf: 'start' }}>
             <select
               className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none"
               value={divisionFilter}

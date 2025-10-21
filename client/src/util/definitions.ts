@@ -158,6 +158,5 @@ export interface NotificationInterface {
   type: 'info' | 'success' | 'warning' | 'error';
   title: string | (() => string);
   description?: string | (() => string);
-  manualDismiss?: boolean;
   duration: number;
 }

@@ -71,10 +71,13 @@ export async function leagueCreationController(
     }
 
     if (divisionsCount < 1) {
-      errors.divisionsCount = 'divisionsCount must be greater than 0';
+      errors.divisionsCount = 'must be greater than 0';
     }
     if (maxSeasonCount < 1) {
-      errors.maxSeasonCount = 'maxSeasonsCount must be greater than 0';
+      errors.maxSeasonCount = 'must be greater than 0';
+    }
+    if (divisionsCount > 5) {
+      errors.divisionsCount = 'must be less than 5';
     }
 
     if (Object.keys(errors).length > 0) {

@@ -53,7 +53,7 @@ export default function FixtureClient({
               underlineEffect={true}
               shadowEffect={false}
               href={'/'}
-              style={{ padding: 0 }}
+              style={{ padding: 0, width: 'max-content' }}
             >
               <Heading1>{fixture.homeTeamDetails.name}</Heading1>
             </LinkButton>
@@ -65,16 +65,16 @@ export default function FixtureClient({
               underlineEffect={true}
               shadowEffect={false}
               href={'/'}
-              style={{ padding: 0 }}
+              style={{ padding: 0, width: 'max-content' }}
             >
               <Heading1>{fixture.awayTeamDetails.name}</Heading1>
             </LinkButton>
           </div>
         </div>
       </LeagueBanner>
-      <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px]">
-          <Paragraph>
+      <div className="flex flex-col items-center gap-[20px] mx-[20px]">
+        <div className="grid grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
+          <Paragraph style={{ justifySelf: 'end' }}>
             Season {fixture.season} Matchweek {fixture.matchweek}
           </Paragraph>
           <LinkButton
@@ -86,21 +86,24 @@ export default function FixtureClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph>
-            {league.tables[fixture.division - 1].name} (div {fixture.division})
-          </Paragraph>
-          {fixture.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
-          {userOwnsThisLeague && (
-            <Button
-              color="var(--primary)"
-              bgHoverColor="var(--accent)"
-              borderlessButton={true}
-              underlineEffect={false}
-              onClick={() => setShowFixtureToResult(fixture)}
-            >
-              Upload result
-            </Button>
-          )}
+          <div className="flex flex-row items-center justify-start gap-12">
+            <Paragraph>
+              {league.tables[fixture.division - 1].name} (div {fixture.division}
+              )
+            </Paragraph>
+            {fixture.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
+            {userOwnsThisLeague && (
+              <Button
+                color="var(--primary)"
+                bgHoverColor="var(--accent)"
+                borderlessButton={true}
+                underlineEffect={false}
+                onClick={() => setShowFixtureToResult(fixture)}
+              >
+                Upload result
+              </Button>
+            )}
+          </div>
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
