@@ -3,7 +3,8 @@ import Image from 'next/image';
 import { League } from '@/util/definitions';
 import { useContext } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import DotGrid from '@/assets/reactbits/DotGrid';
+import DotGrid from '@/assets/reactbits/backgrounds/DotGrid';
+import Particles from '@/assets/reactbits/backgrounds/Particles';
 
 export default function LeagueBanner({
   league,
@@ -38,22 +39,41 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
   //   </div>
   // );
 
+  // return (
+  //   <div className="relative">
+  //     <div className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-2 border-[var(--border)]">
+  //       <DotGrid
+  //         dotSize={6}
+  //         gap={24}
+  //         baseColor="var(--text)"
+  //         activeColor="var(--text)"
+  //         proximity={120}
+  //         shockRadius={0}
+  //         shockStrength={5}
+  //         resistance={750}
+  //         returnDuration={1.5}
+  //         dotOpacity={0.5}
+  //       />
+  //     </div>
+  //     {children}
+  //   </div>
+  // );
+
   return (
     <div className="relative">
-      <div className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-2 border-[var(--border)]">
-        <DotGrid
-          dotSize={6}
-          gap={24}
-          baseColor="#5227FF"
-          activeColor="#5227FF"
-          proximity={120}
-          shockRadius={0}
-          shockStrength={5}
-          resistance={750}
-          returnDuration={1.5}
+      <div className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-1 border-[var(--border)]">
+        <Particles
+          particleColors={['#00aaff', '#808080']}
+          particleCount={800}
+          particleSpread={20}
+          speed={0.1}
+          particleBaseSize={200}
+          moveParticlesOnHover={false}
+          alphaParticles={false}
+          disableRotation={false}
         />
+        {children}
       </div>
-      {children}
     </div>
   );
 }
