@@ -47,7 +47,7 @@ export default function ResultsClient({
           </LinkButton>
           <Paragraph style={{ justifySelf: 'start' }}>
             <select
-              className="bg-[var(--bg)] p-2 rounded-[10px] outline-none"
+              className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
               value={sort}
               onChange={(e) => {
                 if (

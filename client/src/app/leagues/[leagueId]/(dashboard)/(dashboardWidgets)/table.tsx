@@ -4,7 +4,7 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
 import { useQuery } from '@tanstack/react-query';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction, useEffect, useRef } from 'react';
 
 export default function TableWidget({
   league,
@@ -27,8 +27,23 @@ export default function TableWidget({
       ),
     queryKey: ['table', divisionViewing, seasonViewing],
   });
-
   const teams: Team[] | undefined = data?.data.teams;
+
+  const scrollableRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollToTop = () => {
+    if (scrollableRef.current) {
+      scrollableRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth', // optional: smooth scroll
+      });
+    }
+  };
+
+  useEffect(() => {
+    handleScrollToTop();
+  }, [divisionViewing]);
+
   return (
     <div className="p-[20px] col-span-2 row-span-2 h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
       <div className="flex flex-row gap-[10px] items-center">
@@ -43,7 +58,7 @@ export default function TableWidget({
         </Paragraph>
         <Paragraph>
           <select
-            className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none"
+            className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
             value={divisionViewing}
             onChange={(e) => setDivisionViewing(+e.target.value)}
           >
@@ -62,6 +77,7 @@ export default function TableWidget({
         isLoading={isLoading}
         league={league}
         divisionViewing={divisionViewing}
+        ref={scrollableRef}
       />
     </div>
   );
@@ -72,15 +88,17 @@ function Table({
   league,
   divisionViewing,
   isLoading,
+  ref,
 }: {
   teams: Team[] | undefined;
   league: League;
   divisionViewing: number;
   isLoading: boolean;
+  ref: RefObject<HTMLDivElement | null>;
 }) {
   const table = league.tables[divisionViewing - 1];
   return (
-    <div className="max-h-[24rem] overflow-y-auto">
+    <div className="max-h-[24rem] overflow-y-auto" ref={ref}>
       <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-y-[2px]">
         <thead>
           <tr className="text-left z-10">
