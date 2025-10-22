@@ -17,6 +17,7 @@ export async function getResultsController(
       query parameters:
       - limit: number (controls the number of results to return) [default: returns all results]
       - sort: 'matchweek' | anything else  [default: sorts by date of result (most recent first)]
+      - matchweek: number
       
       - season: number (if not provided, just give the most recent season). if league is free level, then return error
     */
@@ -75,6 +76,12 @@ export async function getResultsController(
           (result) => result.season === league.currentSeason
         );
       }
+    }
+
+    if (!isNaN(Number(req.query.matchweek))) {
+      allResults = allResults.filter(
+        (result) => result.matchweek === Number(req.query.matchweek)
+      );
     }
 
     if (req.query.limit !== undefined && +req.query.limit > 0) {

@@ -196,6 +196,8 @@ function ResultsByMatchweek({
     }
   });
 
+  const matchweekViewing = 1;
+
   return (
     <div className="flex flex-col gap-[20px]">
       {Object.entries(organisedResults)
