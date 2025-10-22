@@ -50,8 +50,6 @@ export default async function Page({ params }) {
     cache: 'no-store', // optional: prevent caching
   });
 
-  console.log(league.data.league.currentMatchweek);
-
   const fixtures = await fetchAPI(
     `${API_URL}/leagues/${leagueId}/fixtures?matchweek=${league.data.league.currentMatchweek}`,
     {

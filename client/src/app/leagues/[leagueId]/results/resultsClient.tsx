@@ -8,7 +8,11 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import Subtitle from '@/components/text/Subtitle';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Pagination from '@/components/pagination/Pagination';
+import { fetchAPI } from '@/util/api';
+import { useQuery } from '@tanstack/react-query';
+import { API_URL } from '@/util/config';
 
 export default function ResultsClient({
   league,
@@ -139,6 +143,16 @@ function ResultsByMostRecent({
   results: Result[];
   handleClick: (id: string) => void;
 }) {
+  const { data: results } = useQuery({
+    queryFn: () =>
+      fetchAPI(`${API_URL}/leagues/${league._id}/results`, {
+        method: 'GET',
+      }),
+    queryKey: ['results'],
+
+    enabled: false,
+  });
+
   const organisedResults: { matchweek: number; results: Result[] }[] = [];
 
   results.forEach((result) => {
@@ -183,47 +197,67 @@ function ResultsByMatchweek({
   results: Result[];
   handleClick: (id: string) => void;
 }) {
-  // Go through all the results and put them into a dictionary based off matchweek
-  const organisedResults: { [key: number]: Result[] } = {};
+  const [displayedResults, setDisplayedResults] = useState(results);
 
-  results.forEach((result) => {
-    if (!Object.keys(organisedResults).includes(result.matchweek.toString())) {
-      // if matchweek not in results list already
-      organisedResults[result.matchweek] = [result];
-    } else {
-      // push the result to the matchweek
-      organisedResults[result.matchweek].push(result);
-    }
+  const [matchweekViewing, setMatchweekViewing] = useState(
+    league.currentMatchweek
+  );
+
+  const { refetch: refetchResults } = useQuery({
+    queryFn: () =>
+      fetchAPI(
+        `${API_URL}/leagues/${league._id}/results?matchweek=${matchweekViewing}`,
+        {
+          method: 'GET',
+        }
+      ),
+    queryKey: ['results'],
+
+    enabled: false,
   });
 
-  const matchweekViewing = 1;
+  useEffect(() => {
+    if (matchweekViewing < 1 || matchweekViewing > league.currentMatchweek)
+      return;
+    const fetchData = async () => {
+      const { data } = await refetchResults();
+      if (data.status === 'success') {
+        setDisplayedResults(data.data.results);
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchweekViewing]);
 
   return (
     <div className="flex flex-col gap-[20px]">
-      {Object.entries(organisedResults)
-        .sort(([mwA], [mwB]) => {
-          return +mwB - +mwA; // sorts it from highest mw to lowest
-        })
-        .map(([matchweek, results], i) => (
-          <div key={i}>
-            <Label
-              style={{
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                placeSelf: 'center',
-              }}
-            >
-              Matchweek {matchweek}{' '}
-              {+matchweek > league.currentMatchweek && '(future)'}
-            </Label>
+      <div>
+        <Label
+          style={{
+            fontWeight: 'bold',
+            marginBottom: '10px',
+            placeSelf: 'center',
+          }}
+        >
+          Matchweek {matchweekViewing}{' '}
+          {+matchweekViewing > league.currentMatchweek && '(future)'}
+        </Label>
 
-            <div className="flex flex-col gap-[10px]">
-              {results.map((result, i) => (
-                <ResultRow result={result} key={i} handleClick={handleClick} />
-              ))}
-            </div>
-          </div>
-        ))}
+        <div className="flex flex-col gap-[10px]">
+          {displayedResults.map((result, i) => (
+            <ResultRow result={result} key={i} handleClick={handleClick} />
+          ))}
+        </div>
+        <Pagination
+          page={matchweekViewing}
+          setPage={setMatchweekViewing}
+          lastPage={league.currentMatchweek}
+        />
+      </div>
     </div>
   );
 }

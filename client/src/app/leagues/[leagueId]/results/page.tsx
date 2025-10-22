@@ -42,18 +42,20 @@ export default async function Page({ params }) {
   const cookieStore = await cookies();
   const { leagueId } = await params;
 
-  const [league, results] = await Promise.all([
-    fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+  const league = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+    method: 'GET',
+    headers: {
+      Cookie: cookieStore.toString(), // pass request cookies
+    },
+    cache: 'no-store', // optional: prevent caching
+  });
+
+  const results = await fetchAPI(
+    `${API_URL}/leagues/${leagueId}/results?matchweek=${league.data.league.currentMatchweek}`,
+    {
       method: 'GET',
-      headers: {
-        Cookie: cookieStore.toString(), // pass request cookies
-      },
-      cache: 'no-store', // optional: prevent caching
-    }),
-    fetchAPI(`${API_URL}/leagues/${leagueId}/results`, {
-      method: 'GET',
-    }),
-  ]);
+    }
+  );
 
   if (league.statusCode === 403) {
     return (
