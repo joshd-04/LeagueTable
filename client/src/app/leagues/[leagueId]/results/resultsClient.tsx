@@ -79,11 +79,7 @@ export default function ResultsClient({
             handleClick={handleClick}
           />
         ) : (
-          <ResultsByMostRecent
-            results={results}
-            league={league}
-            handleClick={handleClick}
-          />
+          <ResultsByMostRecent league={league} handleClick={handleClick} />
         )}
       </div>
     </div>
@@ -136,22 +132,30 @@ function ResultRow({
 
 function ResultsByMostRecent({
   league,
-  results,
   handleClick,
 }: {
   league: League;
-  results: Result[];
   handleClick: (id: string) => void;
 }) {
-  const { data: results } = useQuery({
+  const [results, setResults] = useState<Result[]>([]);
+
+  const { data: resultsData, isLoading: resultsAreLoading } = useQuery({
     queryFn: () =>
       fetchAPI(`${API_URL}/leagues/${league._id}/results`, {
         method: 'GET',
       }),
-    queryKey: ['results'],
-
-    enabled: false,
+    queryKey: ['resultsRecent'],
+    staleTime: 1000 * 60 * 1,
+    gcTime: 1000 * 60 * 10,
   });
+
+  useEffect(() => {
+    if (resultsAreLoading === false) {
+      setResults(resultsData.data.results);
+      console.log(resultsData.data.results);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultsAreLoading]);
 
   const organisedResults: { matchweek: number; results: Result[] }[] = [];
 
@@ -164,6 +168,26 @@ function ResultsByMostRecent({
       organisedResults.push({ matchweek: result.matchweek, results: [result] });
     }
   });
+
+  if (resultsAreLoading) {
+    return (
+      <div className="flex flex-col gap-[20px]">
+        <div>
+          <Label
+            style={{
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              placeSelf: 'center',
+            }}
+          >
+            Results loading...
+          </Label>
+          <div className="flex flex-col gap-[10px]"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-[20px]">
       {organisedResults.map((data, i) => (
@@ -211,7 +235,9 @@ function ResultsByMatchweek({
           method: 'GET',
         }
       ),
-    queryKey: ['results'],
+    queryKey: ['resultsMatchweek'],
+    staleTime: 1000 * 60 * 1,
+    gcTime: 1000 * 60 * 10,
 
     enabled: false,
   });

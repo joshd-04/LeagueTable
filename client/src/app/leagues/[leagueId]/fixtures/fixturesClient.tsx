@@ -56,6 +56,8 @@ export default function FixturesClient({
         }
       ),
     queryKey: ['fixtures'],
+    staleTime: 1000 * 60 * 1,
+    gcTime: 1000 * 60 * 10,
 
     enabled: false,
   });
