@@ -115,7 +115,7 @@ export default function AddTeamsForm({
         setTimeout(() => {
           setButtonColor('var(--primary)');
           setButtonHoverColor('var(--accent)');
-          setButtonText('Next');
+          setButtonText("Let's go");
         }, 2000);
       } else {
         setError(result.message);

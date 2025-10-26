@@ -8,11 +8,13 @@ export default function FixtureToResult({
   fixtureObj,
   setShowFixtureToResult,
   invalidateDashboardQueries,
+  onResolution,
 }: {
   leagueType: 'basic' | 'advanced';
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
   invalidateDashboardQueries?: () => void;
+  onResolution?: (isSuccess: boolean) => void;
 }) {
   if (leagueType === 'advanced') {
     return (
@@ -20,6 +22,7 @@ export default function FixtureToResult({
         fixtureObj={fixtureObj}
         setShowFixtureToResult={setShowFixtureToResult}
         invalidateDashboardQueries={invalidateDashboardQueries}
+        onResolution={onResolution}
       />
     );
   }
@@ -28,6 +31,7 @@ export default function FixtureToResult({
       fixtureObj={fixtureObj}
       setShowFixtureToResult={setShowFixtureToResult}
       invalidateDashboardQueries={invalidateDashboardQueries}
+      onResolution={onResolution}
     />
   );
 }

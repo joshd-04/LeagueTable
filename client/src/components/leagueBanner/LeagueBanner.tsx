@@ -71,6 +71,7 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
           alphaParticles={false}
           disableRotation={false}
         />
+
         {children}
       </div>
     </div>

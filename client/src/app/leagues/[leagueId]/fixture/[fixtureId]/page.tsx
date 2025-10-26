@@ -77,8 +77,10 @@ export default async function Page({ params }) {
       />
     );
   }
-  if (league.status !== 'success' || fixture.status !== 'success') {
+  if (league.status !== 'success') {
     return redirect('/');
+  } else if (fixture.status !== 'success') {
+    return redirect(`/leagues/${leagueId}/result/${fixtureId}`);
   }
   const l = league.data.league as League;
   const f = fixture.data.fixture as Fixture;

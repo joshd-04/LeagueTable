@@ -343,14 +343,14 @@ export async function turnFixtureIntoResult(
       }),
     ]);
 
-    res.status(200).json({ status: 'success', data: { fixtures: result } });
+    res.status(200).json({ status: 'success', data: { result: result } });
   } catch (e: any) {
     console.error(e);
     return next(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the fixtures that are still to be played. ${e.message}`
+        `There was an error turning the fixture into a result. ${e.message}`
       )
     );
   }

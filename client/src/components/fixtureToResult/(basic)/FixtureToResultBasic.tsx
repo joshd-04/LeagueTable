@@ -14,10 +14,12 @@ export default function FixtureToResultBasic({
   fixtureObj,
   setShowFixtureToResult,
   invalidateDashboardQueries,
+  onResolution,
 }: {
   fixtureObj: Fixture;
   setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
   invalidateDashboardQueries?: () => void;
+  onResolution?: (isSuccess: boolean) => void;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
   const { setError } = useContext(GlobalContext).errors;
@@ -38,9 +40,18 @@ export default function FixtureToResultBasic({
 
   const { mutateAsync: fixtureToResultBasicMutation, isPending } = useMutation({
     mutationFn: handleSubmit,
-    onSuccess: () => {
-      if (invalidateDashboardQueries) invalidateDashboardQueries();
-      setShowFixtureToResult(null);
+    onSuccess: (response) => {
+      if (response.status === 'success') {
+        if (invalidateDashboardQueries) invalidateDashboardQueries();
+        setShowFixtureToResult(null);
+        if (onResolution) onResolution(true);
+      } else if (response.status === 'fail') {
+        const message = response.data.message;
+        setError(message);
+        if (onResolution) onResolution(false);
+      } else {
+        setError(response.message);
+      }
     },
     onError: (e) => {
       setError(e.message);

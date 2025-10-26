@@ -63,7 +63,7 @@ export async function getAnnouncementController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the fixtures that are still to be played. ${e.message}`
+        `There was an error fetching the announcement ${e.message}`
       )
     );
   }

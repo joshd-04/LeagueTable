@@ -54,7 +54,7 @@ export async function getResultByIdController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the fixtures that are still to be played. ${e.message}`
+        `There was an error fetching the result. ${e.message}`
       )
     );
   }

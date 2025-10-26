@@ -10,6 +10,7 @@ import LinkButton from '@/components/text/LinkButton';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchOutcome from './(resultWidgets)/matchOutcome';
 import AsItStood from './(resultWidgets)/asItStood';
+import { individualTeamPagesEnabled } from '@/util/featureToggle';
 
 export default function ResultClient({
   league,
@@ -51,32 +52,46 @@ export default function ResultClient({
             <Label style={{ color: 'var(--text)' }}>Home</Label>
             <Label style={{ color: 'var(--text)' }}>Away</Label>
           </div>
-          <div className="flex flex-row justify-between gap-[20px]">
-            <LinkButton
-              color="var(--text)"
-              bgHoverColor="transparent"
-              borderlessButton={true}
-              underlineEffect={true}
-              shadowEffect={false}
-              href={'/'}
-            >
+
+          {individualTeamPagesEnabled ? (
+            <div className="flex flex-row justify-between gap-[20px]">
+              <LinkButton
+                color="var(--text)"
+                bgHoverColor="transparent"
+                borderlessButton={true}
+                underlineEffect={true}
+                shadowEffect={false}
+                href={'/'}
+                style={{ padding: 0, width: 'max-content' }}
+              >
+                <Heading1>{result.homeTeamDetails.name}</Heading1>
+              </LinkButton>
+              <Heading1>
+                {homeGoals} - {awayGoals}
+              </Heading1>
+              <LinkButton
+                color="var(--text)"
+                bgHoverColor="transparent"
+                borderlessButton={true}
+                underlineEffect={true}
+                shadowEffect={false}
+                href={'/'}
+                style={{ padding: 0, width: 'max-content' }}
+              >
+                <Heading1>{result.awayTeamDetails.name}</Heading1>
+              </LinkButton>
+            </div>
+          ) : (
+            <div className="flex flex-row justify-between gap-[20px]">
               <Heading1>{result.homeTeamDetails.name}</Heading1>
-            </LinkButton>
-            <Heading1>
-              {homeGoals} - {awayGoals}
-            </Heading1>
-            <LinkButton
-              color="var(--text)"
-              bgHoverColor="transparent"
-              borderlessButton={true}
-              underlineEffect={true}
-              shadowEffect={false}
-              href={'/'}
-              style={{ padding: 0, width: 'max-content' }}
-            >
+
+              <Heading1>
+                {homeGoals} - {awayGoals}
+              </Heading1>
+
               <Heading1>{result.awayTeamDetails.name}</Heading1>
-            </LinkButton>
-          </div>
+            </div>
+          )}
         </div>
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">

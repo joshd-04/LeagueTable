@@ -12,6 +12,7 @@ import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
+import { useRouter } from 'next/navigation';
 
 export default function FixtureClient({
   league,
@@ -30,6 +31,13 @@ export default function FixtureClient({
   if (isLoggedIn && user !== undefined && user !== null) {
     if (user.id === league.leagueOwner._id) {
       userOwnsThisLeague = true;
+    }
+  }
+  const router = useRouter();
+
+  function handleFixtureToResultCompletion(isSuccess: boolean) {
+    if (isSuccess) {
+      router.push(`/leagues/${league._id}/result/${fixture._id}`);
     }
   }
 
@@ -121,6 +129,7 @@ export default function FixtureClient({
             leagueType={league.leagueType}
             fixtureObj={fixture}
             setShowFixtureToResult={setShowFixtureToResult}
+            onResolution={handleFixtureToResultCompletion}
           />
         )}
       </div>

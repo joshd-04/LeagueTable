@@ -8,6 +8,7 @@ import { fetchAPI } from '@/util/api';
 import Label from '../text/Label';
 import { motion } from 'motion/react';
 import useAccount from '@/hooks/useAccount';
+import { useMutation } from '@tanstack/react-query';
 
 export default function CreateLeagueForm() {
   // Values
@@ -41,6 +42,62 @@ export default function CreateLeagueForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  function handleSendRequest() {
+    return fetchAPI(`${API_URL}/leagues`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: leagueName,
+        maxSeasonCount: maxSeasonCount,
+        leagueType: leagueType,
+        divisionsCount: divisionsCount,
+      }),
+      credentials: 'include',
+    });
+  }
+  const { mutateAsync: handleRequestMutation, isPending } = useMutation({
+    mutationFn: handleSendRequest,
+    onSuccess: (response) => {
+      console.log(response);
+      if (response.status === 'success') {
+        setButtonText('Success!');
+        setButtonColor('var(--success)');
+        setButtonHoverColor('var(--bg-light)');
+        setTimeout(() => {
+          router.push(`/leagues/${response.data.league._id}`);
+        }, 300);
+      } else if (response.status === 'fail') {
+        if (response.data.name) {
+          setLeagueNameError(response.data.name);
+        }
+        if (response.data.maxSeasonCount) {
+          setMaxSeasonCountError(response.data.maxSeasonCount);
+        }
+        if (response.data.leagueType) {
+          setLeagueTypeError(response.data.leagueType);
+        }
+        if (response.data.divisionsCount) {
+          setDivisionsCountError(response.data.divisionsCount);
+        }
+        setButtonText('There was an error');
+        setButtonColor('var(--danger)');
+        setButtonHoverColor('var(--bg-light)');
+
+        setTimeout(() => {
+          setButtonColor('var(--primary)');
+          setButtonHoverColor('var(--accent)');
+          setButtonText('Next');
+        }, 2000);
+      } else {
+        setError(response.message);
+      }
+    },
+    onError: (e) => {
+      setError(e.message);
+    },
+  });
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
@@ -86,50 +143,8 @@ export default function CreateLeagueForm() {
 
     if (errorsPresent) return;
 
-    setButtonText('...');
-
     try {
-      const response = await fetchAPI(`${API_URL}/leagues`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: leagueName,
-          maxSeasonCount: maxSeasonCount,
-          leagueType: leagueType,
-          divisionsCount: divisionsCount,
-        }),
-        credentials: 'include',
-      });
-      setButtonText("Let's go");
-
-      if (response.status === 'fail') {
-        if (response.data.name) {
-          setLeagueNameError(response.data.name);
-        }
-        if (response.data.maxSeasonCount) {
-          setMaxSeasonCountError(response.data.maxSeasonCount);
-        }
-        if (response.data.leagueType) {
-          setLeagueTypeError(response.data.leagueType);
-        }
-        if (response.data.divisionsCount) {
-          setDivisionsCountError(response.data.divisionsCount);
-        }
-      } else if (response.status === 'error') {
-        const message = response.data.message as string;
-        setError(message);
-      } else {
-        // success
-        // Do a nice welcome animation
-        setButtonText('Success!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
-        setTimeout(() => {
-          router.push(`/leagues/${response.data.league._id}`);
-        }, 300);
-      }
+      handleRequestMutation();
     } catch (e) {
       console.error(e);
     }
@@ -188,7 +203,7 @@ export default function CreateLeagueForm() {
         onClick={() => {}}
         style={{ width: '100%' }}
       >
-        {buttonText}
+        {isPending ? '...' : buttonText}
       </Button>
     </form>
   );
