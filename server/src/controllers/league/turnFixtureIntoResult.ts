@@ -175,6 +175,7 @@ export async function turnFixtureIntoResult(
     );
 
     const result = await Result.create({
+      _id: fixtureId,
       date: Date.now(),
       season: fixture.season,
       division: fixture.division,

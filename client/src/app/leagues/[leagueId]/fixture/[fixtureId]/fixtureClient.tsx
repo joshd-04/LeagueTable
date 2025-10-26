@@ -37,6 +37,7 @@ export default function FixtureClient({
 
   function handleFixtureToResultCompletion(isSuccess: boolean) {
     if (isSuccess) {
+      console.log(`/leagues/${league._id}/result/${fixture._id}`);
       router.push(`/leagues/${league._id}/result/${fixture._id}`);
     }
   }
