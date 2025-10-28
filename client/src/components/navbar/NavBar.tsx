@@ -1,49 +1,38 @@
 'use client';
-import Button from '@/components/text/Button';
-import LinkButton from '@/components/text/LinkButton';
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+  Link,
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  Switch,
+} from '@heroui/react';
+import Logo from '../logo/logo';
+import { usePathname } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
-import { fetchAPI } from '@/util/api';
+import { useQuery } from '@tanstack/react-query';
 import { API_URL } from '@/util/config';
-import { usePathname, useRouter } from 'next/navigation';
-import { CSSProperties, useContext, useState } from 'react';
-import Logo from '../logo/logo';
+import { fetchAPI } from '@/util/api';
+import { useRouter } from 'next/navigation';
 import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
-import AccountCircleSVG from '@/assets/svg components/AccountCircle';
-import { useNotifier } from '@/hooks/useNotifier';
-import { useQuery } from '@tanstack/react-query';
+import { useTheme } from 'next-themes';
 
-export function NavBar() {
-  const pathname = usePathname();
-  const { colorTheme, setColorTheme } = useContext(GlobalContext).colorTheme;
+export default function NavBar() {
   const { user, setUser } = useContext(GlobalContext).account;
-  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-
   const { isLoggedIn } = useAccount();
+  const pathname = usePathname();
 
   const router = useRouter();
-
-  function makeTime() {
-    const date = new Date();
-    return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-  }
-
-  const notiButtons = useNotifier({
-    id: 'btn',
-    type: 'warning',
-    title: 'This button is unavailable',
-    description: makeTime,
-    duration: 5000,
-  });
-
-  function toggleTheme() {
-    if (colorTheme === 'dark') {
-      setColorTheme('light');
-    } else {
-      setColorTheme('dark');
-    }
-  }
 
   const { refetch: sendSignoutRequest } = useQuery({
     queryFn: () =>
@@ -62,220 +51,150 @@ export function NavBar() {
     router.push('/login');
   }
 
-  let accountMenuButtonStyle: CSSProperties = {
-    padding: '0 10px',
-    zIndex: 20,
-  };
-
-  if (isAccountMenuOpen) {
-    accountMenuButtonStyle = {
-      ...accountMenuButtonStyle,
-      backgroundColor: 'var(--accent)',
-    };
-  }
-
-  const buttonsLoggedOut = (
-    <>
-      <LinkButton
-        href="/login"
-        color="var(--text)"
-        bgHoverColor="var(--bg-light)"
-        style={{ fontSize: '1rem', padding: '8px 20px' }}
-        underlineEffect={false}
-        borderlessButton={true}
-      >
-        Log in
-      </LinkButton>
-      <LinkButton
-        href="/register"
-        color="var(--primary)"
-        bgHoverColor="var(--accent)"
-        style={{ fontSize: '1rem', padding: '8px 20px', height: ' ' }}
-      >
-        Sign up
-      </LinkButton>
-    </>
-  );
-
-  const buttonsLoggedIn = (
-    <>
-      {!pathname.startsWith('/leagues/') && (
-        // needs to be a button instead of linkbutton otherwise hydration error
-        <Button
-          onClick={() => {
-            router.push('/create-league');
-          }}
-          color="var(--primary)"
-          bgHoverColor="var(--accent)"
-          borderlessButton={true}
-          underlineEffect={false}
-        >
-          Create league
-        </Button>
-      )}
-      <Button
-        color="transparent"
-        bgHoverColor="var(--bg-light)"
-        borderlessButton={true}
-        underlineEffect={false}
-        style={accountMenuButtonStyle}
-        onClick={() => setIsAccountMenuOpen((prev) => !prev)}
-      >
-        <span
-          className=" flex flex-row gap-[10px] justify-center items-center"
-          style={{
-            color:
-              user?.accountType === 'pro' ? 'var(--warning)' : 'var(--text)',
-          }}
-        >
-          {user?.accountType === 'pro'
-            ? `👑 ${user?.username}`
-            : user?.username}{' '}
-          <AccountCircleSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
-        </span>
-      </Button>
-      {isAccountMenuOpen && (
-        <>
-          <div className="absolute top-[3.5rem] right-[0] bg-[var(--bg)] rounded-[10px] z-20 shadow-[var(--shadow)] border-1 border-[var(--border)]">
-            <ul className="flex flex-col justify-center items-stretch w-full gap-1">
-              <li className="">
-                <Button
-                  // onClick={handleSignOut}
-                  color="var(--text)"
-                  bgHoverColor="var(--bg-light)"
-                  borderlessButton={true}
-                  underlineEffect={false}
-                  shadowEffect={false}
-                  style={{ fontSize: '1rem', width: '100%' }}
-                >
-                  option 2
-                </Button>
-              </li>
-              <li>
-                <Button
-                  onClick={toggleTheme}
-                  color="var(--text)"
-                  bgHoverColor="var(--bg-light)"
-                  borderlessButton={true}
-                  underlineEffect={false}
-                  shadowEffect={false}
-                  style={{ fontSize: '1rem', width: '100%' }}
-                >
-                  {colorTheme === 'light' ? (
-                    <span className="flex flex-row gap-2 items-center">
-                      <DarkModeSVG className="w-[16px] h-[16px] fill-[var(--text)] inline" />
-                      Dark mode
-                    </span>
-                  ) : (
-                    <span className="flex flex-row gap-2 items-center">
-                      <LightModeSVG className="w-[16px] h-[16px] fill-[var(--text)] inline" />
-                      Light mode
-                    </span>
-                  )}
-                </Button>
-              </li>
-              <li>
-                <Button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
-                    handleSignOut();
-                  }}
-                  color="var(--danger)"
-                  bgHoverColor="var(--bg-light)"
-                  shadowEffect={false}
-                  style={{ fontSize: '1rem', width: '100%' }}
-                >
-                  Sign out
-                </Button>
-              </li>
-            </ul>
-          </div>
-          <div
-            className="absolute top-0 left-0 w-[100vw] h-[100vh] z-10"
-            onClick={() => setIsAccountMenuOpen(false)}
-          ></div>
-        </>
-      )}
-    </>
-  );
-
-  // if (user === undefined) {
-  //   return <></>;
-  // }
-
   return (
-    <div className="flex h-full relative flex-row justify-center items-center grow-1 max-w-full w-full px-[20px] xl:px-[163px] py-[20px] shadow-[var(--shadow)] bg-[var(--bg)]">
-      <div className="flex h-full relative flex-row justify-between w-full items-stretch bg-[var(--bg)]">
-        <LinkButton
-          href="/"
-          color="var(--text)"
-          borderlessButton={true}
-          shadowEffect={false}
-          underlineEffect={true}
-          bgHoverColor="transparent"
-        >
+    <Navbar className="font-instrument" isBordered>
+      <NavbarBrand>
+        <Link href="/">
           <Logo />
-        </LinkButton>
-        {pathname === '/' && !isLoggedIn && (
-          <div>
-            <Button
-              onClick={() => {
-                notiButtons?.fire();
-              }}
-              borderlessButton={true}
-              shadowEffect={false}
-              color="var(--text-muted)"
-              bgHoverColor="transparent"
+        </Link>
+      </NavbarBrand>
+      {pathname === '/' && !isLoggedIn && (
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          <NavbarItem>
+            <Link
+              color="foreground"
+              href="#"
+              className="font-semibold text-medium"
             >
               Features
-            </Button>
-            <Button
-              onClick={() => {
-                notiButtons?.fire();
-              }}
-              borderlessButton={true}
-              shadowEffect={false}
-              color="var(--text-muted)"
-              bgHoverColor="transparent"
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive>
+            <Link
+              aria-current="page"
+              href="#"
+              className="font-semibold text-medium"
             >
               Use cases
-            </Button>
-            <Button
-              onClick={() => {
-                notiButtons?.fire();
-              }}
-              borderlessButton={true}
-              shadowEffect={false}
-              color="var(--text-muted)"
-              bgHoverColor="transparent"
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link
+              color="foreground"
+              href="#"
+              className="font-semibold text-medium"
             >
               FAQ
+            </Link>
+          </NavbarItem>
+        </NavbarContent>
+      )}
+      {!isLoggedIn ? (
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <ThemeSwitch />
+          </NavbarItem>
+          <NavbarItem className="hidden lg:flex">
+            <Button
+              href="/login"
+              as={Link}
+              color="secondary"
+              className="font-semibold text-small"
+              variant="light"
+            >
+              Log In
             </Button>
-          </div>
-        )}
-        {/* {pathname.startsWith('/leagues/') && (
-        <div className="flex flex-col justify-center">
-        <Subtitle>Florian Wirtz Universal</Subtitle>
-        </div>
-        )} */}
-        <div className="flex flex-row gap-2 ">
-          {isLoggedIn ? buttonsLoggedIn : buttonsLoggedOut}
-          {/* <Button
-            onClick={toggleTheme}
-            color="transparent"
-            bgHoverColor="var(--bg-light)"
-            borderlessButton={true}
-            underlineEffect={false}
-            style={{ padding: '0 10px', height: '100%' }}
-          >
-            {colorTheme === 'light' ? (
-              <DarkModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
-            ) : (
-              <LightModeSVG className="w-[32px] h-[32px] fill-[var(--text)]" />
-            )}
-          </Button> */}
-        </div>
-      </div>
-    </div>
+          </NavbarItem>
+          <NavbarItem>
+            <Button
+              as={Link}
+              color="primary"
+              href="/register"
+              variant="shadow"
+              className="font-semibold text-small"
+            >
+              Sign Up
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+      ) : (
+        <NavbarContent as="div" justify="end">
+          <NavbarItem>
+            <ThemeSwitch />
+          </NavbarItem>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                as="button"
+                className="transition-transform"
+                color="primary"
+                name="Jason Hughes"
+                size="sm"
+                src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownSection showDivider>
+                <DropdownItem
+                  key="profile"
+                  className="h-14 gap-2"
+                  textValue="Profile"
+                >
+                  <p className="font-semibold">Signed in as</p>
+                  <p className="font-semibold">{user?.email}</p>
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection>
+                <DropdownItem key="settings" textValue="Settings">
+                  Settings
+                </DropdownItem>
+
+                <DropdownItem
+                  key="logout"
+                  color="danger"
+                  textValue="Log Out"
+                  onPress={handleSignOut}
+                >
+                  Log Out
+                </DropdownItem>
+              </DropdownSection>
+            </DropdownMenu>
+          </Dropdown>
+        </NavbarContent>
+      )}
+    </Navbar>
+  );
+}
+
+function ThemeSwitch() {
+  const { theme, setTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Avoid hydration mismatch between server & client
+  useEffect(() => setIsMounted(true), []);
+  if (!isMounted) return null;
+
+  const isLight = theme === 'light';
+
+  return (
+    <Switch
+      isSelected={isLight}
+      onValueChange={(isChecked) => setTheme(isChecked ? 'light' : 'dark')}
+      color="success"
+      endContent={
+        <DarkModeSVG
+          className="w-[16px] h-[16px] fill-[var(--text)] inline"
+          style={{ width: '16px' }}
+        />
+      }
+      size="md"
+      startContent={
+        <LightModeSVG
+          className="w-[16px] h-[16px] fill-[var(--text)] inline"
+          style={{ width: '16px' }}
+        />
+      }
+    ></Switch>
   );
 }

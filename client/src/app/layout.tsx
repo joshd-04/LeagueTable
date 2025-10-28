@@ -1,16 +1,14 @@
 import type { Metadata } from 'next';
 import { Instrument_Sans, Inter, Roboto } from 'next/font/google';
 import './globals.css';
-import { NavBar } from '@/components/navbar/NavBar';
-import GlobalContextProvider from '@/context/GlobalContextProvider';
 import ErrorMessage from '@/components/errorMessage/ErrorMessage';
 import Footer from '@/components/footer/Footer';
 import { cookies } from 'next/headers';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { fetchAPI } from '@/util/api';
 import { User } from '@/util/definitions';
-import TanstackQueryContextProvider from '@/context/TanstackQueryContextProvider';
-import { NotificationContextProvider } from '@/context/NotificationContextProvider';
+import Provider from './provider';
+import NavBar from '@/components/navbar/NavBar';
 
 const instrumentSans = Instrument_Sans({
   variable: '--font-instrument-sans',
@@ -78,20 +76,16 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative transition-colors duration-250 overflow-x-clip overflow-y-auto`}
       >
-        <TanstackQueryContextProvider>
-          <GlobalContextProvider initialUser={user} initialError={error}>
-            <NotificationContextProvider>
-              <NavBar />
-              {children}
-              <Footer />
-              <ErrorMessage />
-            </NotificationContextProvider>
-          </GlobalContextProvider>
-        </TanstackQueryContextProvider>
+        <Provider initialUser={user} initialError={error}>
+          <NavBar />
+          {children}
+          <Footer />
+          <ErrorMessage />
+        </Provider>
       </body>
     </html>
   );

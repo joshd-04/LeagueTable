@@ -19,6 +19,7 @@ export default function Page() {
     <div className="flex flex-row justify-center items-center">
       <div className="max-w-[40%] w-auto flex flex-col justify-center items-center p-[30px] transition-colors duration-250">
         <Heading1>Hop Back In</Heading1>
+
         <Subtitle style={{ marginTop: '-10px', color: 'var(--text-muted)' }}>
           Welcome back! We missed you!
         </Subtitle>
