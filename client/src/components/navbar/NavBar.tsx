@@ -54,7 +54,7 @@ export default function NavBar() {
   return (
     <Navbar className="font-instrument" isBordered>
       <NavbarBrand>
-        <Link href="/">
+        <Link href="/" className="text-inherit ">
           <Logo />
         </Link>
       </NavbarBrand>
@@ -168,15 +168,17 @@ export default function NavBar() {
 }
 
 function ThemeSwitch() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
 
   // Avoid hydration mismatch between server & client
   useEffect(() => setIsMounted(true), []);
-  if (!isMounted) return null;
+  if (!isMounted) {
+    console.log('not moutned');
+    return null;
+  }
 
-  const isLight = theme === 'light';
-
+  const isLight = resolvedTheme === 'light';
   return (
     <Switch
       isSelected={isLight}

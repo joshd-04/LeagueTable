@@ -9,7 +9,7 @@ export default function Paragraph({
 }) {
   return (
     <p
-      className="font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)]"
+      className="font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem]"
       style={style}
     >
       {children}

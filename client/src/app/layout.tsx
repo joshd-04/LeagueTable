@@ -7,7 +7,7 @@ import { cookies } from 'next/headers';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { fetchAPI } from '@/util/api';
 import { User } from '@/util/definitions';
-import Provider from './provider';
+import Providers from './providers';
 import NavBar from '@/components/navbar/NavBar';
 
 const instrumentSans = Instrument_Sans({
@@ -76,16 +76,16 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative transition-colors duration-250 overflow-x-clip overflow-y-auto`}
       >
-        <Provider initialUser={user} initialError={error}>
+        <Providers initialUser={user} initialError={error}>
           <NavBar />
           {children}
           <Footer />
           <ErrorMessage />
-        </Provider>
+        </Providers>
       </body>
     </html>
   );
