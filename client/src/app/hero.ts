@@ -50,17 +50,18 @@ export default heroui({
         },
       },
       colors: {
-        background: 'hsl(0, 0%, 100%)', // --bg
+        background: 'hsl(0, 0%, 95%)', // --bg
         foreground: 'hsl(0, 0%, 5%)', // --text
         divider: 'hsl(0, 0%, 70%)', // --border
         focus: 'hsl(200, 95%, 80%)', // --accent
-        content1: 'hsl(0, 0%, 100%)', // --bg-light
-        content2: 'hsl(0, 0%, 95%)', // same as bg
-        content3: 'hsl(0, 0%, 90%)', // --bg-dark
+        content1: 'hsl(0, 0%, 90%)', // --bg-light
+        content2: 'hsl(0, 0%, 90%)', // same as bg
+        content3: 'hsl(0, 0%, 85%)', // --bg-dark
         primary: {
           DEFAULT: 'hsl(200, 100%, 50%)',
           foreground: 'hsl(0, 0%, 10%)',
         },
+        success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'black' },
         danger: {
           DEFAULT: 'hsl(0, 70%, 50%)',
           foreground: 'white',
@@ -102,6 +103,7 @@ export default heroui({
           DEFAULT: 'hsl(212, 100%, 47%)',
           foreground: 'hsl(0, 0%, 95%)',
         },
+        success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'white' },
         danger: {
           DEFAULT: 'hsl(0, 60%, 60%)',
           foreground: 'black',
@@ -113,8 +115,4 @@ export default heroui({
       },
     },
   },
-
-  // small extras: map hero typography to your CSS font variables if present
-
-  // keep other heroui defaults (you can extend further if needed)
 });

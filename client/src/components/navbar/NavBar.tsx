@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
 import { useTheme } from 'next-themes';
+import Paragraph from '../text/Paragraph';
 
 export default function NavBar() {
   const { user, setUser } = useContext(GlobalContext).account;
@@ -90,6 +91,7 @@ export default function NavBar() {
         </NavbarContent>
       )}
       {!isLoggedIn ? (
+        // Signed out
         <NavbarContent justify="end">
           <NavbarItem>
             <ThemeSwitch />
@@ -118,7 +120,21 @@ export default function NavBar() {
           </NavbarItem>
         </NavbarContent>
       ) : (
+        // Signed in
+
         <NavbarContent as="div" justify="end">
+          {pathname === '/' && (
+            <NavbarItem>
+              <Button
+                as={Link}
+                href="/create-league"
+                color="success"
+                variant="ghost"
+              >
+                <p>Create league</p>
+              </Button>
+            </NavbarItem>
+          )}
           <NavbarItem>
             <ThemeSwitch />
           </NavbarItem>
@@ -155,6 +171,7 @@ export default function NavBar() {
                   color="danger"
                   textValue="Log Out"
                   onPress={handleSignOut}
+                  className="text-danger"
                 >
                   Log Out
                 </DropdownItem>
@@ -186,14 +203,14 @@ function ThemeSwitch() {
       color="success"
       endContent={
         <DarkModeSVG
-          className="w-[16px] h-[16px] fill-[var(--text)] inline"
-          style={{ width: '16px' }}
+          className="w-[16px] h-[16px] fill- inline"
+          style={{ width: '16px', fill: 'lightgrey' }}
         />
       }
       size="md"
       startContent={
         <LightModeSVG
-          className="w-[16px] h-[16px] fill-[var(--text)] inline"
+          className="w-[16px] h-[16px] fill-black inline"
           style={{ width: '16px' }}
         />
       }

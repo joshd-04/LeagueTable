@@ -2,14 +2,18 @@ import React, { CSSProperties } from 'react';
 
 export default function Heading2({
   style,
+  className,
   children,
 }: {
   style?: CSSProperties;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
     <h2
-      className="font-[family-name:var(--font-instrument-sans)] font-semibold text-[2rem] md:text-[2.5rem] xl:text-[3.5rem] text-[var(--text)]"
+      className={`font-semibold text-[2rem] md:text-[2.5rem] xl:text-[3.5rem] text-[var(--text)] ${
+        className || ''
+      }`}
       style={style}
     >
       {children}
