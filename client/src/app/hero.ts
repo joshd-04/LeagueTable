@@ -53,13 +53,14 @@ export default heroui({
         background: 'hsl(0, 0%, 95%)', // --bg
         foreground: 'hsl(0, 0%, 5%)', // --text
         divider: 'hsl(0, 0%, 70%)', // --border
-        focus: 'hsl(200, 95%, 80%)', // --accent
+        overlay: 'white', // used for modal, popover, etc.
+        focus: 'hsl(200, 95%, 0%)', // --accent
         content1: 'hsl(0, 0%, 90%)', // --bg-light
-        content2: 'hsl(0, 0%, 90%)', // same as bg
-        content3: 'hsl(0, 0%, 85%)', // --bg-dark
+        content2: 'hsl(0, 0%, 85%)', // same as bg
+        content3: 'hsl(0, 0%, 80%)', // --bg-dark
         primary: {
           DEFAULT: 'hsl(200, 100%, 50%)',
-          foreground: 'hsl(0, 0%, 10%)',
+          foreground: 'black',
         },
         success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'black' },
         danger: {
@@ -101,7 +102,7 @@ export default heroui({
         content3: 'hsl(0, 0%, 0%)',
         primary: {
           DEFAULT: 'hsl(212, 100%, 47%)',
-          foreground: 'hsl(0, 0%, 95%)',
+          foreground: 'white',
         },
         success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'white' },
         danger: {

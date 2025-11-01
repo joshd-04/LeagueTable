@@ -11,7 +11,7 @@ export default function Paragraph({
 }) {
   return (
     <p
-      className={`font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] ${
+      className={`font-normal text-[1rem]/[1.65] md:text-[1.125rem]/[1.65] xl:text-[1.25rem]/[1.65] ${
         className || ''
       }`}
       style={style}

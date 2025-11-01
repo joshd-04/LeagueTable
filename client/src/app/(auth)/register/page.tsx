@@ -1,25 +1,41 @@
-'use client';
-import RegistrationForm from '@/components/forms/RegistrationForm';
-import Heading1 from '@/components/text/Heading1';
-import Subtitle from '@/components/text/Subtitle';
-import useAccount from '@/hooks/useAccount';
-import { useRouter } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
+import { User } from '@/util/definitions';
+import { redirect } from 'next/navigation';
+import RegisterClient from './registerClient';
 
-export default function Page() {
-  const { isLoggedIn } = useAccount();
-  const router = useRouter();
-  if (isLoggedIn) {
-    router.replace('/');
+export default async function Page() {
+  const cookieStore = await cookies();
+  const response = await fetchAPI(`${API_URL}/me`, {
+    method: 'GET',
+    headers: {
+      Cookie: cookieStore.toString(), // pass request cookies
+    },
+    cache: 'no-store', // optional: prevent caching
+  });
+
+  let user: User | null;
+
+  if (response.status === 'success') {
+    user = {
+      id: response.data._id,
+      username: response.data.username,
+      email: response.data.email,
+      accountType: response.data.accountType,
+    };
+  } else if (response.status === 'fail') {
+    user = null;
+  } else {
+    user = null;
   }
-  return (
-    <div className="flex flex-row justify-center items-center">
-      <div className="max-w-[40%] w-auto flex flex-col justify-center items-center p-[30px] transition-colors duration-250">
-        <Heading1>Join The Action</Heading1>
-        <Subtitle style={{ marginTop: '-10px', color: 'var(--text-muted)' }}>
-          Create a quick, free account to start making your first league
-        </Subtitle>
-        <RegistrationForm />
-      </div>
-    </div>
-  );
+
+  const isLoggedIn = user !== undefined && user !== null;
+
+  if (isLoggedIn) {
+    // router push
+    redirect('/');
+  } else {
+    return <RegisterClient />;
+  }
 }

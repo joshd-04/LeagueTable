@@ -11,7 +11,7 @@ export default function Heading1({
 }) {
   return (
     <h1
-      className={`inline font-bold text-[2.25rem] md:text-[3rem] xl:text-[4.5rem] ${
+      className={`inline font-bold text-[2rem]/[1.5] md:text-[2.5rem]/[1.5] xl:text-[3rem]/[1.5]  ${
         className || ''
       }`}
       style={style}

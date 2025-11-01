@@ -11,7 +11,7 @@ export default function Heading2({
 }) {
   return (
     <h2
-      className={`font-semibold text-[2rem] md:text-[2.5rem] xl:text-[3.5rem] text-[var(--text)] ${
+      className={`font-semibold text-[1.75rem]/[1.25] md:text-[2rem]/[1.25] xl:text-[2.25rem]/[1.25] ${
         className || ''
       }`}
       style={style}

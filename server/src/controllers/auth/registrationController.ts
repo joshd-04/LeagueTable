@@ -24,6 +24,8 @@ export async function registrationController(
     const { email, username, password }: RegisterReqBody = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const errors: { username?: string; email?: string; password?: string } = {};
+
     // Check if username & email are unique
 
     // Run 2 aggregate pipelines at once, one for username clashes and another for email clashes. $match will find users with matching usernames. $count will tally these into a usernameClashes field
@@ -43,16 +45,17 @@ export async function registrationController(
     const emailClashes = clashes[1][0]?.emailClashes || 0;
 
     if (usernameClashes > 0) {
+      errors.username = 'This username has already been taken.';
+    }
+    if (emailClashes > 0) {
+      errors.email = 'Account with this email already exists.';
+    }
+
+    // Handle errors
+    if (Object.keys(errors).length !== 0) {
       next(
-        new ErrorHandling(409, {
-          message: 'This username has already been taken',
-        })
-      );
-      return;
-    } else if (emailClashes > 0) {
-      next(
-        new ErrorHandling(409, {
-          message: 'Account with this email already exists',
+        new ErrorHandling(400, {
+          errors: { ...errors },
         })
       );
       return;
@@ -80,7 +83,7 @@ export async function registrationController(
     });
     res.status(201).json({
       status: 'success',
-      data: { message: 'Successfully logged in' },
+      data: { message: 'Successfully registered and logged in.' },
     });
   } catch (e: any) {
     next(new ErrorHandling(500, undefined, e.message));

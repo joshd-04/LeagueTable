@@ -8,7 +8,7 @@ import { fetchAPI } from '@/util/api';
 import { useMutation } from '@tanstack/react-query';
 import { useNotifier } from '@/hooks/useNotifier';
 
-export default function LoginForm({
+export default function LoginFormOld({
   callbackUrl = '/',
 }: {
   callbackUrl?: string;

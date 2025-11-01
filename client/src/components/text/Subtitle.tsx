@@ -11,7 +11,7 @@ export default function Subtitle({
 }) {
   return (
     <span
-      className={`font-normal text-[1.125rem] md:text-[1.25rem] xl:text-[1.5rem] ${
+      className={`font-normal text-[1.125rem]/[1.5] md:text-[1.25rem]/[1.5] xl:text-[1.25rem]/[1.5] ${
         className || ''
       }`}
       style={style}

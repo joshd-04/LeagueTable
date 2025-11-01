@@ -11,7 +11,7 @@ export default function Heading3({
 }) {
   return (
     <h3
-      className={`font-normal text-[1.75rem] md:text-[2rem] xl:text-[2.75rem] text-[var(--text)] ${
+      className={`font-normal text-[1.5rem]/[1.35] md:text-[1.625rem]/[1.35] xl:text-[1.75rem]/[1.35] ${
         className || ''
       }`}
       style={style}

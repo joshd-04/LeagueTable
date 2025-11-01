@@ -11,7 +11,7 @@ export default function Label({
 }) {
   return (
     <p
-      className={`text-[0.875rem] md:text-[0.875rem] xl:text-[1rem] text-[var(--text-muted)] ${
+      className={`text-[0.875rem]/[1.4] md:text-[0.875rem]/[1.4] xl:text-[0.875rem]/[1.4]  ${
         className || ''
       }`}
       style={style}

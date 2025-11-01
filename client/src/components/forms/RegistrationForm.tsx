@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { useMutation } from '@tanstack/react-query';
 
-export default function RegistrationForm() {
+export default function RegistrationFormOld() {
   // Values
   const [username, setUsername] = useState<string | number>('');
   const [email, setEmail] = useState<string | number>('');

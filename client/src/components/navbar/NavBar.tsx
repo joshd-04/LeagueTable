@@ -26,7 +26,6 @@ import { useRouter } from 'next/navigation';
 import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
 import { useTheme } from 'next-themes';
-import Paragraph from '../text/Paragraph';
 
 export default function NavBar() {
   const { user, setUser } = useContext(GlobalContext).account;

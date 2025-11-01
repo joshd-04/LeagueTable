@@ -11,7 +11,7 @@ export default function Heading4({
 }) {
   return (
     <h4
-      className={`font-normal text-[1.5rem] md:text-[1.75rem] xl:text-[2rem] text-[var(--text)] ${
+      className={`font-normal text-[1.25rem]/[1.4] md:text-[1.375rem]/[1.4] xl:text-[1.5rem]/[1.4]  ${
         className || ''
       }`}
       style={style}
