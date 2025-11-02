@@ -3,6 +3,7 @@ import User from '../../models/userModel';
 import { ErrorHandling } from '../../util/errorChecking';
 import bcrypt from 'bcrypt';
 import { generateJWTToken } from '../../util/helpers';
+import validator from 'validator';
 
 interface RegisterReqBody {
   email: string;
@@ -22,9 +23,63 @@ export async function registrationController(
 */
   try {
     const { email, username, password }: RegisterReqBody = req.body;
-    const passwordHash = await bcrypt.hash(password, 10);
-
     const errors: { username?: string; email?: string; password?: string } = {};
+
+    // Validation checks
+    // Stage 1: ensure values are given (this should already be taken care of but this API needs to be ROBUST!)
+    if (username.trim().length === 0) {
+      errors.username = 'Username is required.';
+    }
+    if (email.trim().length === 0) {
+      errors.email = 'Email is required.';
+    }
+    if (password.length === 0) {
+      errors.password = 'Password is required.';
+    }
+
+    // Handle errors
+    if (Object.keys(errors).length !== 0) {
+      next(
+        new ErrorHandling(400, {
+          errors: { ...errors },
+        })
+      );
+      return;
+    }
+
+    // Stage 2: Ensure that correct formats given
+    if (!validator.isEmail(email)) {
+      errors.email = 'Invalid email provided';
+    }
+    if (password.length < 8) {
+      errors.password = 'Password must be atleast 8 characters';
+    }
+    if ((password.match(/[a-z]/g) || []).length < 1) {
+      errors.password = 'Password must include at least 1 lower case letter';
+    }
+    if ((password.match(/[A-Z]/g) || []).length < 1) {
+      errors.password = 'Password must include at least 1 upper case letter';
+    }
+    if ((password.match(/[^a-z0-9]/gi) || []).length < 1) {
+      errors.password = 'Password must include at least 1 symbol.';
+    }
+
+    if (/\s/.test(username)) {
+      errors.username =
+        'Username cannot contain spaces or other whitespace characters.';
+    }
+
+    // Handle errors
+    if (Object.keys(errors).length !== 0) {
+      next(
+        new ErrorHandling(400, {
+          errors: { ...errors },
+        })
+      );
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
 
     // Check if username & email are unique
 
