@@ -180,7 +180,7 @@ export async function tablesAddingController(
     const sanitizedLeague = {
       name: newLeague.name,
       currentSeason: newLeague.currentSeason,
-      maxSeasonCount: newLeague.maxSeasonCount,
+      maxSeasonLimit: newLeague.maxSeasonLimit,
       divisionsCount: newLeague.divisionsCount,
       leagueType: newLeague.leagueType,
       tables: newLeague.tables,

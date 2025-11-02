@@ -84,7 +84,7 @@ export async function startNextSeasonController(
     }
 
     // 2. Ensure that their league doesn't exceed the max season count
-    if (league.currentSeason === league.maxSeasonCount) {
+    if (league.currentSeason === league.maxSeasonLimit) {
       return next(
         new ErrorHandling(403, {
           message:
@@ -115,7 +115,8 @@ export async function startNextSeasonController(
       // 2. Sort teams in each division
       const sortedTeamsByDivision: ITeamsSchema[][] = await Promise.all(
         prevSeasonTables.map(
-          async (table) => await sortTeams(leagueId, table.teams as ITeamsSchema[])
+          async (table) =>
+            await sortTeams(leagueId, table.teams as ITeamsSchema[])
         )
       );
 

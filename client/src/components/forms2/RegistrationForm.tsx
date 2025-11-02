@@ -109,10 +109,7 @@ export default function RegistrationForm() {
         <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
           <Input
             value={username}
-            onChange={(e) => {
-              const newVal = e.target.value.trim();
-              setUsername(newVal);
-            }}
+            onValueChange={setUsername}
             size="md"
             radius="md"
             name="username"

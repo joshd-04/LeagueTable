@@ -13,7 +13,6 @@ import { useMutation } from '@tanstack/react-query';
 export default function CreateLeagueForm() {
   // Values
   const [leagueName, setLeagueName] = useState<string | number>('');
-  const [maxSeasonCount, setMaxSeasonCount] = useState<string | number>('');
   const [leagueType, setLeagueType] = useState<'basic' | 'advanced' | null>(
     null
   );
@@ -21,7 +20,6 @@ export default function CreateLeagueForm() {
 
   // Errors
   const [leagueNameError, setLeagueNameError] = useState('');
-  const [maxSeasonCountError, setMaxSeasonCountError] = useState('');
   const [leagueTypeError, setLeagueTypeError] = useState('');
   const [divisionsCountError, setDivisionsCountError] = useState('');
 
@@ -50,7 +48,6 @@ export default function CreateLeagueForm() {
       },
       body: JSON.stringify({
         name: leagueName,
-        maxSeasonCount: maxSeasonCount,
         leagueType: leagueType,
         divisionsCount: divisionsCount,
       }),
@@ -71,9 +68,6 @@ export default function CreateLeagueForm() {
       } else if (response.status === 'fail') {
         if (response.data.name) {
           setLeagueNameError(response.data.name);
-        }
-        if (response.data.maxSeasonCount) {
-          setMaxSeasonCountError(response.data.maxSeasonCount);
         }
         if (response.data.leagueType) {
           setLeagueTypeError(response.data.leagueType);
@@ -108,10 +102,6 @@ export default function CreateLeagueForm() {
       setLeagueNameError('this is required');
       errorsPresent = true;
     }
-    if (!maxSeasonCount) {
-      setMaxSeasonCountError('this is required');
-      errorsPresent = true;
-    }
     if (!leagueType) {
       setLeagueTypeError('this is required');
       errorsPresent = true;
@@ -120,20 +110,8 @@ export default function CreateLeagueForm() {
       setDivisionsCountError('this is required');
       errorsPresent = true;
     }
-    if (+maxSeasonCount <= 0) {
-      setMaxSeasonCountError('must be greater than zero');
-      errorsPresent = true;
-    }
     if (+divisionsCount <= 0) {
       setDivisionsCountError('must be greater than zero');
-      errorsPresent = true;
-    }
-    if (+maxSeasonCount <= 0) {
-      setMaxSeasonCountError('must be greater than zero');
-      errorsPresent = true;
-    }
-    if (!Number.isInteger(+maxSeasonCount)) {
-      setMaxSeasonCountError('must be an integer');
       errorsPresent = true;
     }
     if (!Number.isInteger(+divisionsCount)) {
@@ -167,18 +145,7 @@ export default function CreateLeagueForm() {
           placeholder: 'League Name',
         }}
       />
-      <InputField
-        type="number"
-        value={maxSeasonCount}
-        setValue={setMaxSeasonCount}
-        error={maxSeasonCountError}
-        setError={setMaxSeasonCountError}
-        options={{
-          label: 'Maximum Season Count',
-          labelCaption: 'how long the league will run for',
-          placeholder: 'Max season count',
-        }}
-      />
+
       <LeagueTypeSelection
         selection={leagueType}
         setSelection={setLeagueType}

@@ -17,7 +17,17 @@ const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
   currentSeason: { type: Number, required: true },
   currentMatchweek: { type: Number, required: true },
   finalMatchweek: { type: Number, required: true },
-  maxSeasonCount: { type: Number, required: true },
+  maxSeasonLimit: {
+    type: Number,
+    validate: {
+      validator: function (v) {
+        console.log(`Validator function value: ${v}`);
+        return v === null || typeof v === 'number';
+      },
+      message: 'maxSeasonLimit must be a number or null',
+    },
+    // required: true, // field must exist
+  },
   divisionsCount: { type: Number, required: true },
   leagueType: { type: String, required: true },
   tables: [

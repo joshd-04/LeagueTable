@@ -4,9 +4,9 @@ import { League } from '@/util/definitions';
 
 export default function Upgrade({ league }: { league: League }) {
   let warningLevel: 'light' | 'moderate' | 'heavy' = 'light';
-  if (league.currentSeason === league.maxSeasonCount) warningLevel = 'moderate';
+  if (league.currentSeason === league.maxSeasonLimit) warningLevel = 'moderate';
   if (
-    league.currentSeason === league.maxSeasonCount &&
+    league.currentSeason === league.maxSeasonLimit &&
     league.currentMatchweek === league.finalMatchweek &&
     league.fixtures.length === 0
   )

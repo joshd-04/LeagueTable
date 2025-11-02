@@ -30,7 +30,7 @@ export interface League {
     _id: string;
   };
   leagueType: 'basic' | 'advanced';
-  maxSeasonCount: number;
+  maxSeasonLimit: number | null;
   name: string;
   results: string[];
   tables: {

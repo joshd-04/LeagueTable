@@ -54,7 +54,7 @@ const port = BACKEND_PORT;
 export const requiredFields: RequiredFields = {
   '/api/register': ['username', 'email', 'password'],
   '/api/login': ['username', 'email', 'password'],
-  '/api/leagues': ['name', 'maxSeasonCount', 'leagueType', 'divisionsCount'],
+  '/api/leagues': ['name',  'leagueType', 'divisionsCount'],
   '/api/leagues/:id/tables': ['tables'],
   '/api/leagues/:id/teams': ['teams'],
   '/api/result': ['fixtureId', 'basicOutcome'],
@@ -197,7 +197,7 @@ app.delete(
 // use a token to stop people from going to random leagues to improve privacy
 
 🔐 app.patch('/api/leagues/:id')
-// Should only be allowed to change league name, and the maxSeasonCount
+// Should only be allowed to change league name, and the maxSeasonLimit
 🔐 app.delete('/api/leagues')
 
 app.get('/api/leagues/:uniqueToken/table/:seasonNumber')

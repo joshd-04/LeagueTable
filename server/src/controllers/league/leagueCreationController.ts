@@ -3,10 +3,11 @@ import League from '../../models/leagueModel';
 import { ErrorHandling } from '../../util/errorChecking';
 import { Types } from 'mongoose';
 import User from '../../models/userModel';
+import { ILeagueSchema } from '../../util/definitions';
+
 interface LeagueCreationReqBody {
   name: string;
   leagueOwner?: string;
-  maxSeasonCount: number;
   divisionsCount: number;
   leagueType: 'basic' | 'advanced';
 }
@@ -16,7 +17,7 @@ export async function leagueCreationController(
   res: Response,
   next: NextFunction
 ) {
-  /*  Args: name, maxSeasonCount, leagueType, divisionsCount. tables: {
+  /*  Args: name, maxSeasonLimit, leagueType, divisionsCount. tables: {
     division, name, numberOfTeams, numberOfTeamsToBeRelegated, numberOfTeamsToBePromoted
   }
       Returns: 
@@ -32,17 +33,12 @@ export async function leagueCreationController(
     }
     const accountType = user.accountType;
 
-    const {
-      name,
-      maxSeasonCount,
-      leagueType,
-      divisionsCount,
-    }: LeagueCreationReqBody = req.body;
+    const { name, leagueType, divisionsCount }: LeagueCreationReqBody =
+      req.body;
 
     const errors: {
       name?: string;
       leagueType?: string;
-      maxSeasonCount?: string;
       divisionsCount?: string;
     } = {};
 
@@ -60,9 +56,12 @@ export async function leagueCreationController(
     }
 
     // If the user has a free account, league can have max of 2 seasons
-    if (accountType === 'free' && maxSeasonCount > 2) {
-      errors.maxSeasonCount =
-        'Leagues created by free accounts have a 2 season limit';
+    const leagueLevel = accountType === 'free' ? 'free' : 'standard';
+    let maxSeasonLimit: number | null;
+    if (leagueLevel === 'free') {
+      maxSeasonLimit = 2;
+    } else {
+      maxSeasonLimit = null;
     }
 
     // @ts-ignore
@@ -73,9 +72,7 @@ export async function leagueCreationController(
     if (divisionsCount < 1) {
       errors.divisionsCount = 'must be greater than 0';
     }
-    if (maxSeasonCount < 1) {
-      errors.maxSeasonCount = 'must be greater than 0';
-    }
+
     if (divisionsCount > 5) {
       errors.divisionsCount = 'must be less than 5';
     }
@@ -83,7 +80,8 @@ export async function leagueCreationController(
     if (Object.keys(errors).length > 0) {
       return next(new ErrorHandling(400, errors));
     }
-    let league;
+    console.log(`Max szn limit: ${maxSeasonLimit}`);
+    let league: ILeagueSchema;
     if (accountType === 'pro') {
       league = await League.create({
         name: name,
@@ -93,7 +91,7 @@ export async function leagueCreationController(
         currentSeason: 0,
         currentMatchweek: 0,
         finalMatchweek: -1,
-        maxSeasonCount: maxSeasonCount,
+        maxSeasonLimit: maxSeasonLimit,
         divisionsCount: divisionsCount,
         leagueType: leagueType,
         tables: [],
@@ -113,7 +111,7 @@ export async function leagueCreationController(
         currentSeason: 0,
         currentMatchweek: 0,
         finalMatchweek: -1,
-        maxSeasonCount: maxSeasonCount,
+        maxSeasonLimit: maxSeasonLimit,
         divisionsCount: divisionsCount,
         leagueType: leagueType,
         tables: [],
@@ -139,7 +137,7 @@ export async function leagueCreationController(
       name: league.name,
       currentSeason: league.currentSeason,
       currentMatchweek: league.currentMatchweek,
-      maxSeasonCount: league.maxSeasonCount,
+      maxSeasonLimit: league.maxSeasonLimit,
       divisionsCount: league.divisionsCount,
       leagueType: league.leagueType,
       tables: league.tables,

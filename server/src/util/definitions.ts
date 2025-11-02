@@ -12,7 +12,7 @@ export interface ILeagueSchema extends Document {
   currentSeason: number;
   currentMatchweek: number;
   finalMatchweek: number;
-  maxSeasonCount: number;
+  maxSeasonLimit: number | null;
   divisionsCount: number;
   leagueType: 'basic' | 'advanced';
   tables: ITable[];

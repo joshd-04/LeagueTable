@@ -218,7 +218,7 @@ export async function turnFixtureIntoResult(
 
     // If that was the last fixture, and this is the last season, set the season finished flag to true
     if (
-      league.currentSeason === league.maxSeasonCount &&
+      league.currentSeason === league.maxSeasonLimit &&
       league.currentMatchweek === league.finalMatchweek &&
       league.fixtures.length === 0
     ) {
