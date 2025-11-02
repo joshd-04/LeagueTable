@@ -1,12 +1,24 @@
 'use client';
 import InfoSVG from '@/assets/svg components/Info';
-import CreateLeagueForm from '@/components/forms/CreateLeagueForm';
+import CreateLeagueForm from '@/components/forms2/CreateLeagueForm';
 import Heading1 from '@/components/text/Heading1';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import Subtitle from '@/components/text/Subtitle';
+import useAccount from '@/hooks/useAccount';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function ClientPage() {
+  const { isLoggedIn } = useAccount();
+
+  const router = useRouter();
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.replace('/');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="flex flex-row justify-center items-center">
       <div className=" w-auto flex flex-col justify-center items-center p-[30px] transition-colors duration-250">
@@ -16,6 +28,7 @@ export default function ClientPage() {
         </Subtitle>
         <div className="grid grid-cols-3 grid-rows-1 w-[96vw] gap-[40px] pt-[40px]">
           <div></div>
+          {/* <CreateLeagueFormOld /> */}
           <CreateLeagueForm />
           <div className="p-[20px] max-w-[80%] h-min w-fit bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
             <span>

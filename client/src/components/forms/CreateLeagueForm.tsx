@@ -1,16 +1,15 @@
 import InputField from '@/components/form/InputField';
 import Button from '@/components/text/Button';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { API_URL } from '@/util/config';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import Label from '../text/Label';
 import { motion } from 'motion/react';
-import useAccount from '@/hooks/useAccount';
 import { useMutation } from '@tanstack/react-query';
 
-export default function CreateLeagueForm() {
+export default function CreateLeagueFormOld() {
   // Values
   const [leagueName, setLeagueName] = useState<string | number>('');
   const [leagueType, setLeagueType] = useState<'basic' | 'advanced' | null>(
@@ -32,14 +31,6 @@ export default function CreateLeagueForm() {
 
   const router = useRouter();
 
-  const { isLoggedIn } = useAccount();
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.replace('/');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   function handleSendRequest() {
     return fetchAPI(`${API_URL}/leagues`, {
       method: 'POST',

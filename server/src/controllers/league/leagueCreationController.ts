@@ -33,8 +33,13 @@ export async function leagueCreationController(
     }
     const accountType = user.accountType;
 
-    const { name, leagueType, divisionsCount }: LeagueCreationReqBody =
-      req.body;
+    const {
+      name: nameUntrimmed,
+      leagueType,
+      divisionsCount,
+    }: LeagueCreationReqBody = req.body;
+
+    const name = nameUntrimmed.trim();
 
     const errors: {
       name?: string;
@@ -52,7 +57,7 @@ export async function leagueCreationController(
       },
     ]);
     if (names.length > 0) {
-      errors.name = `You already have a league named '${name}'`;
+      errors.name = 'You already own a league with this name.';
     }
 
     // If the user has a free account, league can have max of 2 seasons
@@ -66,26 +71,33 @@ export async function leagueCreationController(
 
     // @ts-ignore
     if (leagueType !== 'basic' && leagueType !== 'advanced') {
-      errors.leagueType = "leagueType can only be 'basic' or 'advanced'";
+      errors.leagueType =
+        "Invalid league type. leagueType can only be 'basic' or 'advanced'";
     }
 
     if (divisionsCount < 1) {
-      errors.divisionsCount = 'must be greater than 0';
+      errors.divisionsCount = 'Must be greater than 0.';
     }
 
     if (divisionsCount > 5) {
-      errors.divisionsCount = 'must be less than 5';
+      errors.divisionsCount = 'Must be less than or equal to 5.';
     }
 
-    if (Object.keys(errors).length > 0) {
-      return next(new ErrorHandling(400, errors));
+    // Handle errors
+    if (Object.keys(errors).length !== 0) {
+      next(
+        new ErrorHandling(400, {
+          errors: { ...errors },
+        })
+      );
+      return;
     }
-    console.log(`Max szn limit: ${maxSeasonLimit}`);
+
     let league: ILeagueSchema;
     if (accountType === 'pro') {
       league = await League.create({
         name: name,
-        leagueLevel: 'standard',
+        leagueLevel: leagueLevel,
         announcement: { text: '', date: new Date() },
         leagueOwner: userId,
         currentSeason: 0,
@@ -106,7 +118,7 @@ export async function leagueCreationController(
     } else {
       league = await League.create({
         name: name,
-        leagueLevel: 'free',
+        leagueLevel: leagueLevel,
         leagueOwner: userId,
         currentSeason: 0,
         currentMatchweek: 0,

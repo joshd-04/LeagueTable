@@ -16,7 +16,7 @@ import {
 } from '@heroui/react';
 import Logo from '../logo/logo';
 import { usePathname } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { useQuery } from '@tanstack/react-query';
@@ -33,6 +33,7 @@ export default function NavBar() {
   const pathname = usePathname();
 
   const router = useRouter();
+  const navRef = useRef<HTMLElement | null>(null);
 
   const { refetch: sendSignoutRequest } = useQuery({
     queryFn: () =>
@@ -52,7 +53,7 @@ export default function NavBar() {
   }
 
   return (
-    <Navbar className="font-instrument" isBordered>
+    <Navbar isBordered ref={navRef}>
       <NavbarBrand>
         <Link href="/" className="text-inherit ">
           <Logo />
@@ -137,7 +138,11 @@ export default function NavBar() {
           <NavbarItem>
             <ThemeSwitch />
           </NavbarItem>
-          <Dropdown placement="bottom-end">
+          <Dropdown
+            placement="bottom-end"
+            portalContainer={navRef.current ?? undefined}
+            shouldBlockScroll={false}
+          >
             <DropdownTrigger>
               <Avatar
                 isBordered
@@ -190,7 +195,6 @@ function ThemeSwitch() {
   // Avoid hydration mismatch between server & client
   useEffect(() => setIsMounted(true), []);
   if (!isMounted) {
-    console.log('not moutned');
     return null;
   }
 

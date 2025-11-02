@@ -46,6 +46,7 @@ body {
   color: var(--foreground); */
   font-family: 'Instrument Sans';
   /* background: var(--bg-dark); */
+  height: 100%;
 }
 
 @layer base {
