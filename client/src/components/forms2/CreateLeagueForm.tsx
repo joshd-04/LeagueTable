@@ -12,7 +12,7 @@ import {
   RadioGroup,
   Spacer,
 } from '@heroui/react';
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -33,6 +33,8 @@ export default function CreateLeagueForm() {
 
   const globalContext = useContext(GlobalContext);
   const setError = globalContext.errors.setError;
+
+  const formRef = useRef<HTMLFormElement>(null);
 
   const router = useRouter();
 
@@ -89,7 +91,11 @@ export default function CreateLeagueForm() {
   return (
     <Card className="w-[400px] place-self-center">
       <CardBody>
-        <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
+        <Form
+          onSubmit={handleSubmit}
+          validationErrors={serverErrors}
+          ref={formRef}
+        >
           <Input
             value={leagueName}
             onValueChange={setLeagueName}
@@ -169,7 +175,7 @@ export default function CreateLeagueForm() {
             fullWidth
             className="font-semibold text-small"
             isDisabled={isError || isCreationSuccess}
-            isLoading={isPending}
+            isLoading={isPending || isCreationSuccess}
           >
             {isCreationSuccess ? 'Success' : 'Submit'}
           </Button>
