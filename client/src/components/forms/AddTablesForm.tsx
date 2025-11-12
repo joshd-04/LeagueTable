@@ -32,7 +32,7 @@ interface DivisionInputErrorsInterface {
   numberOfTeamsToBeRelegated: string;
 }
 
-export default function AddTablesForm({
+export default function AddTablesFormOld({
   divisionsCount,
   leagueId,
 }: {
