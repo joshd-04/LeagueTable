@@ -12,7 +12,6 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import useAccount from '@/hooks/useAccount';
-import Subtitle from '../text/Subtitle';
 import { useMutation } from '@tanstack/react-query';
 import { useNotifier } from '@/hooks/useNotifier';
 import {
@@ -25,7 +24,6 @@ import {
   NumberInput,
   Spacer,
 } from '@heroui/react';
-import Heading4 from '../text/Heading4';
 import Paragraph from '../text/Paragraph';
 import Label from '../text/Label';
 
@@ -44,9 +42,11 @@ interface DivisionInputErrorsInterface {
 }
 
 export default function AddTablesForm({
+  leagueName,
   divisionsCount,
   leagueId,
 }: {
+  leagueName: string;
   divisionsCount: number;
   leagueId: string;
 }) {
@@ -147,17 +147,22 @@ export default function AddTablesForm({
   }
 
   return (
-    <Card className="w-[400px] place-self-center">
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2">
       <CardBody>
+        <div>
+          <Paragraph className="font-medium">
+            Division Setup: {leagueName}
+          </Paragraph>
+          <Label className="opacity-80 dark:opacity-70">Part 2 of 3</Label>
+        </div>
+        <Spacer y={4} />
         <Form onSubmit={handleSubmit}>
           {Array(divisionsCount)
             .fill('')
             .map((str, i) => {
               return (
                 <div className="flex flex-col gap-2 w-full" key={i + 1}>
-                  <Paragraph className="ml-1 text-large">
-                    Division {i + 1}
-                  </Paragraph>
+                  <p className="text-medium">Division {i + 1}</p>
                   <FormSection
                     divisionInputs={divisionInputs}
                     setDivisionInputs={setDivisionInputs}
@@ -173,7 +178,7 @@ export default function AddTablesForm({
           <Spacer y={2} />
           <Button
             type="submit"
-            variant={isFormSuccess ? 'flat' : 'shadow'}
+            variant={isFormSuccess ? 'flat' : 'solid'}
             color={isFormSuccess ? 'success' : 'primary'}
             fullWidth
             className="font-semibold text-small"
@@ -206,7 +211,6 @@ function FormSection({
   divisionIndex,
   divisionsCount,
 }: FormSectionProps) {
-  const [numTeamsInFocus, setNumTeamsInFocus] = useState(false);
   return (
     <>
       <Input
@@ -280,9 +284,6 @@ function FormSection({
         fullWidth
         isRequired
         errorMessage={divisionErrors[divisionIndex].numberOfTeams}
-        onFocusChange={(isFocused) => {
-          setNumTeamsInFocus(isFocused);
-        }}
       />
 
       {divisionIndex !== 0 && (

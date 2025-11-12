@@ -53,7 +53,7 @@ export default function NavBar() {
   }
 
   return (
-    <Navbar isBordered ref={navRef}>
+    <Navbar ref={navRef}>
       <NavbarBrand>
         <Link href="/" className="text-inherit ">
           <Logo />

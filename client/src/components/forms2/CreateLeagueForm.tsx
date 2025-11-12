@@ -18,6 +18,8 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
 import { GlobalContext } from '@/context/GlobalContextProvider';
+import Paragraph from '../text/Paragraph';
+import Label from '../text/Label';
 
 export default function CreateLeagueForm() {
   const [leagueName, setLeagueName] = useState<string>('');
@@ -87,8 +89,13 @@ export default function CreateLeagueForm() {
   }
 
   return (
-    <Card className="w-[400px] place-self-center">
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10 bg-linear-to-br from-content1 to-content2">
       <CardBody>
+        <div>
+          <Paragraph className="font-medium">Create a league</Paragraph>
+          <Label className="opacity-80 dark:opacity-70">Part 1 of 3</Label>
+        </div>
+        <Spacer y={4} />
         <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
           <Input
             value={leagueName}

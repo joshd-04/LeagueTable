@@ -1,5 +1,5 @@
 'use client';
-import { Button, Card, CardBody, Form, Input } from '@heroui/react';
+import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
 import { useContext, useState } from 'react';
 import Label from '../text/Label';
 import { useRouter } from 'next/navigation';
@@ -7,6 +7,7 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
 import { GlobalContext } from '@/context/GlobalContextProvider';
+import Paragraph from '../text/Paragraph';
 
 export default function LoginForm({
   callbackUrl = '/',
@@ -75,8 +76,15 @@ export default function LoginForm({
   }
 
   return (
-    <Card className="w-[400px] mt-[40px]">
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2">
       <CardBody>
+        <div>
+          <Paragraph className="font-medium">Welcome Back</Paragraph>
+          <Label className="opacity-80 dark:opacity-70">
+            Log in to your account to continue
+          </Label>
+        </div>
+        <Spacer y={4} />
         <Form onSubmit={handleSubmit}>
           <Input
             value={username}

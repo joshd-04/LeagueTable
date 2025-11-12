@@ -1,5 +1,5 @@
 'use client';
-import { Button, Card, CardBody, Form, Input } from '@heroui/react';
+import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
@@ -7,6 +7,8 @@ import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { User } from '@/util/definitions';
+import Paragraph from '../text/Paragraph';
+import Label from '../text/Label';
 
 export default function RegistrationForm() {
   const [username, setUsername] = useState('');
@@ -104,8 +106,15 @@ export default function RegistrationForm() {
   }
 
   return (
-    <Card className="w-[400px] mt-[40px]">
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2">
       <CardBody>
+        <div>
+          <Paragraph className="font-medium">Welcome!</Paragraph>
+          <Label className="opacity-80 dark:opacity-70">
+            Create an account to get started
+          </Label>
+        </div>
+        <Spacer y={4} />
         <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
           <Input
             value={username}
