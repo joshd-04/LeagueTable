@@ -78,7 +78,9 @@ function ExtraInfoOld() {
 
 function ExtraInfo() {
   return (
-    <Card className="p-[20px] max-w-[80%] h-min w-fit  flex flex-col gap-2">
+    <Card className="sticky top-20 self-start p-[20px] max-w-[80%] h-min w-fit  flex flex-col gap-2">
+      <div className="absolute -bottom-28 -left-20 w-64 h-64 bg-primary rounded-full blur-xl opacity-30"></div>
+      <div className="absolute top-0 -right-28 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardBody className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <span>

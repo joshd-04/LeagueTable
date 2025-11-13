@@ -128,8 +128,8 @@ export default function NavBar() {
               <Button
                 as={Link}
                 href="/create-league"
-                color="success"
-                variant="ghost"
+                color="primary"
+                variant="solid"
               >
                 <p>Create league</p>
               </Button>

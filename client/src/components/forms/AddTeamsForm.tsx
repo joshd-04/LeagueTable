@@ -17,7 +17,7 @@ import Subtitle from '../text/Subtitle';
 import { useMutation } from '@tanstack/react-query';
 import { useNotifier } from '@/hooks/useNotifier';
 
-export default function AddTeamsForm({
+export default function AddTeamsFormOld({
   divisions,
   leagueId,
 }: {
