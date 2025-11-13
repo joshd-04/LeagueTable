@@ -1,6 +1,6 @@
 'use client';
 import InfoSVG from '@/assets/svg components/Info';
-import CreateLeagueForm from '@/components/forms2/CreateLeagueForm';
+import CreateLeagueForm from '@/components/forms/CreateLeagueForm';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import useAccount from '@/hooks/useAccount';

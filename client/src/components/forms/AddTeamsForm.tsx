@@ -1,26 +1,29 @@
 'use client';
-import Button from '@/components/text/Button';
 import {
   Dispatch,
   SetStateAction,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { API_URL } from '@/util/config';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
-import Label from '../text/Label';
 import useAccount from '@/hooks/useAccount';
-import Subtitle from '../text/Subtitle';
 import { useMutation } from '@tanstack/react-query';
 import { useNotifier } from '@/hooks/useNotifier';
+import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
+import Paragraph from '../text/Paragraph';
+import Label from '../text/Label';
 
-export default function AddTeamsFormOld({
+export default function AddTablesForm({
+  leagueName,
   divisions,
   leagueId,
 }: {
+  leagueName: string;
   divisions: { divisionNumber: number; name: string; numberOfTeams: number }[];
   leagueId: string;
 }) {
@@ -50,15 +53,13 @@ export default function AddTeamsFormOld({
   const [teamInputs, setTeamInputs] =
     useState<{ name: string }[][]>(emptyInputs);
 
-  const [teamErrors, setTeamErrors] =
-    useState<{ name: string }[][]>(emptyErrors);
-
   const globalContext = useContext(GlobalContext);
   const setError = globalContext.errors.setError;
 
-  const [buttonText, setButtonText] = useState("Let's go!");
-  const [buttonColor, setButtonColor] = useState('var(--primary)');
-  const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
+  const [isError, setIsError] = useState(false);
+  const [isFormSuccess, setIsFormSuccess] = useState(false);
+
+  const failMessageRef = useRef('');
 
   const router = useRouter();
 
@@ -69,13 +70,12 @@ export default function AddTeamsFormOld({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const uniqueNamesNotification = useNotifier({
-    id: 'uniqueTeamName',
-    title: 'Team names must be unique',
-    description:
-      "Just double check that all your team names are different from each other even if they're in different divisions",
-    type: 'warning',
+  const errorNotification = useNotifier({
+    title: 'There was a problem!',
+    description: () => failMessageRef.current,
     duration: 5000,
+    id: 'tables-creation-error',
+    type: 'error',
   });
 
   function handleSendRequest() {
@@ -101,22 +101,14 @@ export default function AddTeamsFormOld({
     mutationFn: handleSendRequest,
     onSuccess: (result) => {
       if (result.status === 'success') {
-        setButtonText('Success!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
+        setIsFormSuccess(true);
         setTimeout(() => {
           router.push(`/leagues/${leagueId}`);
         }, 300);
       } else if (result.status === 'fail') {
-        setButtonText('There was an error');
-        setButtonColor('var(--danger)');
-        setButtonHoverColor('var(--bg-light)');
-
-        setTimeout(() => {
-          setButtonColor('var(--primary)');
-          setButtonHoverColor('var(--accent)');
-          setButtonText("Let's go");
-        }, 2000);
+        failMessageRef.current = result.data.message;
+        errorNotification?.fire();
+        setIsError(true);
       } else {
         setError(result.message);
       }
@@ -130,25 +122,6 @@ export default function AddTeamsFormOld({
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
 
-    // const freshErrors = [...emptyErrors];
-    let errorsPresent = false;
-
-    // Make sure team names are unique
-    const teamNames: string[] = [];
-    teamInputs.forEach((division) => {
-      division.forEach((team) => {
-        teamNames.push(team.name);
-      });
-    });
-    if (new Set(teamNames).size !== teamNames.length) {
-      uniqueNamesNotification?.fire();
-      errorsPresent = true;
-    }
-
-    // true means there are errors
-
-    if (errorsPresent) return;
-
     try {
       handleRequestMutation();
     } catch (e) {
@@ -157,48 +130,52 @@ export default function AddTeamsFormOld({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-[20px] w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
-    >
-      {divisions.map((division, i) => {
-        return (
-          <div className="flex flex-col gap-2" key={i + 1}>
-            <Subtitle>
-              Division {division.divisionNumber}{' '}
-              <span style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-                - {division.name}
-              </span>
-            </Subtitle>
-
-            <FormSection
-              teamInputs={teamInputs}
-              setTeamInputs={setTeamInputs}
-              teamErrors={teamErrors}
-              setTeamErrors={setTeamErrors}
-              division={division}
-            />
-          </div>
-        );
-      })}
-      <Button
-        type="submit"
-        color={buttonColor}
-        bgHoverColor={buttonHoverColor}
-        onClick={() => {}}
-        style={{ width: '100%' }}
-      >
-        {isPending ? '...' : buttonText}
-      </Button>
-    </form>
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2 ">
+      <CardBody>
+        <div>
+          <Paragraph className="font-medium">
+            Team Setup: {leagueName}
+          </Paragraph>
+          <Label className="opacity-80 dark:opacity-70">Part 3 of 3</Label>
+        </div>
+        <Spacer y={4} />
+        <Form onSubmit={handleSubmit}>
+          {divisions.map((division, i) => {
+            return (
+              <div className="flex flex-col gap-2 w-full" key={i + 1}>
+                <p className="text-medium">
+                  Division {division.divisionNumber} - {division.name}
+                </p>
+                <FormSection
+                  teamInputs={teamInputs}
+                  setTeamInputs={setTeamInputs}
+                  division={division}
+                />
+                {/* {i !== divisionsCount - 1 && <Divider className="my-4" />} */}
+              </div>
+            );
+          })}
+          <Spacer y={2} />
+          <Button
+            type="submit"
+            variant={isFormSuccess ? 'flat' : 'solid'}
+            color={isFormSuccess ? 'success' : 'primary'}
+            fullWidth
+            className="font-semibold text-small"
+            isDisabled={isFormSuccess}
+            isLoading={isPending}
+          >
+            {isFormSuccess ? 'Success' : 'Submit'}
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }
 
 interface FormSectionProps {
   teamInputs: { name: string }[][];
   setTeamInputs: Dispatch<SetStateAction<{ name: string }[][]>>;
-  teamErrors: { name: string }[][];
-  setTeamErrors: Dispatch<SetStateAction<{ name: string }[][]>>;
 
   division: {
     divisionNumber: number;
@@ -210,8 +187,6 @@ interface FormSectionProps {
 function FormSection({
   teamInputs,
   setTeamInputs,
-  teamErrors,
-  setTeamErrors,
   division,
 }: FormSectionProps) {
   return (
@@ -220,56 +195,47 @@ function FormSection({
         .fill('')
         .map((_str, i) => {
           return (
-            <div
-              className="flex flex-col justify-baseline items-baseline w-full"
-              key={i + 1}
-            >
-              <Label
-                style={{
-                  fontWeight: 'bold',
-                }}
-              >
-                Team {i + 1} name
-              </Label>
-              <input
-                type="text"
-                required
-                className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-black/50 border-2 w-full 
-              "
-                placeholder="Team name"
-                value={teamInputs[division.divisionNumber - 1][i].name}
-                onChange={(e) => {
-                  setTeamErrors((prev) => {
-                    const newOne = [...prev];
-                    newOne[division.divisionNumber - 1][i].name = '';
-                    return newOne;
-                  });
-                  setTeamInputs((prev) => {
-                    const newOne = [...prev];
-                    newOne[division.divisionNumber - 1][i].name =
-                      e.target.value;
+            <Input
+              value={teamInputs[division.divisionNumber - 1][i].name}
+              onChange={(e) => {
+                setTeamInputs((prev) => {
+                  const newOne = [...prev];
+                  newOne[division.divisionNumber - 1][i].name = e.target.value;
 
-                    return newOne;
-                  });
-                }}
-              />
-              <Label
-                style={{
-                  fontWeight: 'bold',
-                  color: 'var(--danger)',
-                  width: '100%',
-                  opacity: teamErrors[division.divisionNumber - 1][i].name
-                    ? undefined
-                    : '0',
-                }}
-              >
-                Error
-                <span className="font-normal">
-                  {' '}
-                  - {teamErrors[division.divisionNumber - 1][i].name}
-                </span>
-              </Label>
-            </div>
+                  return newOne;
+                });
+              }}
+              key={i}
+              size="md"
+              radius="md"
+              name={`teamInput${i + 1}`}
+              label={`Team ${i + 1}`}
+              labelPlacement="inside"
+              type="text"
+              variant="bordered"
+              fullWidth
+              isRequired
+              validate={(value) => {
+                // Get list of team names, excluding this one
+                const teamNames: string[] = [];
+                const divisionIndex = division.divisionNumber - 1;
+
+                teamInputs.map((division, j) => {
+                  const filteredTeamNames = division
+                    .filter((team, k) => j !== divisionIndex || k !== i)
+                    .map((team) => team.name);
+
+                  console.log(filteredTeamNames);
+
+                  teamNames.push(...filteredTeamNames);
+                }); // Check if this team name is in that list
+
+                if (teamNames.includes(value)) {
+                  // If so, there is a clash
+                  return 'This team name is already in use';
+                }
+              }}
+            />
           );
         })}
     </div>

@@ -1,5 +1,5 @@
 'use client';
-import LoginForm from '@/components/forms2/LoginForm';
+import LoginForm from '@/components/forms/LoginForm';
 import { Spacer } from '@heroui/react';
 import { useSearchParams } from 'next/navigation';
 

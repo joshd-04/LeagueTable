@@ -1,5 +1,4 @@
 'use client';
-import Button from '@/components/text/Button';
 import {
   Dispatch,
   SetStateAction,
@@ -12,17 +11,27 @@ import { API_URL } from '@/util/config';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
-import Label from '../text/Label';
 import useAccount from '@/hooks/useAccount';
-import Subtitle from '../text/Subtitle';
 import { useMutation } from '@tanstack/react-query';
 import { useNotifier } from '@/hooks/useNotifier';
+import {
+  Button,
+  Card,
+  CardBody,
+  Divider,
+  Form,
+  Input,
+  NumberInput,
+  Spacer,
+} from '@heroui/react';
+import Paragraph from '../text/Paragraph';
+import Label from '../text/Label';
 
 interface DivisionInputsInterface {
   tableName: string;
-  numberOfTeams: string | number;
-  numberOfTeamsToBePromoted: string | number;
-  numberOfTeamsToBeRelegated: string | number;
+  numberOfTeams: number | undefined;
+  numberOfTeamsToBePromoted: number | undefined;
+  numberOfTeamsToBeRelegated: number | undefined;
 }
 
 interface DivisionInputErrorsInterface {
@@ -32,10 +41,12 @@ interface DivisionInputErrorsInterface {
   numberOfTeamsToBeRelegated: string;
 }
 
-export default function AddTablesFormOld({
+export default function AddTablesForm({
+  leagueName,
   divisionsCount,
   leagueId,
 }: {
+  leagueName: string;
   divisionsCount: number;
   leagueId: string;
 }) {
@@ -46,9 +57,9 @@ export default function AddTablesFormOld({
   for (let i = 0; i < divisionsCount; i++) {
     emptyInputs.push({
       tableName: '',
-      numberOfTeams: '',
-      numberOfTeamsToBePromoted: '',
-      numberOfTeamsToBeRelegated: '',
+      numberOfTeams: undefined,
+      numberOfTeamsToBePromoted: i === 0 ? 0 : undefined,
+      numberOfTeamsToBeRelegated: i === divisionsCount - 1 ? 0 : undefined,
     });
     emptyErrors.push({
       tableName: '',
@@ -66,9 +77,8 @@ export default function AddTablesFormOld({
   const globalContext = useContext(GlobalContext);
   const setError = globalContext.errors.setError;
 
-  const [buttonText, setButtonText] = useState('Next');
-  const [buttonColor, setButtonColor] = useState('var(--primary)');
-  const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
+  const [isError, setIsError] = useState(false);
+  const [isFormSuccess, setIsFormSuccess] = useState(false);
 
   const failMessageRef = useRef('');
 
@@ -80,15 +90,6 @@ export default function AddTablesFormOld({
     if (!isLoggedIn) router.replace('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const uniqueNamesNotification = useNotifier({
-    id: 'uniqueTableName',
-    title: 'Table names must be unique',
-    description:
-      'Just double check that your table names are different from each other',
-    type: 'warning',
-    duration: 5000,
-  });
 
   const errorNotification = useNotifier({
     title: 'There was a problem!',
@@ -117,25 +118,14 @@ export default function AddTablesFormOld({
     mutationFn: handleSendRequest,
     onSuccess: (result) => {
       if (result.status === 'success') {
-        setButtonText('Success!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
+        setIsFormSuccess(true);
         setTimeout(() => {
           router.push(`/leagues/${leagueId}`);
         }, 300);
       } else if (result.status === 'fail') {
-        setButtonText('There was an error');
-        setButtonColor('var(--danger)');
-        setButtonHoverColor('var(--bg-light)');
-
         failMessageRef.current = result.data.message;
         errorNotification?.fire();
-
-        setTimeout(() => {
-          setButtonColor('var(--primary)');
-          setButtonHoverColor('var(--accent)');
-          setButtonText('Next');
-        }, 2000);
+        setIsError(true);
       } else {
         setError(result.message);
       }
@@ -149,68 +139,6 @@ export default function AddTablesFormOld({
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
 
-    const freshErrors = [...emptyErrors];
-
-    divisionInputs.forEach((divisionInput, i) => {
-      if (divisionInput.tableName.length === 0) {
-        freshErrors[i].tableName = 'this is required';
-      }
-      if (+divisionInput.numberOfTeams <= 0) {
-        freshErrors[i].numberOfTeams = 'this is required';
-      }
-      if (+divisionInput.numberOfTeams > 24) {
-        freshErrors[i].numberOfTeams = 'too many teams (max. 24)';
-      }
-      if (divisionInput.numberOfTeamsToBeRelegated.toString().length === 0) {
-        divisionInput.numberOfTeamsToBeRelegated = 0;
-      }
-      if (divisionInput.numberOfTeamsToBePromoted.toString().length === 0) {
-        divisionInput.numberOfTeamsToBePromoted = 0;
-      }
-      if (+divisionInput.numberOfTeamsToBeRelegated < 0) {
-        freshErrors[i].numberOfTeamsToBeRelegated = 'must be a positive number';
-      }
-      if (+divisionInput.numberOfTeamsToBePromoted < 0) {
-        freshErrors[i].numberOfTeamsToBePromoted = 'must be a positive number';
-      }
-      if (!Number.isInteger(+divisionInput.numberOfTeams)) {
-        freshErrors[i].numberOfTeams = 'must be an integer';
-      }
-      if (!Number.isInteger(+divisionInput.numberOfTeamsToBePromoted)) {
-        freshErrors[i].numberOfTeamsToBePromoted = 'must be an integer';
-      }
-      if (!Number.isInteger(+divisionInput.numberOfTeamsToBeRelegated)) {
-        freshErrors[i].numberOfTeamsToBeRelegated = 'must be an integer';
-      }
-    });
-
-    // Ensure each division name is unique
-    const uniqueCount = new Set(
-      divisionInputs.map((divisionInput) => divisionInput.tableName)
-    ).size;
-    if (uniqueCount !== divisionInputs.length) {
-      uniqueNamesNotification?.fire();
-      return;
-    }
-
-    setDivisionErrors(freshErrors);
-
-    // true means there are errors
-
-    const x = freshErrors.map((freshErrorSet) => {
-      if (
-        freshErrorSet.tableName !== '' ||
-        freshErrorSet.numberOfTeams !== '' ||
-        freshErrorSet.numberOfTeamsToBePromoted !== '' ||
-        freshErrorSet.numberOfTeamsToBeRelegated !== ''
-      )
-        return true;
-      return false;
-    });
-    const errorsPresent = x.some((b) => b === true);
-
-    if (errorsPresent) return;
-
     try {
       handleRequestMutation();
     } catch (e) {
@@ -219,36 +147,49 @@ export default function AddTablesFormOld({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-[20px] w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
-    >
-      {Array(divisionsCount)
-        .fill('')
-        .map((str, i) => {
-          return (
-            <div className="flex flex-col gap-2" key={i + 1}>
-              <Subtitle>Division {i + 1}</Subtitle>
-              <FormSection
-                divisionInputs={divisionInputs}
-                setDivisionInputs={setDivisionInputs}
-                divisionErrors={divisionErrors}
-                setDivisionErrors={setDivisionErrors}
-                divisionIndex={i}
-              />
-            </div>
-          );
-        })}
-      <Button
-        type="submit"
-        color={buttonColor}
-        bgHoverColor={buttonHoverColor}
-        onClick={() => {}}
-        style={{ width: '100%' }}
-      >
-        {isPending ? '...' : buttonText}
-      </Button>
-    </form>
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2 ">
+      <CardBody>
+        <div>
+          <Paragraph className="font-medium">
+            Division Setup: {leagueName}
+          </Paragraph>
+          <Label className="opacity-80 dark:opacity-70">Part 2 of 3</Label>
+        </div>
+        <Spacer y={4} />
+        <Form onSubmit={handleSubmit}>
+          {Array(divisionsCount)
+            .fill('')
+            .map((str, i) => {
+              return (
+                <div className="flex flex-col gap-2 w-full" key={i + 1}>
+                  <p className="text-medium">Division {i + 1}</p>
+                  <FormSection
+                    divisionInputs={divisionInputs}
+                    setDivisionInputs={setDivisionInputs}
+                    divisionErrors={divisionErrors}
+                    setDivisionErrors={setDivisionErrors}
+                    divisionIndex={i}
+                    divisionsCount={divisionsCount}
+                  />
+                  {i !== divisionsCount - 1 && <Divider className="my-4" />}
+                </div>
+              );
+            })}
+          <Spacer y={2} />
+          <Button
+            type="submit"
+            variant={isFormSuccess ? 'flat' : 'solid'}
+            color={isFormSuccess ? 'success' : 'primary'}
+            fullWidth
+            className="font-semibold text-small"
+            isDisabled={isFormSuccess}
+            isLoading={isPending}
+          >
+            {isFormSuccess ? 'Success' : 'Submit'}
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }
 
@@ -259,6 +200,7 @@ interface FormSectionProps {
   setDivisionErrors: Dispatch<SetStateAction<DivisionInputErrorsInterface[]>>;
 
   divisionIndex: number;
+  divisionsCount: number;
 }
 
 function FormSection({
@@ -267,106 +209,85 @@ function FormSection({
   divisionErrors,
   setDivisionErrors,
   divisionIndex,
+  divisionsCount,
 }: FormSectionProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label style={{ fontWeight: 'bold' }}>Table name</Label>
-        <input
-          type="text"
-          required
-          className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-black/50 border-2 w-full 
-              "
-          placeholder="Table name"
-          value={divisionInputs[divisionIndex].tableName}
-          onChange={(e) => {
-            setDivisionErrors((prev) => {
-              const newOne = [...prev];
-              newOne[divisionIndex].tableName = '';
-              return newOne;
-            });
-            setDivisionInputs((prev) => {
-              const newOne = [...prev];
-              newOne[divisionIndex].tableName = e.target.value;
-              return newOne;
-            });
-          }}
-        />
-        <Label
-          style={{
-            color: 'var(--danger)',
-            fontWeight: 'bold',
-            width: '100%',
-            opacity: divisionErrors[divisionIndex].tableName ? undefined : '0',
-          }}
-        >
-          Error
-          <span className="font-normal">
-            {' '}
-            - {divisionErrors[divisionIndex].tableName}
-          </span>
-        </Label>
-      </div>
-      <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label
-          style={{
-            fontWeight: 'bold',
-          }}
-        >
-          Number of teams
-        </Label>
-        <input
-          type="number"
-          step={1}
-          required
-          className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-black/50 border-2 w-full 
-              "
-          placeholder="Number of teams"
-          value={divisionInputs[divisionIndex].numberOfTeams}
-          onChange={(e) => {
-            setDivisionErrors((prev) => {
-              const newOne = [...prev];
-              newOne[divisionIndex].numberOfTeams = '';
-              return newOne;
-            });
-            setDivisionInputs((prev) => {
-              const newOne = [...prev];
-              newOne[divisionIndex].numberOfTeams = +e.target.value;
-              return newOne;
-            });
-          }}
-        />
-        <Label
-          style={{
-            color: 'var(--danger)',
-            fontWeight: 'bold',
-            width: '100%',
-            opacity: divisionErrors[divisionIndex].numberOfTeams
-              ? undefined
-              : '0',
-          }}
-        >
-          Error
-          <span className="font-normal">
-            {' '}
-            - {divisionErrors[divisionIndex].numberOfTeams}
-          </span>
-        </Label>
-      </div>
-      <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label
-          style={{
-            fontWeight: 'bold',
-          }}
-        >
-          Number of teams to be promoted
-        </Label>
-        <input
-          type="number"
-          step={1}
-          className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-black/50 border-2 w-full 
-              "
-          placeholder="Default: 0"
+    <>
+      <Input
+        value={divisionInputs[divisionIndex].tableName}
+        onChange={(e) => {
+          setDivisionErrors((prev) => {
+            const newOne = [...prev];
+            newOne[divisionIndex].tableName = '';
+            return newOne;
+          });
+          setDivisionInputs((prev) => {
+            const newOne = [...prev];
+            newOne[divisionIndex].tableName = e.target.value;
+            return newOne;
+          });
+        }}
+        size="md"
+        radius="md"
+        name="tableName"
+        label="Table name"
+        labelPlacement="inside"
+        type="text"
+        variant="bordered"
+        fullWidth
+        isRequired
+        validate={(value) => {
+          // This validation will check for table name conflicts
+          const conflictedDivisionIndexes: number[] = [];
+          const tableNames = divisionInputs.map(
+            (divisionInput) => divisionInput.tableName
+          );
+
+          tableNames.forEach((name, i) => {
+            if (value === name && name.length > 0 && i !== divisionIndex) {
+              conflictedDivisionIndexes.push(i);
+            }
+          });
+
+          if (conflictedDivisionIndexes.length > 0) {
+            return 'Table name already in use';
+          }
+        }}
+        // errorMessage={divisionErrors[divisionIndex].tableName}
+      />
+
+      <NumberInput
+        value={divisionInputs[divisionIndex].numberOfTeams}
+        onChange={(e) => {
+          setDivisionErrors((prev) => {
+            const newOne = [...prev];
+            newOne[divisionIndex].numberOfTeams = '';
+            return newOne;
+          });
+          setDivisionInputs((prev) => {
+            const newOne = [...prev];
+            newOne[divisionIndex].numberOfTeams = +e;
+            return newOne;
+          });
+        }}
+        size="md"
+        radius="md"
+        name="numberOfTeams"
+        label="Number of teams"
+        labelPlacement="inside"
+        type="number"
+        step={1}
+        minValue={1}
+        maxValue={24}
+        isWheelDisabled
+        variant="bordered"
+        fullWidth
+        isRequired
+        errorMessage={divisionErrors[divisionIndex].numberOfTeams}
+      />
+
+      {divisionIndex !== 0 && (
+        <NumberInput
           value={divisionInputs[divisionIndex].numberOfTeamsToBePromoted}
           onChange={(e) => {
             setDivisionErrors((prev) => {
@@ -376,42 +297,37 @@ function FormSection({
             });
             setDivisionInputs((prev) => {
               const newOne = [...prev];
-              newOne[divisionIndex].numberOfTeamsToBePromoted = +e.target.value;
+              // Change the current division number
+              newOne[divisionIndex].numberOfTeamsToBePromoted = +e;
+
+              // Change the above division's relegated number
+              newOne[divisionIndex - 1].numberOfTeamsToBeRelegated = +e;
+
               return newOne;
             });
           }}
-        />
-        <Label
-          style={{
-            fontWeight: 'bold',
-            color: 'var(--danger)',
-            width: '100%',
-            opacity: divisionErrors[divisionIndex].numberOfTeamsToBePromoted
-              ? undefined
-              : '0',
-          }}
-        >
-          Error
-          <span className="font-normal">
-            {' '}
-            - {divisionErrors[divisionIndex].numberOfTeamsToBePromoted}
-          </span>
-        </Label>
-      </div>
-      <div className="flex flex-col justify-baseline items-baseline w-full">
-        <Label
-          style={{
-            fontWeight: 'bold',
-          }}
-        >
-          Number of teams to be relegated
-        </Label>
-        <input
+          size="md"
+          radius="md"
+          name="numberOfTeamsToBePromoted"
+          label="Number of teams to be promoted"
+          labelPlacement="inside"
           type="number"
           step={1}
-          className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-black/50 border-2 w-full 
-              "
-          placeholder="Default: 0"
+          minValue={0}
+          maxValue={Math.floor(
+            Number(divisionInputs[divisionIndex].numberOfTeams) / 2
+          )}
+          isWheelDisabled
+          isDisabled={divisionInputs[divisionIndex].numberOfTeams === undefined}
+          variant="bordered"
+          fullWidth
+          isRequired
+          errorMessage={divisionErrors[divisionIndex].numberOfTeamsToBePromoted}
+        />
+      )}
+
+      {divisionIndex !== divisionsCount - 1 && (
+        <NumberInput
           value={divisionInputs[divisionIndex].numberOfTeamsToBeRelegated}
           onChange={(e) => {
             setDivisionErrors((prev) => {
@@ -421,29 +337,35 @@ function FormSection({
             });
             setDivisionInputs((prev) => {
               const newOne = [...prev];
-              newOne[divisionIndex].numberOfTeamsToBeRelegated =
-                +e.target.value;
+              // Change current divisions number
+              newOne[divisionIndex].numberOfTeamsToBeRelegated = +e;
+
+              // Change the above division's relegated number
+              newOne[divisionIndex + 1].numberOfTeamsToBePromoted = +e;
               return newOne;
             });
           }}
+          size="md"
+          radius="md"
+          name="numberOfTeamsToBeRelegated"
+          label="Number of teams to be relegated"
+          labelPlacement="inside"
+          type="number"
+          step={1}
+          minValue={0}
+          maxValue={Math.floor(
+            Number(divisionInputs[divisionIndex].numberOfTeams) / 2
+          )}
+          isWheelDisabled
+          isDisabled={divisionInputs[divisionIndex].numberOfTeams === undefined}
+          variant="bordered"
+          fullWidth
+          isRequired
+          errorMessage={
+            divisionErrors[divisionIndex].numberOfTeamsToBeRelegated
+          }
         />
-        <Label
-          style={{
-            color: 'var(--danger)',
-            fontWeight: 'bold',
-            width: '100%',
-            opacity: divisionErrors[divisionIndex].numberOfTeamsToBeRelegated
-              ? undefined
-              : '0',
-          }}
-        >
-          Error
-          <span className="font-normal">
-            {' '}
-            - {divisionErrors[divisionIndex].numberOfTeamsToBeRelegated}
-          </span>
-        </Label>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

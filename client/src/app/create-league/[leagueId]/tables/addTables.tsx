@@ -1,6 +1,6 @@
 'use client';
 import InfoSVG from '@/assets/svg components/Info';
-import AddTablesForm from '@/components/forms2/AddTablesForm';
+import AddTablesForm from '@/components/forms/AddTablesForm';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
 import { Card, CardBody } from '@heroui/react';
@@ -32,46 +32,6 @@ export default function AddTables({
           {divisionsCount > 1 ? <ExtraInfo /> : <div></div>}
         </div>
       </div>
-    </div>
-  );
-}
-function ExtraInfoOld() {
-  return (
-    <div className="sticky top-8 self-start p-[20px] max-w-[80%] h-min w-fit bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <span>
-        <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
-        <Paragraph
-          style={{
-            color: 'var(--info)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Table names
-        </Paragraph>
-      </span>
-      <Label>Make sure the different table names are unique</Label>
-      <span>
-        <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
-        <Paragraph
-          style={{
-            color: 'var(--info)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Promotion/relegation
-        </Paragraph>
-      </span>
-      <Label>
-        Make sure the promotion and relegation numbers match between adjacent
-        leagues.
-        <br />
-        This is managed for you automatically, you may need to double check your
-        inputs.
-        <br />
-        You can&apos;t promote or relegate more than half of a division
-      </Label>
     </div>
   );
 }

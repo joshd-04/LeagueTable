@@ -1,43 +1,28 @@
-import InputField from '@/components/form/InputField';
-import Button from '@/components/text/Button';
+'use client';
+import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
 import { useContext, useState } from 'react';
-import { API_URL } from '@/util/config';
-import { GlobalContext } from '@/context/GlobalContextProvider';
+import Label from '../text/Label';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
-import { useNotifier } from '@/hooks/useNotifier';
+import { GlobalContext } from '@/context/GlobalContextProvider';
+import Paragraph from '../text/Paragraph';
 
-export default function LoginFormOld({
+export default function LoginForm({
   callbackUrl = '/',
 }: {
   callbackUrl?: string;
 }) {
-  // Values
-  const [username, setUsername] = useState<string | number>('');
-  // const [email, setEmail] = useState<string | number>('');
-  const [password, setPassword] = useState<string | number>('');
-
-  // Errors
-  const [usernameError, setUsernameError] = useState('');
-  // const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [buttonText, setButtonText] = useState('Let me in!');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
 
   const globalContext = useContext(GlobalContext);
   const setError = globalContext.errors.setError;
 
-  const [buttonColor, setButtonColor] = useState('var(--primary)');
-  const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
   const router = useRouter();
-
-  const invalidCredentialsNotification = useNotifier({
-    title: 'Invalid credentials',
-    description: 'Make sure your username and password were entered correctly',
-    id: 'invalid-login',
-    type: 'error',
-    duration: 5000,
-  });
 
   function handleSendRequest() {
     return fetchAPI(`${API_URL}/login`, {
@@ -58,23 +43,12 @@ export default function LoginFormOld({
     mutationFn: handleSendRequest,
     onSuccess: (result) => {
       if (result.status === 'success') {
-        setButtonText('Welcome!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
+        setIsLoginSuccess(true);
         setTimeout(() => {
           router.push(callbackUrl);
         }, 300);
       } else if (result.status === 'fail') {
-        setButtonText('Invalid credentials');
-        setButtonColor('var(--danger)');
-        setButtonHoverColor('var(--bg-light)');
-        invalidCredentialsNotification?.fire();
-
-        setTimeout(() => {
-          setButtonColor('var(--primary)');
-          setButtonHoverColor('var(--accent)');
-          setButtonText('Let me in!');
-        }, 2000);
+        setIsError(true);
       } else {
         setError(result.message);
       }
@@ -87,18 +61,11 @@ export default function LoginFormOld({
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
-    let errorsPresent = false;
 
-    if (!username) {
-      setUsernameError('this is required');
-      errorsPresent = true;
+    if (!username || !password) {
+      setIsError(true);
+      return;
     }
-    if (!password) {
-      setPasswordError('this is required');
-      errorsPresent = true;
-    }
-
-    if (errorsPresent) return;
 
     // p.s password hashing will be done on server side.
     try {
@@ -107,41 +74,73 @@ export default function LoginFormOld({
       console.error(e);
     }
   }
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-[20px] mt-[40px] w-[620px] bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
-    >
-      <InputField
-        type="text"
-        value={username}
-        setValue={setUsername}
-        error={usernameError}
-        setError={setUsernameError}
-        options={{
-          label: 'Username',
-          placeholder: 'Username',
-        }}
-      />
-      <InputField
-        type="password"
-        value={password}
-        setValue={setPassword}
-        error={passwordError}
-        setError={setPasswordError}
-        options={{
-          label: 'Password',
-          placeholder: 'Password',
-        }}
-      />
-      <Button
-        type="submit"
-        color={buttonColor}
-        bgHoverColor={buttonHoverColor}
-        style={{ width: '100%' }}
-      >
-        {isPending ? '...' : buttonText}
-      </Button>
-    </form>
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2">
+      <CardBody>
+        <div>
+          <Paragraph className="font-medium">Welcome Back</Paragraph>
+          <Label className="opacity-80 dark:opacity-70">
+            Log in to your account to continue
+          </Label>
+        </div>
+        <Spacer y={4} />
+        <Form onSubmit={handleSubmit}>
+          <Input
+            value={username}
+            onValueChange={setUsername}
+            size="md"
+            radius="md"
+            name="username"
+            label="Username"
+            labelPlacement="inside"
+            type="text"
+            variant="bordered"
+            isRequired
+            isInvalid={isError}
+            onFocus={() => setIsError(false)}
+            errorMessage={
+              username.length === 0 && (
+                <Label className="text-danger">
+                  Please fill in this field.
+                </Label>
+              )
+            }
+          />
+          <Input
+            value={password}
+            onValueChange={setPassword}
+            size="md"
+            radius="md"
+            name="password"
+            label="Password"
+            labelPlacement="inside"
+            type="password"
+            variant="bordered"
+            isRequired
+            isInvalid={isError}
+            onFocus={() => setIsError(false)}
+            errorMessage={
+              <Label className="text-danger">
+                {password.length === 0
+                  ? 'Please fill in this field.'
+                  : 'Invalid username or password.'}
+              </Label>
+            }
+          />
+          <Button
+            type="submit"
+            variant={isLoginSuccess ? 'flat' : 'solid'}
+            color={isLoginSuccess ? 'success' : 'primary'}
+            fullWidth
+            className="font-semibold text-small"
+            isDisabled={isError || isLoginSuccess}
+            isLoading={isPending}
+          >
+            {isLoginSuccess ? 'Success' : 'Submit'}
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }

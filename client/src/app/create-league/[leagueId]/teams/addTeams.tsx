@@ -1,11 +1,8 @@
 'use client';
 import InfoSVG from '@/assets/svg components/Info';
-import AddTeamsFormOld from '@/components/forms/AddTeamsForm';
-import AddTeamsForm from '@/components/forms2/AddTeamsForm';
-import Heading1 from '@/components/text/Heading1';
+import AddTeamsForm from '@/components/forms/AddTeamsForm';
 import Label from '@/components/text/Label';
 import Paragraph from '@/components/text/Paragraph';
-import Subtitle from '@/components/text/Subtitle';
 import { Card, CardBody } from '@heroui/react';
 
 export default function AddTeams({

@@ -1,5 +1,5 @@
 'use client';
-import RegistrationForm from '@/components/forms2/RegistrationForm';
+import RegistrationForm from '@/components/forms/RegistrationForm';
 import { Spacer } from '@heroui/react';
 
 export default function RegisterClient() {

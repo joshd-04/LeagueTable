@@ -1,33 +1,40 @@
-import InputField from '@/components/form/InputField';
-import Button from '@/components/text/Button';
+'use client';
+import {
+  Button,
+  Card,
+  CardBody,
+  cn,
+  Divider,
+  Form,
+  Input,
+  NumberInput,
+  Radio,
+  RadioGroup,
+  Spacer,
+} from '@heroui/react';
 import { useContext, useState } from 'react';
-import { API_URL } from '@/util/config';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
-import Label from '../text/Label';
-import { motion } from 'motion/react';
+import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
+import { GlobalContext } from '@/context/GlobalContextProvider';
+import Paragraph from '../text/Paragraph';
+import Label from '../text/Label';
 
-export default function CreateLeagueFormOld() {
-  // Values
-  const [leagueName, setLeagueName] = useState<string | number>('');
-  const [leagueType, setLeagueType] = useState<'basic' | 'advanced' | null>(
-    null
+export default function CreateLeagueForm() {
+  const [leagueName, setLeagueName] = useState<string>('');
+  const [divisionsCount, setDivisionsCount] = useState<number>(1);
+  const [leagueType, setLeagueType] = useState<string | null>(null);
+
+  const [isError, setIsError] = useState(false);
+  const [isCreationSuccess, setIsCreationSuccess] = useState(false);
+
+  const [serverErrors, setServerErrors] = useState<{ [key: string]: string }>(
+    {}
   );
-  const [divisionsCount, setDivisionsCount] = useState<string | number>('');
-
-  // Errors
-  const [leagueNameError, setLeagueNameError] = useState('');
-  const [leagueTypeError, setLeagueTypeError] = useState('');
-  const [divisionsCountError, setDivisionsCountError] = useState('');
 
   const globalContext = useContext(GlobalContext);
   const setError = globalContext.errors.setError;
-
-  const [buttonText, setButtonText] = useState('Next');
-  const [buttonColor, setButtonColor] = useState('var(--primary)');
-  const [buttonHoverColor, setButtonHoverColor] = useState('var(--accent)');
 
   const router = useRouter();
 
@@ -45,36 +52,21 @@ export default function CreateLeagueFormOld() {
       credentials: 'include',
     });
   }
+
   const { mutateAsync: handleRequestMutation, isPending } = useMutation({
     mutationFn: handleSendRequest,
     onSuccess: (response) => {
-      console.log(response);
       if (response.status === 'success') {
-        setButtonText('Success!');
-        setButtonColor('var(--success)');
-        setButtonHoverColor('var(--bg-light)');
+        setIsCreationSuccess(true);
         setTimeout(() => {
           router.push(`/leagues/${response.data.league._id}`);
         }, 300);
       } else if (response.status === 'fail') {
-        if (response.data.name) {
-          setLeagueNameError(response.data.name);
+        if (response.statusCode === 400) {
+          setIsError(true);
+          const errors: { [key: string]: string } = response.data.errors;
+          setServerErrors(errors);
         }
-        if (response.data.leagueType) {
-          setLeagueTypeError(response.data.leagueType);
-        }
-        if (response.data.divisionsCount) {
-          setDivisionsCountError(response.data.divisionsCount);
-        }
-        setButtonText('There was an error');
-        setButtonColor('var(--danger)');
-        setButtonHoverColor('var(--bg-light)');
-
-        setTimeout(() => {
-          setButtonColor('var(--primary)');
-          setButtonHoverColor('var(--accent)');
-          setButtonText('Next');
-        }, 2000);
       } else {
         setError(response.message);
       }
@@ -87,31 +79,8 @@ export default function CreateLeagueFormOld() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     // fyi default browser validation shouldve ensured the inputs are given and valid
     e.preventDefault();
-    let errorsPresent = false;
 
-    if (!leagueName) {
-      setLeagueNameError('this is required');
-      errorsPresent = true;
-    }
-    if (!leagueType) {
-      setLeagueTypeError('this is required');
-      errorsPresent = true;
-    }
-    if (!divisionsCount) {
-      setDivisionsCountError('this is required');
-      errorsPresent = true;
-    }
-    if (+divisionsCount <= 0) {
-      setDivisionsCountError('must be greater than zero');
-      errorsPresent = true;
-    }
-    if (!Number.isInteger(+divisionsCount)) {
-      setDivisionsCountError('must be an integer');
-      errorsPresent = true;
-    }
-
-    if (errorsPresent) return;
-
+    // p.s password hashing will be done on server side.
     try {
       handleRequestMutation();
     } catch (e) {
@@ -120,167 +89,119 @@ export default function CreateLeagueFormOld() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="p-[20px]  w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2"
-    >
-      <InputField
-        type="text"
-        value={leagueName}
-        setValue={setLeagueName}
-        error={leagueNameError}
-        setError={setLeagueNameError}
-        options={{
-          label: 'League Name',
-          labelCaption: 'visible to others',
-          placeholder: 'League Name',
-        }}
-      />
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10 bg-linear-to-br from-content1 to-content2">
+      <CardBody>
+        <div>
+          <Paragraph className="font-medium">Create a league</Paragraph>
+          <Label className="opacity-80 dark:opacity-70">Part 1 of 3</Label>
+        </div>
+        <Spacer y={4} />
+        <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
+          <Input
+            value={leagueName}
+            onValueChange={setLeagueName}
+            size="md"
+            radius="md"
+            name="name"
+            label="League Name"
+            labelPlacement="inside"
+            type="text"
+            variant="bordered"
+            isRequired
+            fullWidth
+            onFocus={() => setIsError(false)}
+            description={
+              <span className="opacity-80 dark:opacity-70">
+                Visible to others
+              </span>
+            }
+          />
 
-      <LeagueTypeSelection
-        selection={leagueType}
-        setSelection={setLeagueType}
-        error={leagueTypeError}
-        setError={setLeagueTypeError}
-      />
-      <InputField
-        type="number"
-        value={divisionsCount}
-        setValue={setDivisionsCount}
-        error={divisionsCountError}
-        setError={setDivisionsCountError}
-        options={{
-          label: 'Number of Tables/Divisions',
-          placeholder: 'Number of divisions',
-        }}
-      />
-      <Button
-        type="submit"
-        color={buttonColor}
-        bgHoverColor={buttonHoverColor}
-        onClick={() => {}}
-        style={{ width: '100%' }}
-      >
-        {isPending ? '...' : buttonText}
-      </Button>
-    </form>
+          <NumberInput
+            value={divisionsCount}
+            onValueChange={setDivisionsCount}
+            size="md"
+            radius="md"
+            name="divisionsCount"
+            label="Number of tables/divisions"
+            labelPlacement="inside"
+            variant="bordered"
+            isRequired
+            fullWidth
+            minValue={1}
+            maxValue={5}
+            isWheelDisabled
+          />
+          <Spacer y={1} />
+          <Divider />
+          <RadioGroup
+            value={leagueType}
+            onValueChange={setLeagueType}
+            size="sm"
+            name="leagueType"
+            label={<span className="text-small">League Type</span>}
+            description={
+              <span className="opacity-80 dark:opacity-70">
+                League type cannot be changed after creation.
+              </span>
+            }
+            isRequired
+          >
+            <CustomRadio
+              description={
+                <span className="opacity-80 dark:opacity-70">
+                  Simple, streamlined experience
+                </span>
+              }
+              value="basic"
+            >
+              Basic
+            </CustomRadio>
+            <CustomRadio
+              description={
+                <span className="opacity-80 dark:opacity-70">
+                  Includes goals & assists tracking
+                </span>
+              }
+              value="advanced"
+            >
+              Advanced
+            </CustomRadio>
+          </RadioGroup>
+          <Spacer y={1} />
+          <Button
+            type="submit"
+            variant={isCreationSuccess ? 'flat' : 'solid'}
+            color={isCreationSuccess ? 'success' : 'primary'}
+            fullWidth
+            className="font-semibold text-small"
+            isDisabled={isError || isCreationSuccess}
+            isLoading={isPending || isCreationSuccess}
+          >
+            {isCreationSuccess ? 'Success' : 'Submit'}
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }
 
-interface LeagueTypeSelectionProps {
-  selection: 'basic' | 'advanced' | null;
-  setSelection: (selection: 'basic' | 'advanced' | null) => void;
-  error: string;
-  setError: (error: string) => void;
-}
-
-function LeagueTypeSelection({
-  selection,
-  setSelection,
-  error,
-  setError,
-}: LeagueTypeSelectionProps) {
-  const [hoveringElement, setHoveringElement] = useState<
-    'basic' | 'advanced' | null
-  >(null);
-
+function CustomRadio({
+  children,
+  ...otherProps
+}: React.ComponentProps<typeof Radio>) {
   return (
-    <div className="flex flex-col justify-baseline items-baseline w-full">
-      <Label
-        style={{
-          fontWeight: 'bold',
-        }}
-      >
-        League Type
-      </Label>
-
-      <fieldset
-        className="rounded-[10px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] w-full grid grid-rows-1 grid-cols-2 gap-[10px] relative
-          "
-        onChange={() => {
-          setSelection('basic');
-        }}
-      >
-        <motion.label
-          onHoverStart={() => setHoveringElement('basic')}
-          onHoverEnd={() => setHoveringElement(null)}
-          onClick={() => setSelection('basic')}
-        >
-          <input
-            type="radio"
-            name="choice"
-            value="basic"
-            required
-            checked={selection === 'basic'}
-            onChange={() => {
-              setError('');
-              setSelection('basic');
-            }}
-            className="sr-only"
-          />
-          <Button
-            color="var(--text-muted)"
-            bgHoverColor="var(--bg-light)"
-            style={{
-              width: '100% ',
-              backgroundColor:
-                selection === 'basic'
-                  ? 'var(--accent)'
-                  : hoveringElement === 'basic'
-                  ? 'var(--bg-light)'
-                  : 'transparent',
-              borderColor: selection === 'basic' ? 'transparent' : undefined,
-            }}
-          >
-            Basic
-          </Button>
-        </motion.label>
-
-        <motion.label
-          onHoverStart={() => setHoveringElement('advanced')}
-          onHoverEnd={() => setHoveringElement(null)}
-          onClick={() => setSelection('advanced')}
-        >
-          <input
-            type="radio"
-            name="choice"
-            value="advanced"
-            required
-            checked={selection === 'advanced'}
-            onChange={() => {
-              setError('');
-              setSelection('advanced');
-            }}
-            className="sr-only"
-          />
-          <Button
-            color="var(--text-muted)"
-            bgHoverColor="var(--bg-light)"
-            style={{
-              width: '100%',
-              backgroundColor:
-                selection === 'advanced'
-                  ? 'var(--accent)'
-                  : hoveringElement === 'advanced'
-                  ? 'var(--bg-light)'
-                  : 'transparent',
-              borderColor: selection === 'advanced' ? 'transparent' : undefined,
-            }}
-          >
-            Advanced
-          </Button>
-        </motion.label>
-      </fieldset>
-      <Label
-        style={{
-          fontWeight: 'bold',
-          color: 'var(--danger)',
-          width: '100%',
-          opacity: error ? undefined : '0',
-        }}
-      >
-        Error<span className="font-normal"> - {error}</span>
-      </Label>
-    </div>
+    <Radio
+      {...otherProps}
+      classNames={{
+        base: cn(
+          'flex m-0 bg-content2 hover:bg-content3 items-center justify-between',
+          'flex-row-reverse min-w-[376px] cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent',
+          'data-[selected=true]:border-primary'
+        ),
+      }}
+    >
+      {children}
+    </Radio>
   );
 }
