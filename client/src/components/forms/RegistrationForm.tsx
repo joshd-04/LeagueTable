@@ -1,5 +1,15 @@
 'use client';
-import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  Checkbox,
+  Form,
+  Input,
+  Link,
+  Spacer,
+  Tooltip,
+} from '@heroui/react';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
@@ -9,6 +19,7 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import { User } from '@/util/definitions';
 import Paragraph from '../text/Paragraph';
 import Label from '../text/Label';
+import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 export default function RegistrationForm() {
   const [username, setUsername] = useState('');
@@ -30,6 +41,13 @@ export default function RegistrationForm() {
   const setError = globalContext.errors.setError;
 
   const router = useRouter();
+
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
+
+  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
+  const toggleConfirmationVisibility = () =>
+    setIsConfirmationVisible(!isConfirmationVisible);
 
   function handleSendRequest() {
     return fetchAPI(`${API_URL}/register`, {
@@ -115,84 +133,135 @@ export default function RegistrationForm() {
           </Label>
         </div>
         <Spacer y={4} />
-        <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
-          <Input
-            value={username}
-            onValueChange={setUsername}
-            size="md"
-            radius="md"
-            name="username"
-            label="Username"
-            labelPlacement="inside"
-            type="text"
-            variant="bordered"
-            isRequired
-            onFocus={() => setIsError(false)}
-            description={
-              <span className="opacity-80 dark:opacity-70">
-                Visible to others
-              </span>
-            }
-          />
-          <Input
-            value={email}
-            onValueChange={setEmail}
-            size="md"
-            radius="md"
-            name="email"
-            label="Email"
-            labelPlacement="inside"
-            type="email"
-            variant="bordered"
-            isRequired
-            onFocus={() => setIsError(false)}
-            description={
-              <span className="opacity-80 dark:opacity-70">
-                Only you can see this. We&apos;ll never share your email with
-                anyone.
-              </span>
-            }
-          />
-          <Input
-            value={password}
-            onValueChange={setPassword}
-            onChange={(e) => {
-              passwordValidationFn(e.target.value);
-            }}
-            size="md"
-            radius="md"
-            name="password"
-            label="Password"
-            labelPlacement="inside"
-            type="password"
-            variant="bordered"
-            isRequired
-            onFocus={() => setIsError(false)}
-            // validate={passwordValidationFn}
-            isInvalid={passwordErrors.length > 0}
-            errorMessage={() => (
-              <ul>
-                {passwordErrors.map((error, i) => (
-                  <li key={i}>{error}</li>
-                ))}
-              </ul>
-            )}
-          />
-          <Input
-            value={passwordConfirmation}
-            onValueChange={setPasswordConfirmation}
-            size="md"
-            radius="md"
-            name="password confirmation"
-            label="Password confirmation"
-            labelPlacement="inside"
-            type="password"
-            variant="bordered"
-            isRequired
-            onFocus={() => setIsError(false)}
-            isInvalid={passwordConfirmation !== password}
-            errorMessage={'Passwords do not match.'}
-          />
+        <Form
+          onSubmit={handleSubmit}
+          validationErrors={serverErrors}
+          className="flex flex-col gap-4 overflow-hidden"
+        >
+          <div className="flex flex-col gap-2 w-full">
+            <Input
+              value={username}
+              onValueChange={setUsername}
+              size="md"
+              radius="md"
+              name="username"
+              label="Username"
+              labelPlacement="inside"
+              type="text"
+              variant="bordered"
+              isRequired
+              onFocus={() => setIsError(false)}
+              description={
+                <span className="opacity-80 dark:opacity-70">
+                  Visible to others
+                </span>
+              }
+            />
+            <Input
+              value={email}
+              onValueChange={setEmail}
+              size="md"
+              radius="md"
+              name="email"
+              label="Email"
+              labelPlacement="inside"
+              type="email"
+              variant="bordered"
+              isRequired
+              onFocus={() => setIsError(false)}
+              description={
+                <span className="opacity-80 dark:opacity-70">
+                  Only you can see this. We&apos;ll never share your email with
+                  anyone.
+                </span>
+              }
+            />
+            <Input
+              value={password}
+              onValueChange={setPassword}
+              onChange={(e) => {
+                passwordValidationFn(e.target.value);
+              }}
+              size="md"
+              radius="md"
+              name="password"
+              label="Password"
+              labelPlacement="inside"
+              type={isVisible ? 'text' : 'password'}
+              variant="bordered"
+              isRequired
+              onFocus={() => setIsError(false)}
+              // validate={passwordValidationFn}
+              isInvalid={passwordErrors.length > 0}
+              errorMessage={() => (
+                <ul>
+                  {passwordErrors.map((error, i) => (
+                    <li key={i}>{error}</li>
+                  ))}
+                </ul>
+              )}
+              endContent={
+                <Tooltip
+                  content={isVisible ? 'Hide password' : 'Show password'}
+                  showArrow
+                >
+                  <button
+                    aria-label="toggle password visibility"
+                    className="focus:outline-solid outline-transparent cursor-pointer"
+                    type="button"
+                    onClick={toggleVisibility}
+                  >
+                    {isVisible ? (
+                      <LuEyeOff className="text-2xl text-default-400 pointer-events-none" />
+                    ) : (
+                      <LuEye className="text-2xl text-default-400 pointer-events-none" />
+                    )}
+                  </button>
+                </Tooltip>
+              }
+            />
+            <Input
+              value={passwordConfirmation}
+              onValueChange={setPasswordConfirmation}
+              size="md"
+              radius="md"
+              name="password confirmation"
+              label="Password confirmation"
+              labelPlacement="inside"
+              type={isConfirmationVisible ? 'text' : 'password'}
+              variant="bordered"
+              isRequired
+              onFocus={() => setIsError(false)}
+              isInvalid={passwordConfirmation !== password}
+              errorMessage={'Passwords do not match.'}
+              endContent={
+                <Tooltip
+                  content={
+                    isConfirmationVisible ? 'Hide password' : 'Show password'
+                  }
+                  showArrow
+                >
+                  <button
+                    aria-label="toggle password visibility"
+                    className="focus:outline-solid outline-transparent cursor-pointer"
+                    type="button"
+                    onClick={toggleConfirmationVisibility}
+                  >
+                    {isConfirmationVisible ? (
+                      <LuEyeOff className="text-2xl text-default-400 pointer-events-none" />
+                    ) : (
+                      <LuEye className="text-2xl text-default-400 pointer-events-none" />
+                    )}
+                  </button>
+                </Tooltip>
+              }
+            />{' '}
+          </div>
+          <Checkbox isRequired>
+            <p className="text-small">
+              I have read and agree with the Terms and Privacy Policy.
+            </p>
+          </Checkbox>
           <Button
             type="submit"
             variant={isRegisterSuccess ? 'flat' : 'shadow'}
@@ -204,6 +273,12 @@ export default function RegistrationForm() {
           >
             {isRegisterSuccess ? 'Success' : 'Submit'}
           </Button>
+          <Link
+            href="/register"
+            className="text-small font-medium cursor-pointer place-self-center"
+          >
+            Already have an account? Log in
+          </Link>
         </Form>
       </CardBody>
     </Card>

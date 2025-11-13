@@ -52,6 +52,18 @@ export default function DashboardClient({
     following: leagues.following.map((l) => l._id),
   };
 
+  const currentHour = new Date().getHours();
+  let welcomeMessage = 'Hey there';
+  if (currentHour < 5) {
+    welcomeMessage = 'Hey there';
+  } else if (currentHour < 12) {
+    welcomeMessage = 'Good Morning';
+  } else if (currentHour < 18) {
+    welcomeMessage = 'Good Afternoon';
+  } else {
+    welcomeMessage = 'Good evening';
+  }
+
   const { data: associatedLeaguesData, isLoading: associatedLeaguesIsLoading } =
     useQuery({
       queryFn: () =>
@@ -150,7 +162,9 @@ export default function DashboardClient({
   return (
     <div className="w-full h-full flex flex-row justify-center items-baseline">
       <div className="max-w-[960px] w-[960px] flex flex-col gap-4 mt-6">
-        <Heading3>Welcome, {user?.username}</Heading3>
+        <Heading3>
+          {welcomeMessage}, {user?.username}
+        </Heading3>
         {associatedLeaguesIsLoading ? (
           <>
             <LeagueSectionSkeleton title="Favourite Leagues" />

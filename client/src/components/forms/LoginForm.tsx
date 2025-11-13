@@ -1,5 +1,15 @@
 'use client';
-import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  Checkbox,
+  Form,
+  Input,
+  Link,
+  Spacer,
+  Tooltip,
+} from '@heroui/react';
 import { useContext, useState } from 'react';
 import Label from '../text/Label';
 import { useRouter } from 'next/navigation';
@@ -8,6 +18,7 @@ import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import Paragraph from '../text/Paragraph';
+import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 export default function LoginForm({
   callbackUrl = '/',
@@ -23,6 +34,10 @@ export default function LoginForm({
   const setError = globalContext.errors.setError;
 
   const router = useRouter();
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   function handleSendRequest() {
     return fetchAPI(`${API_URL}/login`, {
@@ -85,49 +100,73 @@ export default function LoginForm({
           </Label>
         </div>
         <Spacer y={4} />
-        <Form onSubmit={handleSubmit}>
-          <Input
-            value={username}
-            onValueChange={setUsername}
-            size="md"
-            radius="md"
-            name="username"
-            label="Username"
-            labelPlacement="inside"
-            type="text"
-            variant="bordered"
-            isRequired
-            isInvalid={isError}
-            onFocus={() => setIsError(false)}
-            errorMessage={
-              username.length === 0 && (
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2 w-full">
+            <Input
+              value={username}
+              onValueChange={setUsername}
+              size="md"
+              radius="md"
+              name="username"
+              label="Username"
+              labelPlacement="inside"
+              type="text"
+              variant="bordered"
+              isRequired
+              isInvalid={isError}
+              onFocus={() => setIsError(false)}
+              errorMessage={
+                username.length === 0 && (
+                  <Label className="text-danger">
+                    Please fill in this field.
+                  </Label>
+                )
+              }
+            />
+            <Input
+              value={password}
+              onValueChange={setPassword}
+              size="md"
+              radius="md"
+              name="password"
+              label="Password"
+              labelPlacement="inside"
+              type={isVisible ? 'text' : 'password'}
+              variant="bordered"
+              isRequired
+              isInvalid={isError}
+              onFocus={() => setIsError(false)}
+              errorMessage={
                 <Label className="text-danger">
-                  Please fill in this field.
+                  {password.length === 0
+                    ? 'Please fill in this field.'
+                    : 'Invalid username or password.'}
                 </Label>
-              )
-            }
-          />
-          <Input
-            value={password}
-            onValueChange={setPassword}
-            size="md"
-            radius="md"
-            name="password"
-            label="Password"
-            labelPlacement="inside"
-            type="password"
-            variant="bordered"
-            isRequired
-            isInvalid={isError}
-            onFocus={() => setIsError(false)}
-            errorMessage={
-              <Label className="text-danger">
-                {password.length === 0
-                  ? 'Please fill in this field.'
-                  : 'Invalid username or password.'}
-              </Label>
-            }
-          />
+              }
+              endContent={
+                <Tooltip
+                  content={isVisible ? 'Hide password' : 'Show password'}
+                  showArrow
+                >
+                  <button
+                    aria-label="toggle password visibility"
+                    className="focus:outline-solid outline-transparent cursor-pointer"
+                    type="button"
+                    onClick={toggleVisibility}
+                  >
+                    {isVisible ? (
+                      <LuEyeOff className="text-2xl text-default-400 pointer-events-none" />
+                    ) : (
+                      <LuEye className="text-2xl text-default-400 pointer-events-none" />
+                    )}
+                  </button>
+                </Tooltip>
+              }
+            />
+          </div>
+          <Checkbox className="text-small">
+            <p className="text-small">Remember me (does nothing)</p>
+          </Checkbox>
           <Button
             type="submit"
             variant={isLoginSuccess ? 'flat' : 'solid'}
@@ -139,6 +178,12 @@ export default function LoginForm({
           >
             {isLoginSuccess ? 'Success' : 'Submit'}
           </Button>
+          <Link
+            href="/register"
+            className="text-small font-medium cursor-pointer place-self-center"
+          >
+            Need to create an account? Sign up
+          </Link>
         </Form>
       </CardBody>
     </Card>

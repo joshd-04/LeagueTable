@@ -10,7 +10,7 @@ import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
 import Controls from './(dashboardWidgets)/controls';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
-import TableWidget from './(dashboardWidgets)/table';
+import TableWidgetOld from './(dashboardWidgets)/tableOld';
 import Stats from './(dashboardWidgets)/stats';
 import Heading1 from '@/components/text/Heading1';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
@@ -43,7 +43,6 @@ export default function LeagueDashboardFree({
 
   useEffect(() => {
     if (leagueQueryData !== undefined && !leagueQueryIsLoading) {
-      
       setLeague(leagueQueryData.data.league);
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
@@ -65,7 +64,6 @@ export default function LeagueDashboardFree({
 
   const queryClient = useQueryClient();
   function invalidateDashboardQueries() {
-    
     queryClient.invalidateQueries({ queryKey: ['league'] });
     queryClient.invalidateQueries({ queryKey: ['fixtures'] });
     queryClient.invalidateQueries({ queryKey: ['results'] });
@@ -128,7 +126,7 @@ export default function LeagueDashboardFree({
           )}
           {/* <NewsFeed /> */}
           <div></div>
-          <TableWidget
+          <TableWidgetOld
             league={league}
             divisionViewing={divisionViewing}
             setDivisionViewing={setDivisionViewing}

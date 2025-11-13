@@ -12,7 +12,7 @@ import Controls from './(dashboardWidgets)/controls';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import NewsFeed from './(dashboardWidgets)/newsFeed';
 import SeasonRewind from './(dashboardWidgets)/seasonRewind';
-import TableWidget from './(dashboardWidgets)/table';
+import TableWidgetOld from './(dashboardWidgets)/tableOld';
 import Stats from './(dashboardWidgets)/stats';
 import Heading1 from '@/components/text/Heading1';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
@@ -135,7 +135,7 @@ export default function LeagueDashboardStandard({
             <SeasonSummaryStats league={league} seasonViewing={seasonViewing} />
           )}
           <NewsFeed />
-          <TableWidget
+          <TableWidgetOld
             league={league}
             seasonViewing={seasonViewing}
             divisionViewing={divisionViewing}
