@@ -139,9 +139,9 @@ export default function CreateLeagueForm() {
             onValueChange={setLeagueType}
             size="sm"
             name="leagueType"
-            label={<span className="ml-1 text-small">League Type</span>}
+            label={<span className="text-small">League Type</span>}
             description={
-              <span className="ml-1 opacity-80 dark:opacity-70">
+              <span className="opacity-80 dark:opacity-70">
                 League type cannot be changed after creation.
               </span>
             }

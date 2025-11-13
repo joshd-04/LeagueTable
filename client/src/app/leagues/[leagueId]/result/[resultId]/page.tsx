@@ -82,7 +82,6 @@ export default async function Page({ params }) {
     );
   }
   if (league.status !== 'success' || result.status !== 'success') {
-
     return redirect('/');
   }
   const l = league.data.league as League;

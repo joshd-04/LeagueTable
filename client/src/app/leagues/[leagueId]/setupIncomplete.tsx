@@ -1,14 +1,21 @@
 'use client';
 
-import Button from '@/components/text/Button';
-import LinkButton from '@/components/text/LinkButton';
-import Paragraph from '@/components/text/Paragraph';
-import Subtitle from '@/components/text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { useContext, useState } from 'react';
+import { bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete } from '@/util/featureToggle';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Checkbox,
+  Link,
+} from '@heroui/react';
+import { useQuery } from '@tanstack/react-query';
+import { useContext } from 'react';
 
 export default function SetupIncomplete({
   leagueId,
@@ -22,20 +29,133 @@ export default function SetupIncomplete({
   property: 'teams' | 'tables';
 }) {
   const { user } = useContext(GlobalContext).account;
-  const { isLoggedIn } = useAccount();
   const userOwnsThisLeague = user?.id === leagueOwner;
 
-  const [addToFavText, setAddToFavText] = useState(
-    'Add this league to favourites'
-  );
-  const [addToFavColor, setAddToFavColor] = useState('var(--text-muted)');
+  /*
+  These are the different states:
 
-  const [addToBookmarksText, setAddToBookmarksText] = useState(
-    'Bookmark this league'
-  );
-  const [addToBookmarksColor, setAddToBookmarksColor] =
-    useState('var(--text-muted)');
+  User owns the league:
+  - but they need to add tables
+  - or they need to add teams
 
+  User does not own the league:
+  - show bookmark/favourite buttons if logged in
+  - do not show favourite buttons if not logged in
+
+  */
+
+  if (userOwnsThisLeague) {
+    return (
+      <CardWhenOwner
+        leagueName={leagueName}
+        leagueId={leagueId}
+        property={property}
+      />
+    );
+  } else {
+    return bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete ? (
+      <CardWhenNotOwnerButtons leagueName={leagueName} leagueId={leagueId} />
+    ) : (
+      <CardWhenNotOwner leagueName={leagueName} />
+    );
+  }
+}
+
+function CardWhenOwner({
+  leagueName,
+  leagueId,
+  property,
+}: {
+  leagueName: string;
+  leagueId: string;
+  property: 'tables' | 'teams';
+}) {
+  return (
+    <Card className="overflow-none border-small border-divider relative w-[520px] bg-linear-to-br from-content1 to-content2 place-self-center mt-[100px] px-6 py-4">
+      <div className="absolute -top-48 -left-20 w-64 h-64 bg-warning rounded-full blur-xl opacity-30"></div>
+      <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <p className="text-large font-medium">{leagueName}</p>
+        </div>
+      </CardHeader>
+      <CardBody>
+        <div className="flex flex-col gap-2 px-2">
+          <p className="text-large font-medium text-warning">
+            Setup incomplete
+          </p>
+          <p className="text-small opacity-80 dark:opacity-70">
+            Finish setting up your league before you can start using it.
+          </p>
+          <Checkbox isDisabled defaultSelected>
+            Create league
+          </Checkbox>
+          <Checkbox
+            isDisabled
+            className={`${property === 'tables' ? 'opacity-100' : ''}`}
+            defaultSelected={property === 'teams' ? true : false}
+          >
+            Add divisions
+          </Checkbox>
+          <Checkbox
+            isDisabled
+            className={`${property === 'teams' ? 'opacity-100' : ''}`}
+            defaultSelected={false}
+          >
+            Add teams
+          </Checkbox>
+        </div>
+      </CardBody>
+      <CardFooter className="justify-end gap-2">
+        <Button
+          fullWidth
+          className="border-small border-divider/50 bg-content1/10 "
+          as={Link}
+          href={`/create-league/${leagueId}/${
+            property === 'tables' ? 'tables' : 'teams'
+          }`}
+          variant="light"
+        >
+          Add {property === 'tables' ? 'divisions' : 'teams'} to league
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function CardWhenNotOwner({ leagueName }: { leagueName: string }) {
+  return (
+    <Card className="overflow-none border-small border-divider relative w-[520px] bg-linear-to-br from-content1 to-content2 place-self-center mt-[100px] px-6 py-4">
+      <div className="absolute -top-48 -left-20 w-64 h-64 bg-primary rounded-full blur-xl opacity-30"></div>
+      <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <p className="text-large font-medium">{leagueName}</p>
+        </div>
+      </CardHeader>
+      <CardBody>
+        <div className="flex flex-col gap-2 px-2">
+          <p className="text-large font-medium text-primary">
+            Waiting for final touches
+          </p>
+          <p className="text-small opacity-80 dark:opacity-70">
+            <em>{leagueName}</em> still needs to be finished setting up by the
+            league owner. Check back later.
+          </p>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function CardWhenNotOwnerButtons({
+  leagueName,
+  leagueId,
+}: {
+  leagueName: string;
+  leagueId: string;
+}) {
+  const { isLoggedIn } = useAccount();
   async function addToFavourites() {
     const response = await fetchAPI(`${API_URL}/users/favourites`, {
       method: 'PATCH',
@@ -44,14 +164,8 @@ export default function SetupIncomplete({
       body: JSON.stringify({ leagueId: leagueId }),
     });
     if (response.status === 'success') {
-      setAddToFavText('Added to favourites!');
-      setAddToFavColor('var(--success)');
     } else if (response.status === 'fail') {
-      setAddToFavText('Already added to favourites!');
-      setAddToFavColor('var(--success)');
     } else {
-      setAddToFavText('An error occured');
-      setAddToFavColor('var(--danger)');
     }
   }
   async function addToBookmarks() {
@@ -62,187 +176,66 @@ export default function SetupIncomplete({
       body: JSON.stringify({ leagueId: leagueId }),
     });
     if (response.status === 'success') {
-      setAddToBookmarksText('Added to bookmarks!');
-      setAddToBookmarksColor('var(--success)');
     } else if (response.status === 'fail') {
-      setAddToBookmarksText('Already added to bookmarks!');
-      setAddToBookmarksColor('var(--success)');
     } else {
-      setAddToBookmarksText('An error occured');
-      setAddToBookmarksColor('var(--danger)');
     }
   }
 
+  function handleBookmarkQuery() {
+    fetchAPI(`${API_URL}/users/following`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ leagueId: leagueId }),
+    });
+  }
+
+  const {} = useQuery({
+    queryFn: handleBookmarkQuery,
+    queryKey: ['addBookmark'],
+  });
+
   return (
-    <div className="flex flex-col justify-center items-center w-full pt-[100px]">
-      <div
-        className={`w-[440px] bg-[var(--bg)]  rounded-[10px] border-1 border-solid border-[var(--border)] py-[20px] px-[20px]`}
-      >
-        {userOwnsThisLeague ? (
-          <div className="flex flex-col justify-center">
-            <Subtitle
-              style={{
-                color: 'var(--warning)',
-              }}
-            >
-              Setup incomplete
-            </Subtitle>
-            <Paragraph
-              style={{
-                fontSize: '1rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              {leagueName}
-            </Paragraph>
-
-            <hr className="text-[var(--text-muted)] my-[0.75rem]" />
-
-            <Paragraph
-              style={{
-                fontSize: '1rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              Remaining tasks:
-            </Paragraph>
-            {property === 'tables' ? (
-              <>
-                <ol>
-                  <li>
-                    <Paragraph
-                      style={{
-                        fontSize: '1rem',
-                        color: 'var(--text)',
-                      }}
-                    >
-                      1. Add divisions/tables to your league
-                    </Paragraph>
-                  </li>
-                  <li>
-                    <Paragraph
-                      style={{
-                        fontSize: '1rem',
-                        color: 'var(--text-muted)',
-                      }}
-                    >
-                      2. Add teams to the divisions/tables
-                    </Paragraph>
-                  </li>
-                </ol>
-                <LinkButton
-                  href={`/create-league/${leagueId}/tables`}
-                  color="var(--text-muted)"
-                  bgHoverColor="var(--accent)"
-                  style={{
-                    width: '100%',
-                    fontSize: '1rem',
-                    marginTop: '0.5rem',
-                  }}
-                >
-                  Add tables to league
-                </LinkButton>
-              </>
-            ) : (
-              <>
-                <ol>
-                  <li>
-                    <Paragraph
-                      style={{
-                        fontSize: '1rem',
-                        color: 'var(--text-muted)',
-                        textDecoration: 'line-through',
-                      }}
-                    >
-                      1. Add divisions/tables to your league
-                    </Paragraph>
-                  </li>
-                  <li>
-                    <Paragraph
-                      style={{
-                        fontSize: '1rem',
-                        color: 'var(--text)',
-                      }}
-                    >
-                      2. Add teams to the divisions/tables
-                    </Paragraph>
-                  </li>
-                </ol>
-                <LinkButton
-                  href={`/create-league/${leagueId}/teams`}
-                  color="var(--text-muted)"
-                  bgHoverColor="var(--accent)"
-                  style={{
-                    width: '100%',
-                    fontSize: '1rem',
-                    marginTop: '0.5rem',
-                  }}
-                >
-                  Add teams to league
-                </LinkButton>
-              </>
-            )}
-          </div>
-        ) : (
-          <>
-            <Subtitle style={{ color: 'var(--info)' }}>
-              Waiting for final touches
-            </Subtitle>
-            <Paragraph
-              style={{
-                fontSize: '1rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              <em>{leagueName} </em>
-              still needs to be finished setting up by the league owner. Check
-              back later.
-            </Paragraph>
-            {isLoggedIn && (
-              <>
-                <hr className="text-[var(--text-muted)] my-[1rem]" />
-                <Paragraph
-                  style={{
-                    fontSize: '1rem',
-                    color: 'var(--text-muted)',
-                    marginTop: '-0.25rem',
-                    marginBottom: '0.25rem',
-                  }}
-                >
-                  In the meantime...
-                </Paragraph>
-                <div className="flex flex-col w-full gap-1">
-                  <Button
-                    color={addToFavColor}
-                    bgHoverColor="var(--accent)"
-                    style={{ width: '100%', fontSize: '1rem' }}
-                    onClick={addToFavourites}
-                  >
-                    {addToFavText}
-                  </Button>
-                  <Button
-                    color={addToBookmarksColor}
-                    bgHoverColor="var(--accent)"
-                    style={{ width: '100%', fontSize: '1rem' }}
-                    onClick={addToBookmarks}
-                  >
-                    {addToBookmarksText}
-                  </Button>
-                </div>
-              </>
-            )}
-          </>
-        )}
-
-        {/* <Button
-        color="var(--danger)"
-        bgHoverColor="var(--bg)"
-        style={{ fontSize: '1rem', float: 'right' }}
-        onClick={() => setError('')}
-      >
-      Dismiss
-      </Button> */}
-      </div>
-    </div>
+    <Card className="overflow-none border-small border-divider relative w-[520px] bg-linear-to-br from-content1 to-content2 place-self-center mt-[100px] px-6 py-4">
+      <div className="absolute -top-48 -left-20 w-64 h-64 bg-primary rounded-full blur-xl opacity-30"></div>
+      <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <p className="text-large font-medium">{leagueName}</p>
+        </div>
+      </CardHeader>
+      <CardBody>
+        <div className="flex flex-col gap-2 px-2">
+          <p className="text-large font-medium text-primary">
+            Waiting for final touches
+          </p>
+          <p className="text-small opacity-80 dark:opacity-70">
+            <em>{leagueName}</em> still needs to be finished setting up by the
+            league owner. Check back later.
+          </p>
+        </div>
+      </CardBody>
+      <CardFooter className="flex flex-col items-start justify-start gap-2">
+        <p className="text-small opacity-80 dark:opacity-70">
+          While you&apos;re waiting...
+        </p>
+        <Button
+          fullWidth
+          className="border-small border-divider/50 bg-content1/10"
+          variant="light"
+          onPress={addToBookmarks}
+        >
+          Bookmark this league
+        </Button>
+        <Button
+          fullWidth
+          className="border-small border-divider/50 bg-content1/10 "
+          variant="light"
+          onPress={addToFavourites}
+        >
+          Add to favourites
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
