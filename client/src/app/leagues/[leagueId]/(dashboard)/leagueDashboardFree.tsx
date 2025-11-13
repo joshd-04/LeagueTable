@@ -18,6 +18,7 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import TableWidgetFree from './(dashboardWidgets)/tableFree';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardFree({
@@ -126,7 +127,7 @@ export default function LeagueDashboardFree({
           )}
           {/* <NewsFeed /> */}
           <div></div>
-          <TableWidgetOld
+          <TableWidgetFree
             league={league}
             divisionViewing={divisionViewing}
             setDivisionViewing={setDivisionViewing}

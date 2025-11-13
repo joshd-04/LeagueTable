@@ -1,6 +1,5 @@
 'use client';
 import { useContext } from 'react';
-import Paragraph from '../text/Paragraph';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 
 export default function TeamForm({ form }: { form: string }) {
@@ -24,8 +23,9 @@ export default function TeamForm({ form }: { form: string }) {
   return (
     <div className="grid grid-cols-[repeat(5,3ch)] grid-rows-1 gap-[2px] text-sm h-min items-baseline">
       {sanitizedForm.split('').map((letter, i) => (
-        <Paragraph
+        <p
           key={i}
+          className="text-large rounded-md"
           style={{
             color: letter === '-' ? 'var(--text)' : 'white',
             backgroundColor:
@@ -41,7 +41,7 @@ export default function TeamForm({ form }: { form: string }) {
           }}
         >
           {letter}
-        </Paragraph>
+        </p>
       ))}
     </div>
   );

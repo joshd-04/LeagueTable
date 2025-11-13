@@ -110,9 +110,9 @@ export default heroui({
         foreground: 'hsl(0, 0%, 95%)',
         divider: 'hsl(0, 0%, 30%)',
         focus: 'hsl(200, 95%, 10%)',
-        content1: 'hsl(0, 0%, 10%)',
-        content2: 'hsl(0, 0%, 5%)',
-        content3: 'hsl(0, 0%, 0%)',
+        content1: 'hsl(0, 0%, 5%)',
+        content2: 'hsl(0, 0%, 10%)',
+        content3: 'hsl(0, 0%, 15%)',
         primary: {
           DEFAULT: 'hsl(212, 100%, 47%)',
           foreground: 'white',

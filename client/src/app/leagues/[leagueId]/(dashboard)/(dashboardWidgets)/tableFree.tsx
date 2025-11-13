@@ -4,13 +4,6 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
 import {
-  Button,
-  Card,
-  CardBody,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   SortDescriptor,
   Table,
   TableBody,
@@ -68,66 +61,42 @@ export default function TableWidget({
     handleScrollToTop();
   }, [divisionViewing]);
 
-  const dropdownItems: { key: number; label: string }[] = league.tables
-    .filter((table) => table.season === league.currentSeason)
-    .map((table, i) => {
-      return { key: i, label: table.name };
-    });
-
-  // const [selectedKeys, setSelectedKeys] = useState(new Set(['text']));
-
   return (
-    <Card className="p-[20px] col-span-2 row-span-2 h-full w-full  flex flex-col gap-1">
-      <CardBody className="flex flex-col gap-2">
-        <div className="flex flex-row gap-[10px] items-center">
-          <Paragraph
-            style={{
-              color: 'var(--text)',
-              verticalAlign: 'middle',
-              display: 'inline',
-            }}
+    <div className="p-[20px] col-span-2 row-span-2 h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-1">
+      <div className="flex flex-row gap-[10px] items-center">
+        <Paragraph
+          style={{
+            color: 'var(--text)',
+            verticalAlign: 'middle',
+            display: 'inline',
+          }}
+        >
+          Tables
+        </Paragraph>
+        <Paragraph>
+          <select
+            className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
+            value={divisionViewing}
+            onChange={(e) => setDivisionViewing(+e.target.value)}
           >
-            Tables
-          </Paragraph>
-          <Paragraph>
-            <select
-              className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
-              value={divisionViewing}
-              onChange={(e) => setDivisionViewing(+e.target.value)}
-            >
-              {league.tables
-                .filter((table) => table.season === league.currentSeason)
-                .map((table, i) => (
-                  <option value={table.division} key={i}>
-                    {table.name}
-                  </option>
-                ))}
-            </select>
-          </Paragraph>
-          <Dropdown>
-            <DropdownTrigger>
-              <Button variant="bordered">Open Menu</Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Dynamic Actions"
-              items={dropdownItems}
-              onAction={(key) => setDivisionViewing(+key)}
-            >
-              {(item) => (
-                <DropdownItem key={item.key}>{item.label}</DropdownItem>
-              )}
-            </DropdownMenu>
-          </Dropdown>
-        </div>
-        <TableComponent
-          teams={teams}
-          isLoading={isLoading}
-          league={league}
-          divisionViewing={divisionViewing}
-          ref={scrollableRef}
-        />
-      </CardBody>
-    </Card>
+            {league.tables
+              .filter((table) => table.season === league.currentSeason)
+              .map((table, i) => (
+                <option value={table.division} key={i}>
+                  {table.name}
+                </option>
+              ))}
+          </select>
+        </Paragraph>
+      </div>
+      <TableComponent
+        teams={teams}
+        isLoading={isLoading}
+        league={league}
+        divisionViewing={divisionViewing}
+        ref={scrollableRef}
+      />
+    </div>
   );
 }
 
@@ -147,10 +116,6 @@ function TableComponent({
   const table = league.tables[divisionViewing - 1];
 
   const [rows, setRows] = useState<TableRow[]>([]);
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: 'points',
-    direction: 'descending',
-  });
 
   // CONFIG
   const isStriped = true;
@@ -234,49 +199,6 @@ function TableComponent({
     setRows(rowsData);
   }, [teams]);
 
-  function handleSortChange(descriptor: SortDescriptor) {
-    setSortDescriptor(descriptor);
-    sortData(descriptor);
-  }
-
-  function sortData(descriptor: SortDescriptor) {
-    const columnKey = descriptor.column as keyof TableRow;
-    const direction = descriptor.direction;
-    console.log(columnKey, direction);
-    if (columnKey === 'form') {
-      return;
-    }
-    setRows((prev) => {
-      // Create a DEEP clone to avoid reference issues
-      const cloned = prev.map((row) => ({ ...row }));
-
-      // Stable sort: preserve original order on ties using index
-      const withIndex = cloned.map((row, index) => ({ row, index }));
-
-      withIndex.sort((a, b) => {
-        const valA = a.row[columnKey];
-        const valB = b.row[columnKey];
-
-        if (valA == null || valB == null) return 0;
-
-        let cmp = 0;
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          cmp = valA - valB;
-        } else if (typeof valA === 'string' && typeof valB === 'string') {
-          cmp = valA.localeCompare(valB);
-        }
-
-        // Apply direction
-        if (direction === 'descending') cmp = -cmp;
-
-        // Stable: if equal, keep original order
-        return cmp !== 0 ? cmp : a.index - b.index;
-      });
-
-      return withIndex.map((item) => item.row);
-    });
-  }
-
   function getZone(
     position: number | undefined,
     table: {
@@ -297,7 +219,7 @@ function TableComponent({
   }
 
   return (
-    <div className="relative h-[24rem]" ref={ref}>
+    <div className="relative h-[24rem] " ref={ref}>
       <Table
         isStriped={isStriped}
         radius="md"
@@ -305,11 +227,7 @@ function TableComponent({
         aria-label="The league table"
         className="h-[384px] max-h-[384px]"
         maxTableHeight={384}
-        sortDescriptor={sortDescriptor}
-        onSortChange={handleSortChange}
         classNames={{
-          base: `bg-transparent shadow-none drop-shadow-none border-none`,
-          wrapper: `border-none shadow-none drop-shadow-none outline-none`,
           tr: `
       ${
         highlightBackground
@@ -335,12 +253,7 @@ function TableComponent({
       >
         <TableHeader columns={columns} className="sticky top-0">
           {(column) => (
-            <TableColumn
-              key={column.key}
-              allowsSorting={column.key !== 'form' ? true : false}
-            >
-              {column.label}
-            </TableColumn>
+            <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
         <TableBody items={rows} emptyContent={'No rows to display.'}>
