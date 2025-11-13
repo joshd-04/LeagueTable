@@ -14,6 +14,7 @@ import { API_URL } from '@/util/config';
 import FavouriteSVG from '@/assets/svg components/Favourite';
 import FavouritedSVG from '@/assets/svg components/Favourited';
 import { useQuery } from '@tanstack/react-query';
+import { Tab, Tabs } from '@heroui/react';
 
 interface LeaguesInterface {
   created: LeagueInterface[];
@@ -158,27 +159,41 @@ export default function DashboardClient({
           </>
         ) : (
           <>
-            <LeagueSection
-              simplifiedLeagues={simplifiedLeagues}
-              title="Favourite Leagues"
-              leaguesList={leagues.favourites}
-              handleClick={handleClick}
-              handleFavClick={handleFavClick}
-            />
-            <LeagueSection
-              simplifiedLeagues={simplifiedLeagues}
-              title="Your Leagues"
-              leaguesList={leagues.created}
-              handleClick={handleClick}
-              handleFavClick={handleFavClick}
-            />
-            <LeagueSection
-              simplifiedLeagues={simplifiedLeagues}
-              title="Bookmarked Leagues"
-              leaguesList={leagues.following}
-              handleClick={handleClick}
-              handleFavClick={handleFavClick}
-            />
+            <Tabs radius="md" color="default" variant="bordered">
+              <Tab
+                key="favourites"
+                title={`Favourites (${leagues.favourites.length})`}
+              >
+                <LeagueSection
+                  simplifiedLeagues={simplifiedLeagues}
+                  title="Favourite Leagues"
+                  leaguesList={leagues.favourites}
+                  handleClick={handleClick}
+                  handleFavClick={handleFavClick}
+                />
+              </Tab>
+              <Tab key="yours" title={`Yours (${leagues.created.length})`}>
+                <LeagueSection
+                  simplifiedLeagues={simplifiedLeagues}
+                  title="Your Leagues"
+                  leaguesList={leagues.created}
+                  handleClick={handleClick}
+                  handleFavClick={handleFavClick}
+                />
+              </Tab>
+              <Tab
+                key="bookmarks"
+                title={`Bookmarks (${leagues.following.length})`}
+              >
+                <LeagueSection
+                  simplifiedLeagues={simplifiedLeagues}
+                  title="Bookmarked Leagues"
+                  leaguesList={leagues.following}
+                  handleClick={handleClick}
+                  handleFavClick={handleFavClick}
+                />
+              </Tab>
+            </Tabs>
           </>
         )}
       </div>
