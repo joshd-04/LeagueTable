@@ -89,7 +89,7 @@ export default function CreateLeagueForm() {
   }
 
   return (
-    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10 bg-linear-to-br from-content1 to-content2">
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10 bg-linear-to-br from-content2 to-content1">
       <CardBody>
         <div>
           <Paragraph className="font-medium">Create a league</Paragraph>

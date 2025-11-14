@@ -21,7 +21,6 @@ const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
     type: Number,
     validate: {
       validator: function (v) {
-        console.log(`Validator function value: ${v}`);
         return v === null || typeof v === 'number';
       },
       message: 'maxSeasonLimit must be a number or null',

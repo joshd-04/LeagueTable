@@ -152,7 +152,6 @@ function ResultsByMostRecent({
   useEffect(() => {
     if (resultsAreLoading === false) {
       setResults(resultsData.data.results);
-      console.log(resultsData.data.results);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultsAreLoading]);

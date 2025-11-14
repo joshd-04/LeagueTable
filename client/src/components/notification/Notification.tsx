@@ -14,7 +14,6 @@ export default function Notification({
 }: {
   notification: NotificationInterface;
 }) {
-  // console.log(notification);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   //  Handles the fade in / fade out animation

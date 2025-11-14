@@ -12,7 +12,6 @@ import Controls from './(dashboardWidgets)/controls';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import NewsFeed from './(dashboardWidgets)/newsFeed';
 import SeasonRewind from './(dashboardWidgets)/seasonRewind';
-import TableWidgetOld from './(dashboardWidgets)/tableOld';
 import Stats from './(dashboardWidgets)/stats';
 import Heading1 from '@/components/text/Heading1';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
@@ -20,7 +19,6 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import TableWidgetFree from './(dashboardWidgets)/tableFree';
 import TableWidget from './(dashboardWidgets)/table';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?

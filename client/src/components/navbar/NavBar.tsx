@@ -16,7 +16,7 @@ import {
 } from '@heroui/react';
 import Logo from '../logo/logo';
 import { usePathname } from 'next/navigation';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { useQuery } from '@tanstack/react-query';
@@ -33,7 +33,6 @@ export default function NavBar() {
   const pathname = usePathname();
 
   const router = useRouter();
-  const navRef = useRef<HTMLElement | null>(null);
 
   const { refetch: sendSignoutRequest } = useQuery({
     queryFn: () =>
@@ -53,7 +52,7 @@ export default function NavBar() {
   }
 
   return (
-    <Navbar ref={navRef}>
+    <Navbar>
       <NavbarBrand>
         <Link href="/" className="text-inherit ">
           <Logo />
@@ -138,16 +137,12 @@ export default function NavBar() {
           <NavbarItem>
             <ThemeSwitch />
           </NavbarItem>
-          <Dropdown
-            placement="bottom-end"
-            portalContainer={navRef.current ?? undefined}
-            shouldBlockScroll={false}
-          >
+          <Dropdown placement="bottom-end" shouldBlockScroll={false}>
             <DropdownTrigger>
               <Avatar
                 isBordered
                 as="button"
-                className="transition-transform"
+                className="transition-transform cursor-pointer"
                 color="primary"
                 name="Jason Hughes"
                 size="sm"

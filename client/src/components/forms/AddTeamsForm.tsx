@@ -130,7 +130,7 @@ export default function AddTablesForm({
   }
 
   return (
-    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content1 to-content2 ">
+    <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1 ">
       <CardBody>
         <div>
           <Paragraph className="font-medium">
@@ -224,8 +224,6 @@ function FormSection({
                   const filteredTeamNames = division
                     .filter((team, k) => j !== divisionIndex || k !== i)
                     .map((team) => team.name);
-
-                  console.log(filteredTeamNames);
 
                   teamNames.push(...filteredTeamNames);
                 }); // Check if this team name is in that list

@@ -31,74 +31,46 @@ export default function ClientPage() {
         <div className="grid grid-cols-3 grid-rows-1 w-[96vw] gap-[40px] pt-[40px]">
           <div></div>
           <CreateLeagueForm />
-          {/* <ExtraInfo /> */}
+          <ExtraInfo />
         </div>
       </div>
     </div>
   );
 }
 
-function ExtraInfoOld() {
-  return (
-    <div className="p-[20px] max-w-[80%] h-min w-fit bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <span>
-        <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
-        <Paragraph
-          style={{
-            color: 'var(--info)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          League type
-        </Paragraph>
-      </span>
-      <Label>
-        Basic leagues are simplified for a more streamlined experience. Advanced
-        leagues contain more features & stats. <br /> Currently advanced leagues
-        feature:
-      </Label>
-      <ul className="list-disc pl-[20px] text-[var(--text-muted)]">
-        <li className="">
-          <Label>Goal scorers</Label>
-        </li>
-        <li className="">
-          <Label>Assist makers</Label>
-        </li>
-      </ul>
-    </div>
-  );
-}
-
 function ExtraInfo() {
   return (
-    <Card className="p-[20px] max-w-[80%] h-min w-fit  flex flex-col gap-2">
+    <Card className="p-[20px] max-w-[80%] h-min w-fit flex flex-col gap-2">
+      <div className="absolute -bottom-28 -left-20 w-64 h-64 bg-primary rounded-full blur-xl opacity-30"></div>
+      <div className="absolute top-0 -right-28 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardBody>
-        <span>
-          <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
-          <Paragraph
-            style={{
-              color: 'var(--info)',
-              verticalAlign: 'middle',
-              display: 'inline',
-            }}
-          >
-            League type
-          </Paragraph>
-        </span>
-        <Label>
-          Basic leagues are simplified for a more streamlined experience.
-          Advanced leagues contain more features & stats. <br /> Currently
-          advanced leagues feature:
-        </Label>
-        <ul className="list-disc pl-[20px] text-[var(--text-muted)]">
-          <li className="">
-            <Label>Goal scorers</Label>
-          </li>
-          <li className="">
-            <Label>Assist makers</Label>
-          </li>
-        </ul>
+        <div className="flex flex-col gap-2">
+          <span>
+            <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
+            <Paragraph
+              style={{
+                color: 'var(--info)',
+                verticalAlign: 'middle',
+                display: 'inline',
+              }}
+            >
+              League type
+            </Paragraph>
+          </span>
+          <Label className="opacity-80 dark:opacity-70">
+            Basic leagues are simplified for a more streamlined experience.
+            Advanced leagues contain more features & stats. <br /> Currently
+            advanced leagues offer:
+          </Label>
+          <ul className="list-disc pl-[20px] opacity-80 dark:opacity-70">
+            <li className="">
+              <Label>Goal scorers</Label>
+            </li>
+            <li className="">
+              <Label>Assist makers</Label>
+            </li>
+          </ul>
+        </div>
       </CardBody>
     </Card>
   );

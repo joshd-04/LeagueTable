@@ -54,3 +54,24 @@ body {
     @apply transition-colors duration-250;
   }
 }
+/* globals.css */
+
+/* 1. Allow <body> to be the scroll container */
+html {
+  height: 100%;
+  overflow: hidden; /* Block <html> from scrolling */
+}
+
+body {
+  height: 100%;
+  overflow-y: auto; /* Enable scroll on <body> */
+  overflow-x: hidden;
+  scrollbar-gutter: stable; /* Prevent layout shift */
+}
+
+/* 2. Ensure sticky works */
+.sticky {
+  position: sticky !important;
+  top: 0;
+  z-index: 50;
+}

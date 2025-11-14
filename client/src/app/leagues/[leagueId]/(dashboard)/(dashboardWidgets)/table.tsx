@@ -4,13 +4,10 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
 import {
-  Button,
   Card,
   CardBody,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
+  Select,
+  SelectItem,
   SortDescriptor,
   Table,
   TableBody,
@@ -68,18 +65,16 @@ export default function TableWidget({
     handleScrollToTop();
   }, [divisionViewing]);
 
-  const dropdownItems: { key: number; label: string }[] = league.tables
+  const selectDivisionItems: { key: number; label: string }[] = league.tables
     .filter((table) => table.season === league.currentSeason)
     .map((table, i) => {
-      return { key: i, label: table.name };
+      return { key: i + 1, label: table.name };
     });
-
-  // const [selectedKeys, setSelectedKeys] = useState(new Set(['text']));
 
   return (
     <Card className="p-[20px] col-span-2 row-span-2 h-full w-full  flex flex-col gap-1">
       <CardBody className="flex flex-col gap-2">
-        <div className="flex flex-row gap-[10px] items-center">
+        <div className="flex flex-row justify-between w-full items-center">
           <Paragraph
             style={{
               color: 'var(--text)',
@@ -87,39 +82,28 @@ export default function TableWidget({
               display: 'inline',
             }}
           >
-            Tables
+            Table
           </Paragraph>
-          <Paragraph>
-            <select
-              className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
-              value={divisionViewing}
-              onChange={(e) => setDivisionViewing(+e.target.value)}
-            >
-              {league.tables
-                .filter((table) => table.season === league.currentSeason)
-                .map((table, i) => (
-                  <option value={table.division} key={i}>
-                    {table.name}
-                  </option>
-                ))}
-            </select>
-          </Paragraph>
-          <Dropdown>
-            <DropdownTrigger>
-              <Button variant="bordered">Open Menu</Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Dynamic Actions"
-              items={dropdownItems}
-              onAction={(key) => setDivisionViewing(+key)}
-            >
-              {(item) => (
-                <DropdownItem key={item.key}>{item.label}</DropdownItem>
-              )}
-            </DropdownMenu>
-          </Dropdown>
+          <Select
+            className="max-w-xs"
+            style={{ cursor: 'pointer' }}
+            size="sm"
+            items={selectDivisionItems}
+            label="Division"
+            placeholder="Select a division"
+            selectionMode="single"
+            selectedKeys={new Set([divisionViewing.toString()])}
+            onSelectionChange={(keys) => {
+              const selectedKey = Array.from(keys)[0];
+              if (selectedKey === undefined) return;
+              setDivisionViewing(Number(selectedKey));
+            }}
+          >
+            {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+          </Select>
         </div>
         <TableComponent
+          isFreeLeague={league.leagueLevel === 'free'}
           teams={teams}
           isLoading={isLoading}
           league={league}
@@ -132,12 +116,14 @@ export default function TableWidget({
 }
 
 function TableComponent({
+  isFreeLeague,
   teams,
   league,
   divisionViewing,
   isLoading,
   ref,
 }: {
+  isFreeLeague: boolean;
   teams: Team[] | undefined;
   league: League;
   divisionViewing: number;
@@ -148,7 +134,7 @@ function TableComponent({
 
   const [rows, setRows] = useState<TableRow[]>([]);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: 'points',
+    column: 'position',
     direction: 'descending',
   });
 
@@ -208,7 +194,6 @@ function TableComponent({
   ];
 
   useEffect(() => {
-    console.log('Teams have changed. Setting teams.');
     if (teams === undefined) {
       return;
     }
@@ -234,6 +219,8 @@ function TableComponent({
     setRows(rowsData);
   }, [teams]);
 
+  const isSortingEnabled = !isFreeLeague;
+
   function handleSortChange(descriptor: SortDescriptor) {
     setSortDescriptor(descriptor);
     sortData(descriptor);
@@ -242,7 +229,6 @@ function TableComponent({
   function sortData(descriptor: SortDescriptor) {
     const columnKey = descriptor.column as keyof TableRow;
     const direction = descriptor.direction;
-    console.log(columnKey, direction);
     if (columnKey === 'form') {
       return;
     }
@@ -309,7 +295,7 @@ function TableComponent({
         onSortChange={handleSortChange}
         classNames={{
           base: `bg-transparent shadow-none drop-shadow-none border-none`,
-          wrapper: `border-none shadow-none drop-shadow-none outline-none`,
+          wrapper: `border-none shadow-none drop-shadow-none outline-none px-0`,
           tr: `
       ${
         highlightBackground
@@ -337,7 +323,9 @@ function TableComponent({
           {(column) => (
             <TableColumn
               key={column.key}
-              allowsSorting={column.key !== 'form' ? true : false}
+              allowsSorting={
+                isSortingEnabled && (column.key !== 'form' ? true : false)
+              }
             >
               {column.label}
             </TableColumn>
@@ -364,173 +352,6 @@ function TableComponent({
         />
       )}
     </div>
-  );
-}
-
-function TableRowComponent({
-  team,
-  table,
-}: {
-  team: Team;
-  table: {
-    division: number;
-    name: string;
-    numberOfTeams: number;
-    numberOfTeamsToBePromoted: number;
-    numberOfTeamsToBeRelegated: number;
-    season: number;
-    teams: Team[];
-  };
-}) {
-  // config
-  const showIndicator = true;
-  const highlightBackground = true;
-
-  const goalDifference = team.goalsFor - team.goalsAgainst;
-  const points = 3 * team.wins + team.draws;
-
-  if (team.position === undefined) {
-    return <tr></tr>;
-  }
-
-  const inPromotionZone = table.numberOfTeamsToBePromoted >= team.position;
-  const inRelegationZone =
-    table.numberOfTeamsToBeRelegated - 1 >= table.numberOfTeams - team.position;
-
-  let indicatorColor = undefined;
-  if (showIndicator) {
-    if (inPromotionZone) indicatorColor = 'var(--success)';
-    if (inRelegationZone) indicatorColor = 'var(--danger)';
-  }
-
-  let highlightColor = undefined;
-  if (highlightBackground) {
-    if (inPromotionZone) highlightColor = 'bg-[var(--success)]/20';
-    if (inRelegationZone) highlightColor = 'bg-[var(--danger)]/20';
-  }
-
-  return (
-    <tr className={`${highlightColor}`}>
-      <td className="h-full">
-        <div className="w-full h-full flex flex-row justify-between items-stretch ">
-          <div
-            className="min-h-full my-[4px] w-[5px] rounded-[10px]"
-            style={{ backgroundColor: indicatorColor }}
-          ></div>
-          <Paragraph
-            style={{
-              textAlign: 'right',
-              paddingRight: '10px',
-            }}
-          >
-            {team.position}.
-          </Paragraph>
-        </div>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.name}{' '}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.matchesPlayed}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.wins}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.draws}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.losses}
-        </Paragraph>
-      </td>
-
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.goalsFor}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {team.goalsAgainst}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {goalDifference > 0 ? `+${goalDifference}` : goalDifference}
-        </Paragraph>
-      </td>
-      <td>
-        <Paragraph style={{ fontWeight: 'bold' }}>{points}</Paragraph>
-      </td>
-      <td>
-        <TeamForm form={team.form} />
-      </td>
-    </tr>
   );
 }
 
