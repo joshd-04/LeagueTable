@@ -1,8 +1,7 @@
 'use client';
 import EditSVG from '@/assets/svg components/Edit';
 import Button from '@/components/text/Button';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { Fixture, League } from '@/util/definitions';
 import { useParams, useRouter } from 'next/navigation';
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
@@ -64,26 +63,14 @@ export default function NextFixtures({
       }}
     >
       <div className="flex flex-row items-baseline gap-[4px]">
-        <Paragraph
-          style={{
-            color: 'var(--text)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Fixtures{' '}
-        </Paragraph>
+        <p className="align-middle inline text-medium">Fixtures </p>
         {fixtures !== undefined &&
           nextFixtures !== undefined &&
           nextFixtures.length >= 3 &&
           !isLoading && (
-            <Label
-              style={{
-                display: 'inline',
-              }}
-            >
+            <p className="text-small inline">
               - showing {nextFixtures.length} of {fixtures.totalFixtures}
-            </Label>
+            </p>
           )}
       </div>
       {isLoading || nextFixtures === undefined || fixtures === undefined ? (
@@ -107,14 +94,9 @@ export default function NextFixtures({
           </div>
         ))
       ) : (
-        <Label
-          style={{
-            fontStyle: 'italic',
-            placeSelf: 'center',
-          }}
-        >
+        <p className="italic place-self-center text-small">
           No outstanding fixtures
-        </Label>
+        </p>
       )}
     </motion.div>
   );
@@ -156,49 +138,18 @@ function FixtureRow({
         borderColor: rowHover && !editHover ? 'transparent' : 'var(--border)',
       }}
     >
-      <Label
-        style={{
-          padding: '0 10px',
-          width: 'max-content',
-          height: 'min-content',
-          flex: 'none',
-        }}
-      >
+      <p className="px-[10px] w-max h-min flex-none text-small">
         MD {fixtureObj.matchweek}
-      </Label>
+      </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_40px_1fr] flex-grow place-items-end">
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'right',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.homeTeamDetails.name}
-        </Paragraph>
-        <Label
-          style={{
-            width: '100%',
-            textAlign: 'center',
-          }}
-        >
-          vs
-        </Label>
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'left',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        </p>
+        <p className="w-full text-center text-small">vs</p>
+
+        <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.awayTeamDetails.name}
-        </Paragraph>
+        </p>
       </div>
       {userOwnsThisLeague && (
         <div

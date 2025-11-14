@@ -1,11 +1,10 @@
 'use client';
-import Paragraph from '@/components/text/Paragraph';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { League, Result } from '@/util/definitions';
 import { useContext } from 'react';
 import Heading1 from '@/components/text/Heading1';
-import Label from '@/components/text/Label';
+
 import LinkButton from '@/components/text/LinkButton';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchOutcome from './(resultWidgets)/matchOutcome';
@@ -49,8 +48,8 @@ export default function ResultClient({
               result.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <Label style={{ color: 'var(--text)' }}>Home</Label>
-            <Label style={{ color: 'var(--text)' }}>Away</Label>
+            <p className="text-small">Home</p>
+            <p className="text-small">Away</p>
           </div>
 
           {individualTeamPagesEnabled ? (
@@ -96,9 +95,9 @@ export default function ResultClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <Paragraph style={{ justifySelf: 'end' }}>
+          <p className="text-medium justify-self-end">
             Season {result.season} Matchweek {result.matchweek}
-          </Paragraph>
+          </p>
           <LinkButton
             color="var(--text)"
             bgHoverColor="var(--bg)"
@@ -108,14 +107,16 @@ export default function ResultClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph style={{ justifySelf: 'start' }}>
+          <p className="text-medium justify-self-end">
             {league.tables[result.division - 1].name} (div {result.division})
-          </Paragraph>
-          {result.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
+          </p>
+          {result.neutralGround && (
+            <p className="text-medium">Neutral Ground</p>
+          )}
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
-          <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <Paragraph style={{ color: 'var(--info)' }}>AI insights</Paragraph>
+          <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
+            <p className="text-medium">AI insights</p>
           </div>
           <MatchOutcome result={result} />
           <AsItStood result={result} />

@@ -1,25 +1,24 @@
 import TeamForm from '@/components/teamForm/TeamForm';
-import Paragraph from '@/components/text/Paragraph';
 import { Result } from '@/util/definitions';
 import ordinal from 'ordinal';
 
 export default function AsItStood({ result }: { result: Result }) {
   return (
     <div className="p-[20px] h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <Paragraph>Before the action started</Paragraph>
+      <p className="text-medium">Before the action started</p>
       <table className="table-fixed border-separate border-spacing-x-[20px] w-full">
         <thead>
           <tr>
             <th>
-              <Paragraph style={{ textAlign: 'right' }}>
+              <p className="text-medium text-right">
                 {result.homeTeamDetails.name}
-              </Paragraph>
+              </p>
             </th>
             <th></th>
             <th>
-              <Paragraph style={{ textAlign: 'left' }}>
+              <p className="text-medium text-left">
                 {result.awayTeamDetails.name}
-              </Paragraph>
+              </p>
             </th>
           </tr>
         </thead>
@@ -31,11 +30,12 @@ export default function AsItStood({ result }: { result: Result }) {
               </div>
             </td>
             <td>
-              <Paragraph
-                style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+              <p
+                className="text-center text-medium"
+                style={{ color: 'var(--text-muted)' }}
               >
                 Form
-              </Paragraph>
+              </p>
             </td>
             <td>
               <div className="place-self-start">
@@ -45,59 +45,62 @@ export default function AsItStood({ result }: { result: Result }) {
           </tr>
           <tr>
             <td>
-              <Paragraph style={{ textAlign: 'right' }}>
+              <p className="text-right text-medium">
                 {ordinal(result.homeTeamDetails.leaguePosition)}
-              </Paragraph>
+              </p>
             </td>
             <td>
-              <Paragraph
-                style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+              <p
+                style={{ color: 'var(--text-muted)' }}
+                className="text-center text-medium"
               >
                 Position
-              </Paragraph>
+              </p>
             </td>
             <td>
-              <Paragraph style={{ textAlign: 'left' }}>
+              <p className="text-left text-medium">
                 {ordinal(result.awayTeamDetails.leaguePosition)}
-              </Paragraph>
+              </p>
             </td>
           </tr>
           <tr>
             <td>
-              <Paragraph style={{ textAlign: 'right' }}>
+              <p className="text-right text-medium">
                 {result.homeTeamDetails.matchesPlayed}
-              </Paragraph>
+              </p>
             </td>
             <td>
-              <Paragraph
-                style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+              <p
+                style={{ color: 'var(--text-muted)' }}
+                className="text-center text-medium"
               >
                 Matches played
-              </Paragraph>
+              </p>
             </td>
             <td>
-              <Paragraph style={{ textAlign: 'left' }}>
+              <p className="text-left text-medium">
                 {result.awayTeamDetails.matchesPlayed}
-              </Paragraph>
+              </p>
             </td>
           </tr>
           <tr>
             <td>
-              <Paragraph style={{ textAlign: 'right' }}>
+              <p className="text-right text-medium">
                 {result.homeTeamDetails.points}
-              </Paragraph>
+              </p>
             </td>
             <td>
-              <Paragraph
-                style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+              <p
+                style={{ color: 'var(--text-muted)' }}
+                className="text-center text-medium"
               >
                 Points
-              </Paragraph>
+              </p>
             </td>
             <td>
-              <Paragraph style={{ textAlign: 'left' }}>
+              <p className="text-left text-medium">
                 {result.awayTeamDetails.points}
-              </Paragraph>
+              </p>
             </td>
           </tr>
         </tbody>

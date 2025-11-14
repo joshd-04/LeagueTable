@@ -1,5 +1,3 @@
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
 import { Result } from '@/util/definitions';
 
 export default function MatchOutcome({ result }: { result: Result }) {
@@ -15,7 +13,7 @@ export default function MatchOutcome({ result }: { result: Result }) {
   }
   return (
     <div className="p-[20px] h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <Paragraph>Match outcome</Paragraph>
+      <p className="text-medium">Match outcome</p>
       <div
         className="max-h-[24rem] overflow-y-auto flex flex-col items-center  gap-2 "
         style={{
@@ -23,7 +21,7 @@ export default function MatchOutcome({ result }: { result: Result }) {
           scrollbarColor: 'var(--border) transparent',
         }}
       >
-        <Label style={{ color: 'var(--text)' }}>Match start. 0-0</Label>
+        <p className="text-small">Match start. 0-0</p>
         {result.detailedOutcome !== undefined &&
         result.detailedOutcome.length !== 0
           ? result.detailedOutcome.map((goal, i) => {
@@ -50,9 +48,9 @@ export default function MatchOutcome({ result }: { result: Result }) {
                 />
               );
             })}
-        <Label style={{ color: 'var(--text)' }}>
+        <p className="text-small">
           Full time: {calculateScore(result.basicOutcome.length - 1)}
-        </Label>
+        </p>
       </div>
     </div>
   );
@@ -91,31 +89,27 @@ function MatchOutcomeRowBasic({
     <div className="grid grid-cols-[1fr_max-content_1fr] bg-[var(--bg-light)] px-4 py-2 rounded-[10px] w-full">
       {goal === 'home' ? (
         <div className="flex flex-col justify-center ">
-          <Label style={{ color: 'var(--text)' }}>
-            Goal: {homeTeamDetails.name}
-          </Label>
+          <p className="text-small">Goal: {homeTeamDetails.name}</p>
         </div>
       ) : (
         <div></div>
       )}
-      <div className="place-self-center">
+      <div className="place-self-center text-medium">
         {goal === 'home' ? (
-          <Paragraph style={{ color: 'var(--text-muted)' }}>
+          <p style={{ color: 'var(--text-muted)' }}>
             <span className="text-[var(--text)] font-bold">{homeGoals}</span>-
             {awayGoals}
-          </Paragraph>
+          </p>
         ) : (
-          <Paragraph style={{ color: 'var(--text-muted)' }}>
+          <p style={{ color: 'var(--text-muted)' }}>
             {homeGoals}-
             <span className="text-[var(--text)] font-bold">{awayGoals}</span>
-          </Paragraph>
+          </p>
         )}
       </div>
       {goal === 'away' ? (
         <div className="flex flex-col justify-center items-end">
-          <Label style={{ color: 'var(--text)' }}>
-            Goal: {awayTeamDetails.name}
-          </Label>
+          <p className="text-small">Goal: {awayTeamDetails.name}</p>
         </div>
       ) : (
         <div></div>
@@ -162,35 +156,31 @@ function MatchOutcomeRowAdvanced({
     <div className="grid grid-cols-[1fr_max-content_1fr] bg-[var(--bg-light)] px-4 py-2 rounded-[10px] w-full">
       {goal.team === 'home' ? (
         <div className="place-self-start  flex flex-col items-start ">
-          <Label style={{ color: 'var(--text)' }}>
-            Goal: {homeTeamDetails.name}
-          </Label>
-          <Label>⚽ {goal.scorer}</Label>
-          {goal.assist && <Label>👟 {goal.assist}</Label>}
+          <p className="text-small">Goal: {homeTeamDetails.name}</p>
+          <p className="text-small">⚽ {goal.scorer}</p>
+          {goal.assist && <p className="text-small">👟 {goal.assist}</p>}
         </div>
       ) : (
         <div></div>
       )}
-      <div className="place-self-center ">
+      <div className="place-self-center text-medium">
         {goal.team === 'home' ? (
-          <Paragraph style={{ color: 'var(--text-muted)' }}>
+          <p style={{ color: 'var(--text-muted)' }}>
             <span className="text-[var(--text)] font-bold">{homeGoals}</span>-
             {awayGoals}
-          </Paragraph>
+          </p>
         ) : (
-          <Paragraph style={{ color: 'var(--text-muted)' }}>
+          <p style={{ color: 'var(--text-muted)' }}>
             {homeGoals}-
             <span className="text-[var(--text)] font-bold">{awayGoals}</span>
-          </Paragraph>
+          </p>
         )}
       </div>
       {goal.team === 'away' ? (
         <div className="place-self-end flex flex-col items-end">
-          <Label style={{ color: 'var(--text)' }}>
-            Goal: {awayTeamDetails.name}
-          </Label>
-          <Label>⚽ {goal.scorer}</Label>
-          {goal.assist && <Label>👟 {goal.assist}</Label>}
+          <p className="text-small">Goal: {awayTeamDetails.name}</p>
+          <p className="text-small">⚽ {goal.scorer}</p>
+          {goal.assist && <p className="text-small">👟 {goal.assist}</p>}
         </div>
       ) : (
         <div></div>

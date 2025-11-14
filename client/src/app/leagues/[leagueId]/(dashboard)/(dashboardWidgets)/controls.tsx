@@ -1,7 +1,6 @@
 'use client';
 import Button from '@/components/text/Button';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useNotifier } from '@/hooks/useNotifier';
 import { fetchAPI } from '@/util/api';
@@ -128,15 +127,7 @@ export default function Controls({
   return (
     <div className="p-[20px]  h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <span>
-        <Paragraph
-          style={{
-            color: 'var(--text)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Controls
-        </Paragraph>
+        <p className="text-medium align-middle inline">Controls</p>
       </span>
       <Button
         onClick={() => matchweekMutation()}
@@ -147,9 +138,9 @@ export default function Controls({
           league.currentMatchweek === 0
         }
       >
-        <Label style={{ fontWeight: 'bold', color: 'inherit' }}>
+        <p className="font-bold text-inherit text-small">
           {matchweekButtonText}
-        </Label>
+        </p>
       </Button>
 
       <Button
@@ -163,9 +154,7 @@ export default function Controls({
           ) && !(league.currentSeason === 0 && league.currentMatchweek === 0)
         }
       >
-        <Label style={{ fontWeight: 'bold', color: 'inherit' }}>
-          {seasonButtonText}
-        </Label>
+        <p className="font-bold text-inherit text-small">{seasonButtonText}</p>
       </Button>
     </div>
   );

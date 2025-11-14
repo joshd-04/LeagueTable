@@ -1,8 +1,7 @@
 'use client';
-import Paragraph from '@/components/text/Paragraph';
 import { Fixture, League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
-import Label from '@/components/text/Label';
+
 import LinkButton from '@/components/text/LinkButton';
 import TeamForm from '@/components/teamForm/TeamForm';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
@@ -88,9 +87,9 @@ export default function FixturesClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <Paragraph style={{ justifySelf: 'end' }}>
+          <p className="text-medium justify-self-end">
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
-          </Paragraph>
+          </p>
           <LinkButton
             color="var(--text)"
             bgHoverColor="var(--bg)"
@@ -100,7 +99,7 @@ export default function FixturesClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph style={{ justifySelf: 'start' }}>
+          <p className="text-medium justify-self-start">
             <select
               className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
               value={divisionFilter}
@@ -115,22 +114,16 @@ export default function FixturesClient({
                   </option>
                 ))}
             </select>
-          </Paragraph>
+          </p>
         </div>
       </div>
       <div className="w-[50%] place-self-center">
         <div className="flex flex-col gap-[20px]">
           <div>
-            <Label
-              style={{
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                placeSelf: 'center',
-              }}
-            >
+            <p className="font-bold mb-[10px] place-self-center text-small">
               Matchweek {matchweekViewing}{' '}
               {+matchweekViewing > league.currentMatchweek && '(future)'}
-            </Label>
+            </p>
 
             <div className="flex flex-col gap-[10px]">
               {filteredFixtures.map((fixture, i) =>
@@ -177,9 +170,12 @@ function FixtureRow({
     >
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
-        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
+        <p
+          style={{ color: 'var(--text-muted)' }}
+          className="inline text-medium"
+        >
           {homePoints} pt{homePoints === 1 ? '' : 's'}
-        </Paragraph>
+        </p>
         <Subtitle
           style={{
             textAlign: 'right',
@@ -193,7 +189,7 @@ function FixtureRow({
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
-      <Label style={{ fontWeight: 'bold', textAlign: 'center' }}>vs</Label>
+      <p className="font-bold text-center text-small">vs</p>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
         <Subtitle
@@ -206,9 +202,12 @@ function FixtureRow({
         >
           {fixture.awayTeamDetails.name}
         </Subtitle>
-        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
+        <p
+          style={{ color: 'var(--text-muted)' }}
+          className="inline text-medium"
+        >
           {awayPoints} pt{awayPoints === 1 ? '' : 's'}
-        </Paragraph>
+        </p>
         <TeamForm form={fixture.awayTeamDetails.form} />
       </div>
     </motion.div>
@@ -224,9 +223,12 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
     <div className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline brightness-80">
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
-        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
+        <p
+          style={{ color: 'var(--text-muted)' }}
+          className="text-medium inline"
+        >
           {homePoints} pt{homePoints === 1 ? '' : 's'}
-        </Paragraph>
+        </p>
         <Subtitle
           style={{
             color: 'var(--text-muted)',
@@ -241,7 +243,7 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
-      <Label style={{ fontWeight: 'bold', textAlign: 'center' }}>vs</Label>
+      <p className="font-bold text-center text-small">vs</p>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
         <Subtitle
@@ -255,9 +257,12 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
         >
           {fixture.awayTeamDetails.name}
         </Subtitle>
-        <Paragraph style={{ display: 'inline', color: 'var(--text-muted)' }}>
+        <p
+          style={{ color: 'var(--text-muted)' }}
+          className="inline text-medium"
+        >
           {awayPoints} pt{awayPoints === 1 ? '' : 's'}
-        </Paragraph>
+        </p>
         <TeamForm form={fixture.awayTeamDetails.form} />
       </div>
     </div>

@@ -15,8 +15,6 @@ import useAccount from '@/hooks/useAccount';
 import { useMutation } from '@tanstack/react-query';
 import { useNotifier } from '@/hooks/useNotifier';
 import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
-import Paragraph from '../text/Paragraph';
-import Label from '../text/Label';
 
 export default function AddTablesForm({
   leagueName,
@@ -133,10 +131,8 @@ export default function AddTablesForm({
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1 ">
       <CardBody>
         <div>
-          <Paragraph className="font-medium">
-            Team Setup: {leagueName}
-          </Paragraph>
-          <Label className="opacity-80 dark:opacity-70">Part 3 of 3</Label>
+          <p className="font-medium text-medium">Team Setup: {leagueName}</p>
+          <p className="opacity-80 dark:opacity-70 text-small">Part 3 of 3</p>
         </div>
         <Spacer y={4} />
         <Form onSubmit={handleSubmit}>

@@ -1,5 +1,3 @@
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
 import { League } from '@/util/definitions';
 
 export default function Upgrade({ league }: { league: League }) {
@@ -28,34 +26,33 @@ export default function Upgrade({ league }: { league: League }) {
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <span>
-        <Paragraph
+        <p
           style={{
             color: titleColor,
-            verticalAlign: 'middle',
-            display: 'inline',
           }}
+          className="align-middle inline text-medium"
         >
           {titleText}
-        </Paragraph>
-        <Label>
+        </p>
+        <p className="text-small">
           {warningLevel === 'light' ? '' : 'This is a free league.'} Upgrade to
           standard level to unlock:
-        </Label>
-        <ul className="list-disc pl-[20px] text-[var(--text-muted)]">
+        </p>
+        <ul className="list-disc pl-[20px] text-[var(--text-muted)] text-small">
           <li>
-            <Label>More seasons</Label>
+            <p>More seasons</p>
           </li>
           <li>
-            <Label>Custom league banner</Label>
+            <p>Custom league banner</p>
           </li>
           <li>
-            <Label>Custom league announcements</Label>
+            <p>Custom league announcements</p>
           </li>
           <li>
-            <Label>Auto-generated news feed</Label>
+            <p>Auto-generated news feed</p>
           </li>
           <li>
-            <Label>Season rewind</Label>
+            <p>Season rewind</p>
           </li>
         </ul>
       </span>

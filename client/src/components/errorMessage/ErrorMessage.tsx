@@ -1,7 +1,6 @@
 'use client';
 import { useContext } from 'react';
 import Button from '../text/Button';
-import Paragraph from '../text/Paragraph';
 import Subtitle from '../text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { AnimatePresence, motion } from 'motion/react';
@@ -23,9 +22,9 @@ export default function ErrorMessage() {
             className={`w-[440px] bg-[var(--bg-light)] fixed left-[50%] top-[50px] translate-x-[-50%] rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px] z-10`}
           >
             <Subtitle style={{ color: 'var(--danger)' }}>Error</Subtitle>
-            <Paragraph style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>
+            <p style={{ color: 'var(--text-muted)' }} className="text-medium">
               {error}
-            </Paragraph>
+            </p>
             <Button
               color="var(--danger)"
               bgHoverColor="var(--bg)"

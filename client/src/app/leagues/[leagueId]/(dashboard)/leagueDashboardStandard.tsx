@@ -1,6 +1,5 @@
 'use client';
 import PersonSVG from '@/assets/svg components/Person';
-import Paragraph from '@/components/text/Paragraph';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
@@ -93,24 +92,24 @@ export default function LeagueDashboardStandard({
         </Heading1>
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px]">
-          <Paragraph>
+        <div className="flex flex-row justify-center items-center gap-[50px] text-medium">
+          <p>
             <PersonSVG className="w-[24px] h-[24px] fill-[var(--text)] inline-block align-text-top" />
             {league.leagueOwner.username === user?.username
               ? 'You'
               : league.leagueOwner.username}
-          </Paragraph>
-          <Paragraph>
+          </p>
+          <p>
             {league.divisionsCount} division
             {league.divisionsCount === 1 ? '' : 's'}
-          </Paragraph>
-          <Paragraph>
+          </p>
+          <p>
             {teamsCount} team
             {teamsCount === 1 ? '' : 's'}
-          </Paragraph>
-          <Paragraph>
+          </p>
+          <p>
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
-          </Paragraph>
+          </p>
         </div>
         <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-[20px] ">
           <Announcement

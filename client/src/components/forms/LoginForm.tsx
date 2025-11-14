@@ -11,13 +11,11 @@ import {
   Tooltip,
 } from '@heroui/react';
 import { useContext, useState } from 'react';
-import Label from '../text/Label';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import Paragraph from '../text/Paragraph';
 import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 export default function LoginForm({
@@ -94,10 +92,10 @@ export default function LoginForm({
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1">
       <CardBody>
         <div>
-          <Paragraph className="font-medium">Welcome Back</Paragraph>
-          <Label className="opacity-80 dark:opacity-70">
+          <p className="font-medium text-medium">Welcome Back</p>
+          <p className="opacity-80 dark:opacity-70 text-small">
             Log in to your account to continue
-          </Label>
+          </p>
         </div>
         <Spacer y={4} />
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -117,9 +115,9 @@ export default function LoginForm({
               onFocus={() => setIsError(false)}
               errorMessage={
                 username.length === 0 && (
-                  <Label className="text-danger">
+                  <p className="text-danger text-small">
                     Please fill in this field.
-                  </Label>
+                  </p>
                 )
               }
             />
@@ -137,11 +135,11 @@ export default function LoginForm({
               isInvalid={isError}
               onFocus={() => setIsError(false)}
               errorMessage={
-                <Label className="text-danger">
+                <p className="text-danger text-small">
                   {password.length === 0
                     ? 'Please fill in this field.'
                     : 'Invalid username or password.'}
-                </Label>
+                </p>
               }
               endContent={
                 <Tooltip

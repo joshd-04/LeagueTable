@@ -1,5 +1,3 @@
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
 import { League, Result } from '@/util/definitions';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
@@ -47,15 +45,7 @@ export default function LatestResults({
       }}
     >
       <span>
-        <Paragraph
-          style={{
-            color: 'var(--text)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Latest Results
-        </Paragraph>
+        <p className="align-middle inline text-medium">Latest Results</p>
       </span>
       {isLoading ? (
         <>
@@ -74,14 +64,7 @@ export default function LatestResults({
           </div>
         ))
       ) : (
-        <Label
-          style={{
-            fontStyle: 'italic',
-            placeSelf: 'center',
-          }}
-        >
-          No results yet
-        </Label>
+        <p className="italic place-self-center text-small">No results yet</p>
       )}
     </motion.div>
   );
@@ -110,51 +93,32 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       onClick={(e) => handleResultClick(e)}
       whileTap={{ scale: 0.98 }}
     >
-      <Label
+      <p
         style={{
           width: 'max-content',
           height: 'min-content',
           flex: 'none',
         }}
+        className="flex-none w-max h-min text-small"
       >
         MD {result.matchweek}
-      </Label>
-      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'right',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+      </p>
+      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-medium">
+        <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
-        </Paragraph>
-        <Paragraph
+        </p>
+        <p
           style={{
-            width: '100%',
-            textAlign: 'center',
             color: 'var(--text-muted)',
-            fontWeight: 'normal',
           }}
+          className="w-full text-center font-normal"
         >
           {homeGoals} <span className="text-[var(--text-muted)]">-</span>{' '}
           {awayGoals}
-        </Paragraph>
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'left',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        </p>
+        <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.awayTeamDetails.name}
-        </Paragraph>
+        </p>
       </div>
       {/* {userOwnsThisLeague && (
         <Button

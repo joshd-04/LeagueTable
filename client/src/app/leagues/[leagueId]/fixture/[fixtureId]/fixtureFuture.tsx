@@ -1,9 +1,8 @@
 'use client';
-import Paragraph from '@/components/text/Paragraph';
 import { Fixture, League } from '@/util/definitions';
 import { useContext, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
-import Label from '@/components/text/Label';
+
 import LinkButton from '@/components/text/LinkButton';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
@@ -40,8 +39,8 @@ export default function FixtureFuture({
               fixture.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <Label style={{ color:'var(--text)' }}>Home</Label>
-            <Label style={{ color:'var(--text)' }}>Away</Label>
+            <p className="text-small">Home</p>
+            <p className="text-small">Away</p>
           </div>
           <div className="flex flex-row justify-between gap-[20px]">
             <LinkButton
@@ -72,9 +71,9 @@ export default function FixtureFuture({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="flex flex-row justify-center items-center gap-[50px]">
-          <Paragraph>
+          <p className="text-medium">
             Season {fixture.season} Matchweek {fixture.matchweek}
-          </Paragraph>
+          </p>
           <LinkButton
             color="var(--text)"
             bgHoverColor="var(--bg)"
@@ -84,16 +83,18 @@ export default function FixtureFuture({
           >
             {league.name}
           </LinkButton>
-          <Paragraph>Division {fixture.division}</Paragraph>
-          {fixture.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
+          <p className="text-medium">Division {fixture.division}</p>
+          {fixture.neutralGround && (
+            <p className="text-medium">Neutral Ground</p>
+          )}
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <Paragraph style={{ color: 'var(--info)' }}>AI insights</Paragraph>
-            <Label>
+            <p className="text-medium">AI insights</p>
+            <p className="text-small">
               AI Insights not available yet. Come back when matchweek{' '}
               {fixture.matchweek} starts!
-            </Label>
+            </p>
           </div>
           <MatchPreview fixture={fixture} />
           <HeadToHead

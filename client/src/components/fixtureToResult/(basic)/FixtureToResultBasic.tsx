@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
-import Paragraph from '../../text/Paragraph';
+
 import { AnimatePresence, motion } from 'motion/react';
 import Button from '../../text/Button';
 import Subtitle from '../../text/Subtitle';
 import { Fixture } from '@/util/definitions';
-import Label from '../../text/Label';
+
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
@@ -90,9 +90,9 @@ export default function FixtureToResultBasic({
                   )} 
               ${fixtureObj.awayTeamDetails.name}`}
             </Subtitle>
-            <Paragraph style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>
+            <p style={{ color: 'var(--text-muted)' }} className="text-medium">
               Fixture into result
-            </Paragraph>
+            </p>
           </div>
 
           <ResultFormBasic
@@ -163,11 +163,9 @@ function ResultFormBasic({
   return (
     <>
       <div className="max-h-[300px] min-h-[300px] overflow-auto ">
-        <div className="flex flex-col gap-[8px] p-[8px] ">
+        <div className="flex flex-col gap-[8px] p-[8px] text-small">
           {matchStory.length === 0 ? (
-            <Label style={{ placeSelf: 'center', fontWeight: 'bold' }}>
-              No events
-            </Label>
+            <p className="font-bold place-self-center">No events</p>
           ) : (
             matchStory.map((goal, i) => (
               <div
@@ -180,12 +178,12 @@ function ResultFormBasic({
                   } `}
                 >
                   <div>
-                    <Label style={{ fontWeight: 'bold', color: 'var(--text)' }}>
+                    <p className="font-bold">
                       {goal === 'home'
                         ? fixture.homeTeamDetails.name
                         : fixture.awayTeamDetails.name}{' '}
                       ({calculateScore(i)})
-                    </Label>
+                    </p>
                   </div>
                 </div>
                 <Button

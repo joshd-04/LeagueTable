@@ -1,6 +1,5 @@
 'use client';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { Fixture, League, Result } from '@/util/definitions';
@@ -20,7 +19,7 @@ export default function HeadToHead({
 }) {
   return (
     <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <Paragraph>Head-to-head record</Paragraph>
+      <p className="text-medium">Head-to-head record</p>
       {league.leagueLevel === 'free' ? (
         <HeadToHeadLocked userOwnsThisLeague={userOwnsThisLeague} />
       ) : (
@@ -37,18 +36,18 @@ function HeadToHeadLocked({
 }) {
   if (userOwnsThisLeague) {
     return (
-      <div>
-        <Label style={{ color: 'var(--warning)' }}>
+      <div className="text-small">
+        <p className="text-warning">
           Head-to-head is not available for free leagues.
-        </Label>
-        <Label>Upgrade to standard level to unlock.</Label>
+        </p>
+        <p>Upgrade to standard level to unlock.</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <Label>Head-to-head is not available for this league.</Label>
+    <div className="text-small">
+      <p>Head-to-head is not available for this league.</p>
     </div>
   );
 }
@@ -75,10 +74,10 @@ function HeadToHeadBody({
   return (
     <div>
       {isLoading ? (
-        <Label>Loading...</Label>
+        <p className="text-small">Loading...</p>
       ) : results.length > 0 ? (
         <>
-          <Label>Last 5 meetings:</Label>
+          <p className="text-small">Last 5 meetings:</p>
           <div>
             <div className="w-[70%] flex flex-col gap-1">
               {results.map((result, i) => (
@@ -88,7 +87,7 @@ function HeadToHeadBody({
           </div>
         </>
       ) : (
-        <Label>No history found</Label>
+        <p className="text-small">No history found</p>
       )}
     </div>
   );
@@ -117,49 +116,18 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       onClick={(e) => handleResultClick(e)}
       whileTap={{ scale: 0.98 }}
     >
-      <Label
-        style={{
-          width: 'max-content',
-          height: 'min-content',
-          flex: 'none',
-        }}
-      >
-        Season {result.season}
-      </Label>
+      <p className="text-small w-max h-min flex-none">Season {result.season}</p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'right',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        <p className="text-medium w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
-        </Paragraph>
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'center',
-          }}
-        >
+        </p>
+        <p className="text-medium w-full text-center">
           {homeGoals} <span className="text-[var(--text-muted)]">-</span>{' '}
           {awayGoals}
-        </Paragraph>
-        <Paragraph
-          style={{
-            width: '100%',
-            textAlign: 'left',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        </p>
+        <p className="text-medium w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.awayTeamDetails.name}
-        </Paragraph>
+        </p>
       </div>
     </motion.div>
   );

@@ -1,6 +1,5 @@
 'use client';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonStats } from '@/util/definitions';
@@ -32,7 +31,7 @@ export default function Stats({
 
   return (
     <div className="p-[20px] h-full w-full row-span-2 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <Paragraph>
+      <p className="text-medium">
         <select
           className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
           value={view}
@@ -46,7 +45,7 @@ export default function Stats({
           )}
           <option value="cleansheets">Cleansheets</option>
         </select>
-      </Paragraph>
+      </p>
       {stats === undefined || isLoading ? (
         <TableRowSkeleton
           numRows={league.tables[divisionViewing - 1].numberOfTeams}
@@ -94,13 +93,15 @@ function StatsTablePlayerBased({
           <tr className="text-left">
             <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[11rem] sticky top-0 bg-[var(--bg)]">
-              <Paragraph>Name</Paragraph>
+              <p className="text-medium">Name</p>
             </th>
             <th className="w-[8rem] sticky top-0 bg-[var(--bg)]">
-              <Paragraph style={{ color: 'var(--text-muted)' }}>Team</Paragraph>
+              <p style={{ color: 'var(--text-muted)' }} className="text-medium">
+                Team
+              </p>
             </th>
             <th className="sticky top-0 bg-[var(--bg)]">
-              <Paragraph>Value</Paragraph>
+              <p className="text-medium">Value</p>
             </th>
           </tr>
         </thead>
@@ -111,14 +112,15 @@ function StatsTablePlayerBased({
         </tbody>
       </table>
       {(data?.length === 0 || !data) && (
-        <Label
+        <p
+          className="italic place-self-center text-small"
           style={{
             placeSelf: 'center',
             fontStyle: 'italic',
           }}
         >
           No data yet
-        </Label>
+        </p>
       )}
     </div>
   );
@@ -132,39 +134,27 @@ function TableRowPlayerBased({
   return (
     <tr>
       <td>
-        <Paragraph style={{ textAlign: 'right', paddingRight: '10px' }}>
+        <p className="text-medium text-right pr-[10px]">
           {datapoint.position}.
-        </Paragraph>
+        </p>
       </td>
       <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        <p className="text-medium text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {datapoint.player}
-        </Paragraph>
+        </p>
       </td>
       <td>
-        <Paragraph
+        <p
           style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
             color: 'var(--text-muted)',
           }}
+          className="text-medium text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
         >
           {datapoint.team}
-        </Paragraph>
+        </p>
       </td>
       <td>
-        <Paragraph style={{ textAlign: 'right', paddingRight: '10px' }}>
-          {datapoint.value}
-        </Paragraph>
+        <p className="text-right pr-[10px] text-medium">{datapoint.value}</p>
       </td>
     </tr>
   );
@@ -182,10 +172,10 @@ function StatsTableTeamBased({
           <tr className="text-left">
             <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[10rem] sticky top-0 bg-[var(--bg)]">
-              <Paragraph>Team</Paragraph>
+              <p className="text-medium">Team</p>
             </th>
             <th className="sticky top-0 bg-[var(--bg)] w-[6rem]">
-              <Paragraph>Value</Paragraph>
+              <p className="text-medium">Value</p>
             </th>
           </tr>
         </thead>
@@ -196,14 +186,7 @@ function StatsTableTeamBased({
         </tbody>
       </table>
       {(data?.length === 0 || !data) && (
-        <Label
-          style={{
-            placeSelf: 'center',
-            fontStyle: 'italic',
-          }}
-        >
-          No data yet
-        </Label>
+        <p className="text-small place-self-center italic">No data yet</p>
       )}
     </div>
   );
@@ -217,24 +200,17 @@ function TableRowTeamBased({
   return (
     <tr>
       <td>
-        <Paragraph style={{ textAlign: 'right', paddingRight: '10px' }}>
+        <p className="text-right pr-[10px] text-medium">
           {datapoint.position}.
-        </Paragraph>
+        </p>
       </td>
       <td>
-        <Paragraph
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
+        <p className="text-medium text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {datapoint.team}
-        </Paragraph>
+        </p>
       </td>
       <td>
-        <Paragraph>{datapoint.value}</Paragraph>
+        <p className="text-medium">{datapoint.value}</p>
       </td>
     </tr>
   );

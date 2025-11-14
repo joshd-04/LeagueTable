@@ -17,8 +17,7 @@ import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { User } from '@/util/definitions';
-import Paragraph from '../text/Paragraph';
-import Label from '../text/Label';
+
 import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 export default function RegistrationForm() {
@@ -127,10 +126,10 @@ export default function RegistrationForm() {
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1">
       <CardBody>
         <div>
-          <Paragraph className="font-medium">Welcome!</Paragraph>
-          <Label className="opacity-80 dark:opacity-70">
+          <p className="font-medium text-medium">Welcome!</p>
+          <p className="opacity-80 dark:opacity-70 text-small">
             Create an account to get started
-          </Label>
+          </p>
         </div>
         <Spacer y={4} />
         <Form

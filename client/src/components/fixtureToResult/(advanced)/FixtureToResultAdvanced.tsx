@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
-import Paragraph from '../../text/Paragraph';
+
 import { AnimatePresence, motion } from 'motion/react';
 import Button from '../../text/Button';
 import Subtitle from '../../text/Subtitle';
 import { Fixture } from '@/util/definitions';
-import Label from '../../text/Label';
+
 import InputField from '../../form/InputField';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -93,9 +93,9 @@ export default function FixtureToResultAdvanced({
                   )} 
               ${fixtureObj.awayTeamDetails.name}`}
             </Subtitle>
-            <Paragraph style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>
+            <p style={{ color: 'var(--text-muted)' }} className="text-medium">
               Fixture into result
-            </Paragraph>
+            </p>
           </div>
 
           <ResultFormAdvanced
@@ -189,9 +189,7 @@ function ResultFormAdvanced({
       <div className="max-h-[300px] min-h-[300px] overflow-auto ">
         <div className="flex flex-col gap-[8px] p-[8px] ">
           {matchStory.length === 0 ? (
-            <Label style={{ placeSelf: 'center', fontWeight: 'bold' }}>
-              No events
-            </Label>
+            <p className="place-self-center font-bold text-small">No events</p>
           ) : (
             matchStory.map((goal, i) => (
               <div
@@ -203,21 +201,15 @@ function ResultFormAdvanced({
                     goal.team === 'home' ? 'text-left' : 'text-right'
                   } `}
                 >
-                  <div>
-                    <Label style={{ fontWeight: 'bold', color: 'var(--text)' }}>
+                  <div className="text-small">
+                    <p className="font-bold ">
                       {goal.team === 'home'
                         ? fixture.homeTeamDetails.name
                         : fixture.awayTeamDetails.name}{' '}
                       ({calculateScore(i)})
-                    </Label>
-                    <Label style={{ color: 'var(--text' }}>
-                      ⚽ {goal.scorer}
-                    </Label>
-                    {goal.assist && (
-                      <Label style={{ color: 'var(--text' }}>
-                        👟 {goal.assist}
-                      </Label>
-                    )}
+                    </p>
+                    <p>⚽ {goal.scorer}</p>
+                    {goal.assist && <p>👟 {goal.assist}</p>}
                   </div>
                 </div>
                 <Button

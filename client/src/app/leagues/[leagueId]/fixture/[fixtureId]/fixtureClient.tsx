@@ -1,11 +1,10 @@
 'use client';
-import Paragraph from '@/components/text/Paragraph';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
 import { useContext, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
-import Label from '@/components/text/Label';
+
 import LinkButton from '@/components/text/LinkButton';
 import Button from '@/components/text/Button';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
@@ -50,8 +49,8 @@ export default function FixtureClient({
               fixture.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <Label style={{ color: 'var(--text)' }}>Home</Label>
-            <Label style={{ color: 'var(--text)' }}>Away</Label>
+            <p className="text-small">Home</p>
+            <p className="text-small">Away</p>
           </div>
           <div className="flex flex-row justify-between gap-[20px]">
             <LinkButton
@@ -82,9 +81,9 @@ export default function FixtureClient({
       </LeagueBanner>
       <div className="flex flex-col items-center gap-[20px] mx-[20px]">
         <div className="grid grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <Paragraph style={{ justifySelf: 'end' }}>
+          <p className="justify-self-end text-medium">
             Season {fixture.season} Matchweek {fixture.matchweek}
-          </Paragraph>
+          </p>
           <LinkButton
             color="var(--text)"
             bgHoverColor="var(--bg)"
@@ -94,12 +93,12 @@ export default function FixtureClient({
           >
             {league.name}
           </LinkButton>
-          <div className="flex flex-row items-center justify-start gap-12">
-            <Paragraph>
+          <div className="flex flex-row items-center justify-start gap-12 text-medium">
+            <p>
               {league.tables[fixture.division - 1].name} (div {fixture.division}
               )
-            </Paragraph>
-            {fixture.neutralGround && <Paragraph>Neutral Ground</Paragraph>}
+            </p>
+            {fixture.neutralGround && <p>Neutral Ground</p>}
             {userOwnsThisLeague && (
               <Button
                 color="var(--primary)"
@@ -115,7 +114,7 @@ export default function FixtureClient({
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <Paragraph style={{ color: 'var(--info)' }}>AI insights</Paragraph>
+            <p className="text-medium">AI insights</p>
           </div>
           <MatchPreview fixture={fixture} />
           <HeadToHead

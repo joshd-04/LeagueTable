@@ -1,12 +1,11 @@
 import TeamForm from '@/components/teamForm/TeamForm';
-import Paragraph from '@/components/text/Paragraph';
 import { Fixture } from '@/util/definitions';
 import ordinal from 'ordinal';
 
 export default function MatchPreview({ fixture }: { fixture: Fixture }) {
   return (
     <div className="p-[20px] h-full w-full col-span-1 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <Paragraph>Match preview</Paragraph>
+      <p className="text-medium">Match preview</p>
       <PreviewTable fixture={fixture} />
     </div>
   );
@@ -22,15 +21,15 @@ function PreviewTable({ fixture }: { fixture: Fixture }) {
       <thead>
         <tr>
           <th>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-medium text-right">
               {fixture.homeTeamDetails.name}
-            </Paragraph>
+            </p>
           </th>
           <th></th>
           <th>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-medium text-left">
               {fixture.awayTeamDetails.name}
-            </Paragraph>
+            </p>
           </th>
         </tr>
       </thead>
@@ -42,11 +41,12 @@ function PreviewTable({ fixture }: { fixture: Fixture }) {
             </div>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              style={{ color: 'var(--text-muted)' }}
+              className="text-center text-medium"
             >
               Form
-            </Paragraph>
+            </p>
           </td>
           <td>
             <div className="place-self-start">
@@ -56,136 +56,143 @@ function PreviewTable({ fixture }: { fixture: Fixture }) {
         </tr>
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {ordinal(fixture.homeTeamDetails.position)}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              style={{ color: 'var(--text-muted)' }}
+              className="text-center text-medium"
             >
               Position
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {ordinal(fixture.awayTeamDetails.position)}
-            </Paragraph>
+            </p>
           </td>
         </tr>
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              style={{ color: 'var(--text-muted)' }}
+              className="text-medium text-center"
             >
               Points
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws}
-            </Paragraph>
+            </p>
           </td>
         </tr>
 
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {fixture.homeTeamDetails.wins}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              className="text-center text-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Wins
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {fixture.awayTeamDetails.wins}
-            </Paragraph>
+            </p>
           </td>
         </tr>
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {fixture.homeTeamDetails.draws}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              className="text-center text-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Draws
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {fixture.awayTeamDetails.draws}
-            </Paragraph>
+            </p>
           </td>
         </tr>
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {fixture.homeTeamDetails.losses}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              className="text-center text-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Losses
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {fixture.awayTeamDetails.losses}
-            </Paragraph>
+            </p>
           </td>
         </tr>
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {fixture.homeTeamDetails.goalsFor}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              className="text-center text-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Goals scored
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {fixture.awayTeamDetails.goalsAgainst}
-            </Paragraph>
+            </p>
           </td>
         </tr>
         <tr>
           <td>
-            <Paragraph style={{ textAlign: 'right' }}>
+            <p className="text-right text-medium">
               {homeGD > 0 ? `+${homeGD}` : homeGD}
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph
-              style={{ textAlign: 'center', color: 'var(--text-muted)' }}
+            <p
+              className="text-center text-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Goal Diff
-            </Paragraph>
+            </p>
           </td>
           <td>
-            <Paragraph style={{ textAlign: 'left' }}>
+            <p className="text-left text-medium">
               {awayGD > 0 ? `+${awayGD}` : homeGD}
-            </Paragraph>
+            </p>
           </td>
         </tr>
       </tbody>

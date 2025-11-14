@@ -1,12 +1,11 @@
 import { NotificationInterface } from '@/util/definitions';
-import Paragraph from '../text/Paragraph';
 import InfoSVG from '@/assets/svg components/Info';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import WarningSVG from '@/assets/svg components/Warning';
 import ErrorSVG from '@/assets/svg components/Error';
 import SuccessSVG from '@/assets/svg components/Success';
-import Label from '../text/Label';
+
 import { useNotification } from '@/context/NotificationContextProvider';
 
 export default function Notification({
@@ -115,20 +114,17 @@ export default function Notification({
         >
           <span>
             {icon}{' '}
-            <Paragraph
+            <p
               style={{
                 color: colour,
-                display: 'inline',
-                verticalAlign: 'middle',
               }}
+              className="inline align-middle text-medium"
             >
               {title}
-            </Paragraph>
+            </p>
           </span>
           {notification.description !== undefined && (
-            <Label style={{ fontSize: '1rem', lineHeight: 1.25 }}>
-              {description}
-            </Label>
+            <p className="text-small ">{description}</p>
           )}
 
           <SwipeBackground color={colour} duration={notification.duration} />

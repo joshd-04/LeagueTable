@@ -1,5 +1,4 @@
 import TeamForm from '@/components/teamForm/TeamForm';
-import Paragraph from '@/components/text/Paragraph';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
@@ -75,15 +74,7 @@ export default function TableWidget({
     <Card className="p-[20px] col-span-2 row-span-2 h-full w-full  flex flex-col gap-1">
       <CardBody className="flex flex-col gap-2">
         <div className="flex flex-row justify-between w-full items-center">
-          <Paragraph
-            style={{
-              color: 'var(--text)',
-              verticalAlign: 'middle',
-              display: 'inline',
-            }}
-          >
-            Table
-          </Paragraph>
+          <p className="align-middle inline text-xl">Table</p>
           <Select
             className="max-w-xs"
             style={{ cursor: 'pointer' }}

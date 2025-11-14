@@ -24,8 +24,6 @@ import {
   NumberInput,
   Spacer,
 } from '@heroui/react';
-import Paragraph from '../text/Paragraph';
-import Label from '../text/Label';
 
 interface DivisionInputsInterface {
   tableName: string;
@@ -150,10 +148,10 @@ export default function AddTablesForm({
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1 ">
       <CardBody>
         <div>
-          <Paragraph className="font-medium">
+          <p className="font-medium text-medium">
             Division Setup: {leagueName}
-          </Paragraph>
-          <Label className="opacity-80 dark:opacity-70">Part 2 of 3</Label>
+          </p>
+          <p className="opacity-80 dark:opacity-70 text-small">Part 2 of 3</p>
         </div>
         <Spacer y={4} />
         <Form onSubmit={handleSubmit}>

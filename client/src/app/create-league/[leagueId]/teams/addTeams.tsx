@@ -1,8 +1,7 @@
 'use client';
 import InfoSVG from '@/assets/svg components/Info';
 import AddTeamsForm from '@/components/forms/AddTeamsForm';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { Card, CardBody } from '@heroui/react';
 
 export default function AddTeams({
@@ -21,7 +20,7 @@ export default function AddTeams({
         <Subtitle style={{ marginTop: '-10px', color: 'var(--text-muted)' }}>
           {leagueName} - Part 3 of 3
         </Subtitle> */}
-        <div className="grid grid-cols-3 grid-rows-1 w-[96vw] gap-[40px] pt-[40px]">
+        <div className="grid grid-cols-3 grid-rows-1 w-[96vw] gap-[40px] pt-[40px] relative">
           <div></div>
           {/* <AddTeamsFormOld divisions={divisions} leagueId={leagueId} /> */}
           <AddTeamsForm
@@ -38,26 +37,18 @@ export default function AddTeams({
 
 function ExtraInfo() {
   return (
-    <Card className="sticky top-20 self-start p-[20px] max-w-[80%] h-min w-fit  flex flex-col gap-2">
+    <Card className="sticky top-20  p-[20px] max-w-[80%] h-min w-fit  flex flex-col gap-2">
       <div className="absolute -bottom-28 -left-30 w-64 h-64 bg-primary rounded-full blur-xl opacity-30"></div>
       <div className="absolute top-0 -right-48 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardBody className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <span>
             <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
-            <Paragraph
-              style={{
-                color: 'var(--info)',
-                verticalAlign: 'middle',
-                display: 'inline',
-              }}
-            >
-              Team names
-            </Paragraph>
+            <p className="text-medium align-middle inline">Team names</p>
           </span>
-          <Label className="opacity-80 dark:opacity-70">
+          <p className="opacity-80 dark:opacity-70 text-small">
             Make sure the different team names are unique
-          </Label>
+          </p>
         </div>
       </CardBody>
     </Card>

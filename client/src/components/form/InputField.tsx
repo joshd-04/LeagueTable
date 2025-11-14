@@ -1,5 +1,4 @@
 import { HTMLInputTypeAttribute } from 'react';
-import Label from '../text/Label';
 
 interface InputFieldProps {
   type: HTMLInputTypeAttribute | undefined;
@@ -26,15 +25,14 @@ export default function InputField({
 
   options,
 }: InputFieldProps) {
-  // font details taken from <Paragraph />
   return (
     <div className="flex flex-col justify-baseline items-baseline w-full">
-      <Label style={{ fontWeight: 'bold' }}>
+      <p className="font-bold text-small">
         {options.label}
         {options.labelCaption && (
           <span className="font-normal"> - {options.labelCaption}</span>
         )}
-      </Label>
+      </p>
       <input
         type={type}
         required={required}
@@ -49,16 +47,12 @@ export default function InputField({
           }
         }}
       />
-      <Label
-        style={{
-          fontWeight: 'normal',
-          color: 'var(--danger)',
-          width: '100%',
-          opacity: error ? undefined : '0',
-        }}
+      <p
+        style={{ opacity: error ? undefined : '0' }}
+        className="font-normal text-danger w-full"
       >
         Error<span className="font-normal"> - {error}</span>
-      </Label>
+      </p>
     </div>
   );
 }

@@ -41,14 +41,6 @@
   }
 } */
 
-body {
-  /* background: var(--background);
-  color: var(--foreground); */
-  font-family: 'Instrument Sans';
-  /* background: var(--bg-dark); */
-  height: 100%;
-}
-
 @layer base {
   * {
     @apply transition-colors duration-250;
@@ -67,11 +59,10 @@ body {
   overflow-y: auto; /* Enable scroll on <body> */
   overflow-x: hidden;
   scrollbar-gutter: stable; /* Prevent layout shift */
+  font-family: 'Instrument Sans';
 }
 
 /* 2. Ensure sticky works */
 .sticky {
   position: sticky !important;
-  top: 0;
-  z-index: 50;
 }

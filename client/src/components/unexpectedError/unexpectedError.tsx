@@ -1,5 +1,4 @@
 import LinkButton from '../text/LinkButton';
-import Paragraph from '../text/Paragraph';
 import Subtitle from '../text/Subtitle';
 
 export default function UnexpectedError() {
@@ -16,24 +15,24 @@ export default function UnexpectedError() {
           >
             Oops! W&apos;ve run into a problem
           </Subtitle>
-          <Paragraph
+          <p
             style={{
-              fontSize: '1rem',
               color: 'var(--text-muted)',
             }}
+            className="text-medium"
           >
             Something unexpected happened.
-          </Paragraph>
+          </p>
           <hr className="text-[var(--text-muted)] my-[0.75rem]" />
           <div className="flex flex-col w-full gap-1">
-            <Paragraph
+            <p
               style={{
-                fontSize: '1rem',
                 color: 'var(--text-muted)',
               }}
+              className="text-medium"
             >
               Returning home should fix this
-            </Paragraph>
+            </p>
             <LinkButton
               href="/"
               color="var(--text-muted)"

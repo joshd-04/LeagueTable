@@ -1,5 +1,3 @@
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonSummaryStatsInterface } from '@/util/definitions';
@@ -28,15 +26,7 @@ export default function SeasonSummaryStats({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <span>
-        <Paragraph
-          style={{
-            color: 'var(--text)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Season stats
-        </Paragraph>
+        <p className="text-medium align-middle inline">Season stats</p>
       </span>
       {stats === undefined || isLoading ? (
         <SeasonSummarySkeleton />
@@ -51,69 +41,39 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
   return (
     <div className="flex flex-row flex-wrap justify-baseline flex-grow gap-x-[20px]">
       <span>
-        <Paragraph style={{ display: 'inline-block' }}>
-          {stats.goalsScored}
-        </Paragraph>{' '}
-        <Label
-          style={{
-            display: 'inline-block',
-          }}
-        >
+        <p className="inline-block text-medium">{stats.goalsScored}</p>{' '}
+        <p className="inline-block text-small">
           Goal{stats.goalsScored === 1 ? '' : 's'} Scored
-        </Label>
+        </p>
       </span>
       <span>
-        <Paragraph style={{ display: 'inline-block' }}>
-          {stats.cleansheets}
-        </Paragraph>{' '}
-        <Label
-          style={{
-            display: 'inline-block',
-          }}
-        >
+        <p className="inline-block text-medium">{stats.cleansheets}</p>{' '}
+        <p className="inline-block text-small">
           Cleansheet{stats.cleansheets === 1 ? '' : 's'}
-        </Label>
+        </p>
       </span>
       {stats.hattricks !== undefined && (
         <span>
-          <Paragraph style={{ display: 'inline-block' }}>
-            {stats.hattricks}
-          </Paragraph>{' '}
-          <Label
-            style={{
-              display: 'inline-block',
-            }}
-          >
+          <p className="inline-block text-medium">{stats.hattricks}</p>{' '}
+          <p className="inline-block text-small">
             Hattrick{stats.hattricks === 1 ? '' : 's'}
-          </Label>
+          </p>
         </span>
       )}
       {stats.ownGoals !== undefined && (
         <span>
-          <Paragraph style={{ display: 'inline-block' }}>
-            {stats.ownGoals}
-          </Paragraph>{' '}
-          <Label
-            style={{
-              display: 'inline-block',
-            }}
-          >
+          <p className="inline-block text-medium">{stats.ownGoals}</p>{' '}
+          <p className="inline-block text-small">
             Own goal{stats.ownGoals === 1 ? '' : 's'}
-          </Label>
+          </p>
         </span>
       )}
       {stats.soloGoals !== undefined && (
         <span>
-          <Paragraph style={{ display: 'inline-block' }}>
-            {stats.soloGoals}
-          </Paragraph>{' '}
-          <Label
-            style={{
-              display: 'inline-block',
-            }}
-          >
+          <p className="inline-block text-medium">{stats.soloGoals}</p>{' '}
+          <p className="inline-block text-small">
             Solo goal{stats.soloGoals === 1 ? '' : 's'}
-          </Label>
+          </p>
         </span>
       )}
     </div>

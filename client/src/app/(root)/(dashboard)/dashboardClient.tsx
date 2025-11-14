@@ -1,7 +1,6 @@
 'use client';
 import Heading3 from '@/components/text/Heading3';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import Subtitle from '@/components/text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import React, { Suspense, useContext, useEffect, useState } from 'react';
@@ -54,15 +53,17 @@ export default function DashboardClient({
 
   const currentHour = new Date().getHours();
   let welcomeMessage = 'Hey there';
-  if (currentHour < 5) {
+  if (currentHour >= 0 && currentHour < 5) {
     welcomeMessage = 'Hey there';
-  } else if (currentHour < 12) {
+  } else if (currentHour >= 5 && currentHour < 12) {
     welcomeMessage = 'Good Morning';
-  } else if (currentHour < 18) {
+  } else if (currentHour >= 12 && currentHour < 17) {
     welcomeMessage = 'Good Afternoon';
   } else {
     welcomeMessage = 'Good evening';
   }
+
+  console.log(currentHour);
 
   const { data: associatedLeaguesData, isLoading: associatedLeaguesIsLoading } =
     useQuery({
@@ -173,7 +174,7 @@ export default function DashboardClient({
           </>
         ) : (
           <>
-            <Tabs radius="md" color="default" variant="bordered">
+            <Tabs radius="md" color="default" variant="solid">
               <Tab
                 key="favourites"
                 title={`Favourites (${leagues.favourites.length})`}
@@ -218,7 +219,7 @@ export default function DashboardClient({
 function LeagueSectionSkeleton({ title }: { title: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <Paragraph>{title}</Paragraph>
+      <p className="text-medium">{title}</p>
       <div className=" animate-pulse">
         <NoLeaguesFound>
           <i>Loading...</i>
@@ -250,9 +251,9 @@ function LeagueSection({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <Paragraph>
+      <p className="text-medium">
         {title} ({leaguesList.length})
-      </Paragraph>
+      </p>
       {leaguesList.length > 0 ? (
         leaguesList.map((league, i) => (
           <Suspense
@@ -342,18 +343,18 @@ function LeagueRow({
       <div className="flex flex-col justify-center items-start">
         <Subtitle>{league.name}</Subtitle>
         <div className="flex flex-row w-full justify-start items-center gap-[40px]">
-          <Label style={{ fontWeight: 'bold' }}>{league.owner.name}</Label>
-          <Label style={{ fontWeight: 'bold' }}>
+          <p className="font-bold text-small">{league.owner.name}</p>
+          <p className="font-bold text-small">
             {league.actions?.length > 0 ? (
               <span className="text-[var(--warning)]">action required</span>
             ) : (
               `Season ${league.currentSeason} matchweek ${league.currentMatchweek}`
             )}
-          </Label>
-          <Label style={{ fontWeight: 'bold' }}>
+          </p>
+          <p className="font-bold text-small">
             {league.numDivisions} division{league.numDivisions > 1 ? 's' : ''}
-          </Label>
-          <Label style={{ fontWeight: 'bold' }}>{league.numTeams} teams</Label>
+          </p>
+          <p className="font-bold text-small">{league.numTeams} teams</p>
         </div>
       </div>
     </motion.button>
@@ -363,7 +364,9 @@ function LeagueRow({
 function NoLeaguesFound({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full h-[80px] bg-[var(--bg)] rounded-[10px] flex flex-col justify-center items-start px-[20px] py-[10px]  border-1 border-solid border-[var(--border)] ">
-      <Paragraph style={{ color: 'var(--text-muted)' }}>{children}</Paragraph>
+      <p style={{ color: 'var(--text-muted)' }} className="text-medium">
+        {children}
+      </p>
     </div>
   );
 }

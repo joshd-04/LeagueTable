@@ -1,8 +1,7 @@
 import ArrowBackSVG from '@/assets/svg components/ArrowBack';
 import ArrowForwardSVG from '@/assets/svg components/ArrowForward';
 import Button from '@/components/text/Button';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { League } from '@/util/definitions';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -34,15 +33,7 @@ export default function SeasonRewind({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col">
       <div className="flex flex-row justify-between items-start">
-        <Paragraph
-          style={{
-            color: 'var(--text)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Season rewind
-        </Paragraph>
+        <p className="align-middle inline text-medium">Season rewind</p>
         {seasonViewing === league.currentSeason ? (
           <Button
             color="transparent"
@@ -57,17 +48,9 @@ export default function SeasonRewind({
             onClick={() => {}}
             disabled
           >
-            <Label
-              style={{
-                backgroundColor: 'var(--border)',
-                height: 'min-content',
-                padding: '0 8px',
-                borderRadius: '10px',
-                fontWeight: 'bold',
-              }}
-            >
+            <p className="bg-divider h-min px-[8px] rounded-[10px] font-bold text-small">
               OFF
-            </Label>
+            </p>
           </Button>
         ) : (
           <Button
@@ -82,22 +65,15 @@ export default function SeasonRewind({
             underlineEffect={false}
             onClick={() => resetSeason()}
           >
-            <Label
-              style={{
-                backgroundColor: 'var(--success)',
-                color: 'black',
-                height: 'min-content',
-                padding: '0 8px',
-                borderRadius: '10px',
-                fontWeight: 'bold',
-              }}
-            >
+            <p className="text-black bg-success h-min px-[8px] rounded-[10px] font-bold text-small">
               ON
-            </Label>
+            </p>
           </Button>
         )}
       </div>
-      <Label>View results, tables & stats from previous seasons</Label>
+      <p className="text-small">
+        View results, tables & stats from previous seasons
+      </p>
       <div className="my-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center shadow-[var(--shadow)]">
         <Button
           color="transparent"
@@ -115,19 +91,17 @@ export default function SeasonRewind({
             }}
           />
         </Button>
-        <Paragraph
+        <p
           style={{
-            margin: '0 10px',
             color:
               seasonViewing === league.currentSeason
                 ? 'var(--text-muted)'
                 : 'var(--text)',
-            padding: '0 10px',
-            borderRadius: '10px',
           }}
+          className="mx-[10px] px-[10px] rounded-[10px] text-medium"
         >
           Season {seasonViewing}
-        </Paragraph>
+        </p>
         <Button
           color="transparent"
           bgHoverColor="var(--accent)"
@@ -148,11 +122,11 @@ export default function SeasonRewind({
           />
         </Button>
       </div>
-      <Label>
+      <p className="text-small">
         {league.currentSeason === seasonViewing
           ? `You are viewing the current season`
           : `${league.name} is currently on season ${league.currentSeason}`}
-      </Label>
+      </p>
     </div>
   );
 }

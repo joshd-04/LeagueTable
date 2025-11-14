@@ -1,7 +1,6 @@
 import EditSVG from '@/assets/svg components/Edit';
 import Button from '@/components/text/Button';
-import Label from '@/components/text/Label';
-import Paragraph from '@/components/text/Paragraph';
+
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -83,15 +82,7 @@ export default function Announcement({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <div className="flex flex-row justify-between">
-        <Paragraph
-          style={{
-            color: 'var(--text)',
-            verticalAlign: 'middle',
-            display: 'inline',
-          }}
-        >
-          Latest Announcement
-        </Paragraph>
+        <p className="align-middle inline text-medium">Latest Announcement</p>
         {userOwnsThisLeague && !isEditingAnnouncement && (
           <Button
             color="transparent"
@@ -113,34 +104,21 @@ export default function Announcement({
       {!isEditingAnnouncement &&
         (league.announcement && league.announcement.text.length > 0 ? (
           <div className="flex flex-col justify-between grow-1">
-            <Label>{announcement.text}</Label>
+            <p className="text-small">{announcement.text}</p>
             <div className="flex flex-row">
-              <Label>
+              <p className="text-small">
                 {new Date(announcement.date).toLocaleTimeString(undefined, {
                   timeStyle: 'short',
                 })}{' '}
                 • {new Date(announcement.date).toLocaleDateString()}
-              </Label>
+              </p>
             </div>
           </div>
         ) : (
-          <Label
-            style={{
-              fontStyle: 'italic',
-            }}
-          >
-            No announcements yet
-          </Label>
+          <p className="text-small italic">No announcements yet</p>
         ))}
       {isEditingAnnouncement && (
-        <Label
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            flexGrow: '1',
-            color: 'var(--text)',
-          }}
-        >
+        <p className="flex flex-col grow text-small">
           <TextAreaComponent
             announcement={announcement}
             announcementEditingText={announcementEditingText}
@@ -148,7 +126,7 @@ export default function Announcement({
             setIsEditingAnnouncement={setIsEditingAnnouncement}
             handleEditAnnouncement={handleEditAnnouncement}
           />
-        </Label>
+        </p>
       )}
     </div>
   );

@@ -1,8 +1,7 @@
 'use client';
-import Paragraph from '@/components/text/Paragraph';
 import { Result, League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
-import Label from '@/components/text/Label';
+
 import LinkButton from '@/components/text/LinkButton';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import Subtitle from '@/components/text/Subtitle';
@@ -37,9 +36,9 @@ export default function ResultsClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <Paragraph style={{ justifySelf: 'end' }}>
+          <p className="justify-self-end text-medium">
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
-          </Paragraph>
+          </p>
           <LinkButton
             color="var(--text)"
             bgHoverColor="var(--bg)"
@@ -49,7 +48,10 @@ export default function ResultsClient({
           >
             {league.name}
           </LinkButton>
-          <Paragraph style={{ justifySelf: 'start' }}>
+          <p
+            style={{ justifySelf: 'start' }}
+            className="justify-self-start text-medium"
+          >
             <select
               className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
               value={sort}
@@ -68,7 +70,7 @@ export default function ResultsClient({
               <option value="matchweek">Matchweek</option>
               <option value="most recent">Most recent</option>
             </select>
-          </Paragraph>
+          </p>
         </div>
       </div>
       <div className="w-[50%] place-self-center">
@@ -111,16 +113,9 @@ function ResultRow({
         <Subtitle>{result.homeTeamDetails.name}</Subtitle>
         <Subtitle>{homeGoals}</Subtitle>
       </div>
-      <Label
-        style={{
-          fontWeight: 'bold',
-          textAlign: 'center',
-          alignItems: 'baseline',
-          verticalAlign: 'middle',
-        }}
-      >
+      <p className="font-bold text-center items-baseline align-middle text-small">
         -
-      </Label>
+      </p>
 
       <div className="grid grid-rows-1 grid-cols-[3ch_1fr] gap-[20px] items-baseline">
         <Subtitle>{awayGoals}</Subtitle>
@@ -172,15 +167,9 @@ function ResultsByMostRecent({
     return (
       <div className="flex flex-col gap-[20px]">
         <div>
-          <Label
-            style={{
-              fontWeight: 'bold',
-              marginBottom: '10px',
-              placeSelf: 'center',
-            }}
-          >
+          <p className="font-bold mb-[10px] place-self-center text-small">
             Results loading...
-          </Label>
+          </p>
           <div className="flex flex-col gap-[10px]"></div>
         </div>
       </div>
@@ -191,16 +180,10 @@ function ResultsByMostRecent({
     <div className="flex flex-col gap-[20px]">
       {organisedResults.map((data, i) => (
         <div key={i}>
-          <Label
-            style={{
-              fontWeight: 'bold',
-              marginBottom: '10px',
-              placeSelf: 'center',
-            }}
-          >
+          <p className="font-bold mb-[10px] place-self-center text-small">
             Matchweek {data.matchweek}{' '}
             {+data.matchweek > league.currentMatchweek && '(future)'}
-          </Label>
+          </p>
           <div className="flex flex-col gap-[10px]">
             {data.results.map((result, i) => (
               <ResultRow result={result} key={i} handleClick={handleClick} />
@@ -261,16 +244,10 @@ function ResultsByMatchweek({
   return (
     <div className="flex flex-col gap-[20px]">
       <div>
-        <Label
-          style={{
-            fontWeight: 'bold',
-            marginBottom: '10px',
-            placeSelf: 'center',
-          }}
-        >
+        <p className="text-small font-bold mb-[10px] place-self-center">
           Matchweek {matchweekViewing}{' '}
           {+matchweekViewing > league.currentMatchweek && '(future)'}
-        </Label>
+        </p>
 
         <div className="flex flex-col gap-[10px]">
           {displayedResults.map((result, i) => (

@@ -11,7 +11,6 @@ import Button from '@/components/text/Button';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import ArrowBackSVG from '@/assets/svg components/ArrowBack';
 import ArrowForwardSVG from '@/assets/svg components/ArrowForward';
-import Paragraph from '../text/Paragraph';
 export default function Pagination({
   page,
   setPage,
@@ -199,7 +198,7 @@ export default function Pagination({
             }}
             className="h-full"
           >
-            <Paragraph style={{ width: '100%', height: '100%' }}>
+            <p className="w-full h-full text-medium">
               {isTyping ? (
                 <input
                   className="w-[4ch] h-full outline-none px-2 text-center align-middle
@@ -228,7 +227,7 @@ export default function Pagination({
                   {page}
                 </Button>
               )}
-            </Paragraph>
+            </p>
           </form>
         </div>
 
