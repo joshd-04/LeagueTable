@@ -26,7 +26,7 @@ export default function SeasonSummaryStats({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <span>
-        <p className="text-medium align-middle inline">Season stats</p>
+        <p className="text-md align-middle inline">Season stats</p>
       </span>
       {stats === undefined || isLoading ? (
         <SeasonSummarySkeleton />
@@ -41,37 +41,37 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
   return (
     <div className="flex flex-row flex-wrap justify-baseline flex-grow gap-x-[20px]">
       <span>
-        <p className="inline-block text-medium">{stats.goalsScored}</p>{' '}
-        <p className="inline-block text-small">
+        <p className="inline-block text-md">{stats.goalsScored}</p>{' '}
+        <p className="inline-block text-sm">
           Goal{stats.goalsScored === 1 ? '' : 's'} Scored
         </p>
       </span>
       <span>
-        <p className="inline-block text-medium">{stats.cleansheets}</p>{' '}
-        <p className="inline-block text-small">
+        <p className="inline-block text-md">{stats.cleansheets}</p>{' '}
+        <p className="inline-block text-sm">
           Cleansheet{stats.cleansheets === 1 ? '' : 's'}
         </p>
       </span>
       {stats.hattricks !== undefined && (
         <span>
-          <p className="inline-block text-medium">{stats.hattricks}</p>{' '}
-          <p className="inline-block text-small">
+          <p className="inline-block text-md">{stats.hattricks}</p>{' '}
+          <p className="inline-block text-sm">
             Hattrick{stats.hattricks === 1 ? '' : 's'}
           </p>
         </span>
       )}
       {stats.ownGoals !== undefined && (
         <span>
-          <p className="inline-block text-medium">{stats.ownGoals}</p>{' '}
-          <p className="inline-block text-small">
+          <p className="inline-block text-md">{stats.ownGoals}</p>{' '}
+          <p className="inline-block text-sm">
             Own goal{stats.ownGoals === 1 ? '' : 's'}
           </p>
         </span>
       )}
       {stats.soloGoals !== undefined && (
         <span>
-          <p className="inline-block text-medium">{stats.soloGoals}</p>{' '}
-          <p className="inline-block text-small">
+          <p className="inline-block text-md">{stats.soloGoals}</p>{' '}
+          <p className="inline-block text-sm">
             Solo goal{stats.soloGoals === 1 ? '' : 's'}
           </p>
         </span>

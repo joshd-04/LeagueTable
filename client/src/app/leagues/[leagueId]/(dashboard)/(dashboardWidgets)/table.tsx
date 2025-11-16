@@ -121,6 +121,12 @@ function TableComponent({
   isLoading: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }) {
+  // CONFIG
+  const isStriped = true;
+  const isHeaderSticky = true;
+  const showIndicator = true;
+  const highlightBackground = true;
+
   const table = league.tables[divisionViewing - 1];
 
   const [rows, setRows] = useState<TableRow[]>([]);
@@ -129,11 +135,7 @@ function TableComponent({
     direction: 'descending',
   });
 
-  // CONFIG
-  const isStriped = true;
-  const isHeaderSticky = true;
-  const showIndicator = true;
-  const highlightBackground = true;
+  const isSortedByPosition = sortDescriptor.column === 'position';
 
   interface TableColumn {
     key: string;
@@ -289,7 +291,7 @@ function TableComponent({
           wrapper: `border-none shadow-none drop-shadow-none outline-none px-0`,
           tr: `
       ${
-        highlightBackground
+        highlightBackground && isSortedByPosition
           ? `data-[zone=promotion]:bg-[var(--success)]/20
       data-[zone=relegation]:bg-[var(--danger)]/20
       data-[zone=none]:bg-transparent
@@ -299,7 +301,7 @@ function TableComponent({
       }
       
       ${
-        showIndicator
+        showIndicator && isSortedByPosition
           ? `data-[zone=promotion]:border-l-4 data-[zone=promotion]:border-l-[var(--success)]
       data-[zone=relegation]:border-l-4 data-[zone=relegation]:border-l-[var(--danger)]
       data-[zone=none]:border-l-0`

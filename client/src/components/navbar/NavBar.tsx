@@ -61,11 +61,7 @@ export default function NavBar() {
       {pathname === '/' && !isLoggedIn && (
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
-            <Link
-              color="foreground"
-              href="#"
-              className="font-semibold text-medium"
-            >
+            <Link color="foreground" href="#" className="font-semibold text-md">
               Features
             </Link>
           </NavbarItem>
@@ -73,17 +69,13 @@ export default function NavBar() {
             <Link
               aria-current="page"
               href="#"
-              className="font-semibold text-medium"
+              className="font-semibold text-md"
             >
               Use cases
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link
-              color="foreground"
-              href="#"
-              className="font-semibold text-medium"
-            >
+            <Link color="foreground" href="#" className="font-semibold text-md">
               FAQ
             </Link>
           </NavbarItem>
@@ -100,7 +92,7 @@ export default function NavBar() {
               href="/login"
               as={Link}
               color="secondary"
-              className="font-semibold text-small"
+              className="font-semibold text-sm"
               variant="light"
             >
               Log In
@@ -112,7 +104,7 @@ export default function NavBar() {
               color="primary"
               href="/register"
               variant="shadow"
-              className="font-semibold text-small"
+              className="font-semibold text-sm"
             >
               Sign Up
             </Button>
@@ -158,6 +150,14 @@ export default function NavBar() {
                 >
                   <p className="font-semibold">Signed in as</p>
                   <p className="font-semibold">{user?.email}</p>
+                </DropdownItem>
+                <DropdownItem key="reportbug" textValue="Report a bug">
+                  Upgrade to PRO
+                </DropdownItem>
+              </DropdownSection>
+              <DropdownSection showDivider>
+                <DropdownItem key="reportbug" textValue="Report a bug">
+                  Report a bug
                 </DropdownItem>
               </DropdownSection>
               <DropdownSection>

@@ -87,7 +87,7 @@ export default function FixturesClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="text-medium justify-self-end">
+          <p className="text-md justify-self-end">
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
           </p>
           <LinkButton
@@ -99,7 +99,7 @@ export default function FixturesClient({
           >
             {league.name}
           </LinkButton>
-          <p className="text-medium justify-self-start">
+          <p className="text-md justify-self-start">
             <select
               className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
               value={divisionFilter}
@@ -120,7 +120,7 @@ export default function FixturesClient({
       <div className="w-[50%] place-self-center">
         <div className="flex flex-col gap-[20px]">
           <div>
-            <p className="font-bold mb-[10px] place-self-center text-small">
+            <p className="font-bold mb-[10px] place-self-center text-sm">
               Matchweek {matchweekViewing}{' '}
               {+matchweekViewing > league.currentMatchweek && '(future)'}
             </p>
@@ -170,10 +170,7 @@ function FixtureRow({
     >
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
-        <p
-          style={{ color: 'var(--text-muted)' }}
-          className="inline text-medium"
-        >
+        <p className="inline text-md text-muted">
           {homePoints} pt{homePoints === 1 ? '' : 's'}
         </p>
         <Subtitle
@@ -189,7 +186,7 @@ function FixtureRow({
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
-      <p className="font-bold text-center text-small">vs</p>
+      <p className="font-bold text-center text-sm">vs</p>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
         <Subtitle
@@ -202,10 +199,7 @@ function FixtureRow({
         >
           {fixture.awayTeamDetails.name}
         </Subtitle>
-        <p
-          style={{ color: 'var(--text-muted)' }}
-          className="inline text-medium"
-        >
+        <p className="inline text-md text-muted">
           {awayPoints} pt{awayPoints === 1 ? '' : 's'}
         </p>
         <TeamForm form={fixture.awayTeamDetails.form} />
@@ -223,15 +217,11 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
     <div className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline brightness-80">
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
-        <p
-          style={{ color: 'var(--text-muted)' }}
-          className="text-medium inline"
-        >
+        <p className="text-md inline text-muted">
           {homePoints} pt{homePoints === 1 ? '' : 's'}
         </p>
         <Subtitle
           style={{
-            color: 'var(--text-muted)',
             textAlign: 'right',
             textWrap: 'nowrap',
             textOverflow: 'ellipsis',
@@ -239,28 +229,26 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
             overflow: 'hidden',
             width: '100%',
           }}
+          className=" text-muted"
         >
           {fixture.homeTeamDetails.name}
         </Subtitle>
       </div>
-      <p className="font-bold text-center text-small">vs</p>
+      <p className="font-bold text-center text-sm">vs</p>
 
       <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
         <Subtitle
           style={{
-            color: 'var(--text-muted)',
             textWrap: 'nowrap',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
           }}
+          className=" text-muted"
         >
           {fixture.awayTeamDetails.name}
         </Subtitle>
-        <p
-          style={{ color: 'var(--text-muted)' }}
-          className="inline text-medium"
-        >
+        <p className="inline text-md text-muted">
           {awayPoints} pt{awayPoints === 1 ? '' : 's'}
         </p>
         <TeamForm form={fixture.awayTeamDetails.form} />

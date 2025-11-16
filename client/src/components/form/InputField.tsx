@@ -27,7 +27,7 @@ export default function InputField({
 }: InputFieldProps) {
   return (
     <div className="flex flex-col justify-baseline items-baseline w-full">
-      <p className="font-bold text-small">
+      <p className="font-bold text-sm">
         {options.label}
         {options.labelCaption && (
           <span className="font-normal"> - {options.labelCaption}</span>
@@ -36,7 +36,7 @@ export default function InputField({
       <input
         type={type}
         required={required}
-        className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-[var(--text-muted)] outline-none border-[var(--border)]/50 border-2 w-full 
+        className="bg-[var(--bg-light)] rounded-[10px] px-[16px] py-[8px] font-[family-name:var(--font-instrument-sans)] font-normal text-[1rem] md:text-[1.125rem] xl:text-[1.25rem] text-[var(--text)] placeholder:text-muted outline-none border-[var(--border)]/50 border-2 w-full 
         "
         placeholder={options.placeholder}
         value={value}

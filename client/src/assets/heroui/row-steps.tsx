@@ -195,7 +195,7 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
                       <m.div animate={status} className="relative">
                         <m.div
                           className={cn(
-                            'border-medium text-large text-default-foreground relative flex h-[34px] w-[34px] items-center justify-center rounded-full font-semibold',
+                            'border-medium text-lg text-default-foreground relative flex h-[34px] w-[34px] items-center justify-center rounded-full font-semibold',
                             {
                               'shadow-lg': status === 'complete',
                             }
@@ -234,7 +234,7 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
                   <div className="max-w-full flex-1 text-start">
                     <div
                       className={cn(
-                        'text-small text-default-foreground lg:text-medium font-medium transition-[color,opacity] duration-300 group-active:opacity-80',
+                        'text-sm text-default-foreground lg:text-md font-medium transition-[color,opacity] duration-300 group-active:opacity-80',
                         {
                           'text-default-500': status === 'inactive',
                         }

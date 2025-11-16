@@ -93,9 +93,7 @@ export default function FixtureToResultAdvanced({
                   )} 
               ${fixtureObj.awayTeamDetails.name}`}
             </Subtitle>
-            <p style={{ color: 'var(--text-muted)' }} className="text-medium">
-              Fixture into result
-            </p>
+            <p className="text-md text-muted">Fixture into result</p>
           </div>
 
           <ResultFormAdvanced
@@ -189,7 +187,7 @@ function ResultFormAdvanced({
       <div className="max-h-[300px] min-h-[300px] overflow-auto ">
         <div className="flex flex-col gap-[8px] p-[8px] ">
           {matchStory.length === 0 ? (
-            <p className="place-self-center font-bold text-small">No events</p>
+            <p className="place-self-center font-bold text-sm">No events</p>
           ) : (
             matchStory.map((goal, i) => (
               <div
@@ -201,7 +199,7 @@ function ResultFormAdvanced({
                     goal.team === 'home' ? 'text-left' : 'text-right'
                   } `}
                 >
-                  <div className="text-small">
+                  <div className="text-sm">
                     <p className="font-bold ">
                       {goal.team === 'home'
                         ? fixture.homeTeamDetails.name

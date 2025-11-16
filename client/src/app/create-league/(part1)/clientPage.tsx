@@ -50,17 +50,17 @@ function ExtraInfo() {
                 verticalAlign: 'middle',
                 display: 'inline',
               }}
-              className="text-large"
+              className="text-lg"
             >
               League type
             </p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-small">
+          <p className="opacity-80 dark:opacity-70 text-sm">
             Basic leagues are simplified for a more streamlined experience.
             Advanced leagues contain more features & stats. <br /> Currently
             advanced leagues offer:
           </p>
-          <ul className="list-disc pl-[20px] opacity-80 dark:opacity-70 text-small">
+          <ul className="list-disc pl-[20px] opacity-80 dark:opacity-70 text-sm">
             <li className="">
               <p>Goal scorers</p>
             </li>

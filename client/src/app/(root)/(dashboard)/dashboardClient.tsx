@@ -3,7 +3,7 @@ import Heading3 from '@/components/text/Heading3';
 
 import Subtitle from '@/components/text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import React, { Suspense, useContext, useEffect, useState } from 'react';
+import React, { Key, Suspense, useContext, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { LeagueInterface } from './dashboard';
@@ -13,7 +13,7 @@ import { API_URL } from '@/util/config';
 import FavouriteSVG from '@/assets/svg components/Favourite';
 import FavouritedSVG from '@/assets/svg components/Favourited';
 import { useQuery } from '@tanstack/react-query';
-import { Tab, Tabs } from '@heroui/react';
+import { Chip, Tab, Tabs } from '@heroui/react';
 
 interface LeaguesInterface {
   created: LeagueInterface[];
@@ -51,6 +51,9 @@ export default function DashboardClient({
     following: leagues.following.map((l) => l._id),
   };
 
+  const [selectedLeagueTab, setSelectedLeagueTab] =
+    useState<string>('favourites');
+
   const currentHour = new Date().getHours();
   let welcomeMessage = 'Hey there';
   if (currentHour >= 0 && currentHour < 5) {
@@ -62,8 +65,6 @@ export default function DashboardClient({
   } else {
     welcomeMessage = 'Good evening';
   }
-
-  console.log(currentHour);
 
   const { data: associatedLeaguesData, isLoading: associatedLeaguesIsLoading } =
     useQuery({
@@ -166,51 +167,110 @@ export default function DashboardClient({
         <Heading3>
           {welcomeMessage}, {user?.username}
         </Heading3>
-        {associatedLeaguesIsLoading ? (
-          <>
-            <LeagueSectionSkeleton title="Favourite Leagues" />
-            <LeagueSectionSkeleton title="Your Leagues" />
-            <LeagueSectionSkeleton title="Bookmarked Leagues" />
-          </>
-        ) : (
-          <>
-            <Tabs radius="md" color="default" variant="solid">
-              <Tab
-                key="favourites"
-                title={`Favourites (${leagues.favourites.length})`}
+        <div>
+          {associatedLeaguesIsLoading ? (
+            <>
+              <LeagueSectionSkeleton title="Favourite Leagues" />
+              <LeagueSectionSkeleton title="Your Leagues" />
+              <LeagueSectionSkeleton title="Bookmarked Leagues" />
+            </>
+          ) : (
+            <>
+              <Tabs
+                radius="md"
+                color="primary"
+                variant="solid"
+                selectedKey={selectedLeagueTab}
+                onSelectionChange={(key) => setSelectedLeagueTab(String(key))}
               >
-                <LeagueSection
-                  simplifiedLeagues={simplifiedLeagues}
-                  title="Favourite Leagues"
-                  leaguesList={leagues.favourites}
-                  handleClick={handleClick}
-                  handleFavClick={handleFavClick}
-                />
-              </Tab>
-              <Tab key="yours" title={`Yours (${leagues.created.length})`}>
-                <LeagueSection
-                  simplifiedLeagues={simplifiedLeagues}
-                  title="Your Leagues"
-                  leaguesList={leagues.created}
-                  handleClick={handleClick}
-                  handleFavClick={handleFavClick}
-                />
-              </Tab>
-              <Tab
-                key="bookmarks"
-                title={`Bookmarks (${leagues.following.length})`}
-              >
-                <LeagueSection
-                  simplifiedLeagues={simplifiedLeagues}
-                  title="Bookmarked Leagues"
-                  leaguesList={leagues.following}
-                  handleClick={handleClick}
-                  handleFavClick={handleFavClick}
-                />
-              </Tab>
-            </Tabs>
-          </>
-        )}
+                <Tab
+                  key="favourites"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Favourites</span>
+                      <Chip
+                        variant="solid"
+                        radius="full"
+                        size="sm"
+                        className={
+                          selectedLeagueTab === 'favourites'
+                            ? 'bg-foreground text-primary'
+                            : ''
+                        }
+                      >
+                        {leagues.favourites.length}
+                      </Chip>
+                    </div>
+                  }
+                >
+                  <LeagueSection
+                    simplifiedLeagues={simplifiedLeagues}
+                    title="Favourite Leagues"
+                    leaguesList={leagues.favourites}
+                    handleClick={handleClick}
+                    handleFavClick={handleFavClick}
+                  />
+                </Tab>
+                <Tab
+                  key="yours"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Yours</span>
+                      <Chip
+                        variant="solid"
+                        radius="full"
+                        size="sm"
+                        className={
+                          selectedLeagueTab === 'yours'
+                            ? 'bg-foreground text-primary'
+                            : ''
+                        }
+                      >
+                        {leagues.created.length}
+                      </Chip>
+                    </div>
+                  }
+                >
+                  <LeagueSection
+                    simplifiedLeagues={simplifiedLeagues}
+                    title="Your Leagues"
+                    leaguesList={leagues.created}
+                    handleClick={handleClick}
+                    handleFavClick={handleFavClick}
+                  />
+                </Tab>
+                <Tab
+                  key="bookmarks"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Bookmarks</span>
+                      <Chip
+                        variant="solid"
+                        radius="full"
+                        size="sm"
+                        className={
+                          selectedLeagueTab === 'bookmarks'
+                            ? 'bg-foreground text-primary'
+                            : ''
+                        }
+                      >
+                        {leagues.following.length}
+                      </Chip>
+                    </div>
+                  }
+                >
+                  <LeagueSection
+                    simplifiedLeagues={simplifiedLeagues}
+                    title="Bookmarked Leagues"
+                    leaguesList={leagues.following}
+                    handleClick={handleClick}
+                    handleFavClick={handleFavClick}
+                  />
+                </Tab>
+              </Tabs>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -219,7 +279,7 @@ export default function DashboardClient({
 function LeagueSectionSkeleton({ title }: { title: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-medium">{title}</p>
+      <p className="text-md">{title}</p>
       <div className=" animate-pulse">
         <NoLeaguesFound>
           <i>Loading...</i>
@@ -251,9 +311,12 @@ function LeagueSection({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-medium">
-        {title} ({leaguesList.length})
-      </p>
+      {/* <div className="flex flex-row gap-2">
+        <p className="text-md">{title}</p>
+        <Chip variant="solid" radius="full" size="sm">
+          {leaguesList.length}
+        </Chip>
+      </div> */}
       {leaguesList.length > 0 ? (
         leaguesList.map((league, i) => (
           <Suspense
@@ -343,18 +406,18 @@ function LeagueRow({
       <div className="flex flex-col justify-center items-start">
         <Subtitle>{league.name}</Subtitle>
         <div className="flex flex-row w-full justify-start items-center gap-[40px]">
-          <p className="font-bold text-small">{league.owner.name}</p>
-          <p className="font-bold text-small">
+          <p className="font-bold text-sm">{league.owner.name}</p>
+          <p className="font-bold text-sm">
             {league.actions?.length > 0 ? (
               <span className="text-[var(--warning)]">action required</span>
             ) : (
               `Season ${league.currentSeason} matchweek ${league.currentMatchweek}`
             )}
           </p>
-          <p className="font-bold text-small">
+          <p className="font-bold text-sm">
             {league.numDivisions} division{league.numDivisions > 1 ? 's' : ''}
           </p>
-          <p className="font-bold text-small">{league.numTeams} teams</p>
+          <p className="font-bold text-sm">{league.numTeams} teams</p>
         </div>
       </div>
     </motion.button>
@@ -364,9 +427,7 @@ function LeagueRow({
 function NoLeaguesFound({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full h-[80px] bg-[var(--bg)] rounded-[10px] flex flex-col justify-center items-start px-[20px] py-[10px]  border-1 border-solid border-[var(--border)] ">
-      <p style={{ color: 'var(--text-muted)' }} className="text-medium">
-        {children}
-      </p>
+      <p className="text-md text-muted">{children}</p>
     </div>
   );
 }

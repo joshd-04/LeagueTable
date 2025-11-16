@@ -44,6 +44,8 @@ export default function SetupIncomplete({
 
   */
 
+  const { isLoggedIn } = useAccount();
+
   if (userOwnsThisLeague) {
     return (
       <CardWhenOwner
@@ -53,7 +55,8 @@ export default function SetupIncomplete({
       />
     );
   } else {
-    return bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete ? (
+    return bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete &&
+      isLoggedIn ? (
       <CardWhenNotOwnerButtons leagueName={leagueName} leagueId={leagueId} />
     ) : (
       <CardWhenNotOwner leagueName={leagueName} />
@@ -76,15 +79,13 @@ function CardWhenOwner({
       <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <p className="text-large font-medium">{leagueName}</p>
+          <p className="text-md font-medium">{leagueName}</p>
         </div>
       </CardHeader>
       <CardBody>
-        <div className="flex flex-col gap-2 px-2">
-          <p className="text-large font-medium text-warning">
-            Setup incomplete
-          </p>
-          <p className="text-small opacity-80 dark:opacity-70">
+        <div className="flex flex-col gap-2 ">
+          <p className="text-lg font-medium text-warning">Setup incomplete</p>
+          <p className="text-sm opacity-80 dark:opacity-70">
             Finish setting up your league before you can start using it.
           </p>
           <Checkbox isDisabled defaultSelected>
@@ -130,15 +131,15 @@ function CardWhenNotOwner({ leagueName }: { leagueName: string }) {
       <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <p className="text-large font-medium">{leagueName}</p>
+          <p className="text-lg font-medium">{leagueName}</p>
         </div>
       </CardHeader>
       <CardBody>
-        <div className="flex flex-col gap-2 px-2">
-          <p className="text-large font-medium text-primary">
+        <div className="flex flex-col gap-2">
+          <p className="text-lg font-medium text-primary">
             Waiting for final touches
           </p>
-          <p className="text-small opacity-80 dark:opacity-70">
+          <p className="text-sm opacity-80 dark:opacity-70">
             <em>{leagueName}</em> still needs to be finished setting up by the
             league owner. Check back later.
           </p>
@@ -155,7 +156,6 @@ function CardWhenNotOwnerButtons({
   leagueName: string;
   leagueId: string;
 }) {
-  const { isLoggedIn } = useAccount();
   async function addToFavourites() {
     const response = await fetchAPI(`${API_URL}/users/favourites`, {
       method: 'PATCH',
@@ -201,22 +201,22 @@ function CardWhenNotOwnerButtons({
       <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <p className="text-large font-medium">{leagueName}</p>
+          <p className="text-lg font-medium">{leagueName}</p>
         </div>
       </CardHeader>
       <CardBody>
-        <div className="flex flex-col gap-2 px-2">
-          <p className="text-large font-medium text-primary">
+        <div className="flex flex-col gap-2">
+          <p className="text-lg font-medium text-primary">
             Waiting for final touches
           </p>
-          <p className="text-small opacity-80 dark:opacity-70">
+          <p className="text-sm opacity-80 dark:opacity-70">
             <em>{leagueName}</em> still needs to be finished setting up by the
             league owner. Check back later.
           </p>
         </div>
       </CardBody>
       <CardFooter className="flex flex-col items-start justify-start gap-2">
-        <p className="text-small opacity-80 dark:opacity-70">
+        <p className="text-sm opacity-80 dark:opacity-70">
           While you&apos;re waiting...
         </p>
         <Button

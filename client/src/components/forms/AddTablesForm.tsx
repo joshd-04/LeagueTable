@@ -148,10 +148,8 @@ export default function AddTablesForm({
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1 ">
       <CardBody>
         <div>
-          <p className="font-medium text-medium">
-            Division Setup: {leagueName}
-          </p>
-          <p className="opacity-80 dark:opacity-70 text-small">Part 2 of 3</p>
+          <h1 className="font-medium text-lg">Division Setup: {leagueName}</h1>
+          <p className="opacity-80 dark:opacity-70 text-sm">Part 2 of 3</p>
         </div>
         <Spacer y={4} />
         <Form onSubmit={handleSubmit}>
@@ -160,7 +158,7 @@ export default function AddTablesForm({
             .map((str, i) => {
               return (
                 <div className="flex flex-col gap-2 w-full" key={i + 1}>
-                  <p className="text-medium">Division {i + 1}</p>
+                  <p className="text-md">Division {i + 1}</p>
                   <FormSection
                     divisionInputs={divisionInputs}
                     setDivisionInputs={setDivisionInputs}
@@ -179,7 +177,7 @@ export default function AddTablesForm({
             variant={isFormSuccess ? 'flat' : 'solid'}
             color={isFormSuccess ? 'success' : 'primary'}
             fullWidth
-            className="font-semibold text-small"
+            className="font-semibold text-sm"
             isDisabled={isFormSuccess}
             isLoading={isPending}
           >

@@ -36,7 +36,7 @@ export default function ResultsClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="justify-self-end text-medium">
+          <p className="justify-self-end text-md">
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
           </p>
           <LinkButton
@@ -50,7 +50,7 @@ export default function ResultsClient({
           </LinkButton>
           <p
             style={{ justifySelf: 'start' }}
-            className="justify-self-start text-medium"
+            className="justify-self-start text-md"
           >
             <select
               className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
@@ -113,7 +113,7 @@ function ResultRow({
         <Subtitle>{result.homeTeamDetails.name}</Subtitle>
         <Subtitle>{homeGoals}</Subtitle>
       </div>
-      <p className="font-bold text-center items-baseline align-middle text-small">
+      <p className="font-bold text-center items-baseline align-middle text-sm">
         -
       </p>
 
@@ -167,7 +167,7 @@ function ResultsByMostRecent({
     return (
       <div className="flex flex-col gap-[20px]">
         <div>
-          <p className="font-bold mb-[10px] place-self-center text-small">
+          <p className="font-bold mb-[10px] place-self-center text-sm">
             Results loading...
           </p>
           <div className="flex flex-col gap-[10px]"></div>
@@ -180,7 +180,7 @@ function ResultsByMostRecent({
     <div className="flex flex-col gap-[20px]">
       {organisedResults.map((data, i) => (
         <div key={i}>
-          <p className="font-bold mb-[10px] place-self-center text-small">
+          <p className="font-bold mb-[10px] place-self-center text-sm">
             Matchweek {data.matchweek}{' '}
             {+data.matchweek > league.currentMatchweek && '(future)'}
           </p>
@@ -244,7 +244,7 @@ function ResultsByMatchweek({
   return (
     <div className="flex flex-col gap-[20px]">
       <div>
-        <p className="text-small font-bold mb-[10px] place-self-center">
+        <p className="text-sm font-bold mb-[10px] place-self-center">
           Matchweek {matchweekViewing}{' '}
           {+matchweekViewing > league.currentMatchweek && '(future)'}
         </p>

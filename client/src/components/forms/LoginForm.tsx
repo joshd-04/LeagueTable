@@ -92,8 +92,8 @@ export default function LoginForm({
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1">
       <CardBody>
         <div>
-          <p className="font-medium text-medium">Welcome Back</p>
-          <p className="opacity-80 dark:opacity-70 text-small">
+          <h1 className="font-medium text-lg">Welcome Back</h1>
+          <p className="opacity-80 dark:opacity-70 text-sm">
             Log in to your account to continue
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function LoginForm({
               onFocus={() => setIsError(false)}
               errorMessage={
                 username.length === 0 && (
-                  <p className="text-danger text-small">
+                  <p className="text-danger text-sm">
                     Please fill in this field.
                   </p>
                 )
@@ -135,7 +135,7 @@ export default function LoginForm({
               isInvalid={isError}
               onFocus={() => setIsError(false)}
               errorMessage={
-                <p className="text-danger text-small">
+                <p className="text-danger text-sm">
                   {password.length === 0
                     ? 'Please fill in this field.'
                     : 'Invalid username or password.'}
@@ -162,15 +162,15 @@ export default function LoginForm({
               }
             />
           </div>
-          <Checkbox className="text-small">
-            <p className="text-small">Remember me (does nothing)</p>
+          <Checkbox className="text-sm">
+            <p className="text-sm">Remember me (does nothing)</p>
           </Checkbox>
           <Button
             type="submit"
             variant={isLoginSuccess ? 'flat' : 'solid'}
             color={isLoginSuccess ? 'success' : 'primary'}
             fullWidth
-            className="font-semibold text-small"
+            className="font-semibold text-sm"
             isDisabled={isError || isLoginSuccess}
             isLoading={isPending}
           >
@@ -178,7 +178,7 @@ export default function LoginForm({
           </Button>
           <Link
             href="/register"
-            className="text-small font-medium cursor-pointer place-self-center"
+            className="text-sm font-medium cursor-pointer place-self-center"
           >
             Need to create an account? Sign up
           </Link>

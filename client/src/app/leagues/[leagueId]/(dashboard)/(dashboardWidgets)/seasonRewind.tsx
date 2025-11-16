@@ -33,7 +33,7 @@ export default function SeasonRewind({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col">
       <div className="flex flex-row justify-between items-start">
-        <p className="align-middle inline text-medium">Season rewind</p>
+        <p className="align-middle inline text-md">Season rewind</p>
         {seasonViewing === league.currentSeason ? (
           <Button
             color="transparent"
@@ -48,7 +48,7 @@ export default function SeasonRewind({
             onClick={() => {}}
             disabled
           >
-            <p className="bg-divider h-min px-[8px] rounded-[10px] font-bold text-small">
+            <p className="bg-divider h-min px-[8px] rounded-[10px] font-bold text-sm">
               OFF
             </p>
           </Button>
@@ -65,13 +65,13 @@ export default function SeasonRewind({
             underlineEffect={false}
             onClick={() => resetSeason()}
           >
-            <p className="text-black bg-success h-min px-[8px] rounded-[10px] font-bold text-small">
+            <p className="text-black bg-success h-min px-[8px] rounded-[10px] font-bold text-sm">
               ON
             </p>
           </Button>
         )}
       </div>
-      <p className="text-small">
+      <p className="text-sm">
         View results, tables & stats from previous seasons
       </p>
       <div className="my-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center shadow-[var(--shadow)]">
@@ -98,7 +98,7 @@ export default function SeasonRewind({
                 ? 'var(--text-muted)'
                 : 'var(--text)',
           }}
-          className="mx-[10px] px-[10px] rounded-[10px] text-medium"
+          className="mx-[10px] px-[10px] rounded-[10px] text-md"
         >
           Season {seasonViewing}
         </p>
@@ -122,7 +122,7 @@ export default function SeasonRewind({
           />
         </Button>
       </div>
-      <p className="text-small">
+      <p className="text-sm">
         {league.currentSeason === seasonViewing
           ? `You are viewing the current season`
           : `${league.name} is currently on season ${league.currentSeason}`}

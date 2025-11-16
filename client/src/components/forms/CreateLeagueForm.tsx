@@ -90,8 +90,8 @@ export default function CreateLeagueForm() {
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10 bg-linear-to-br from-content2 to-content1">
       <CardBody>
         <div>
-          <p className="font-medium text-medium">Create a league</p>
-          <p className="opacity-80 dark:opacity-70 text-small">Part 1 of 3</p>
+          <h1 className="font-medium text-lg">Create a league</h1>
+          <p className="text-muted text-sm">Part 1 of 3</p>
         </div>
         <Spacer y={4} />
         <Form onSubmit={handleSubmit} validationErrors={serverErrors}>
@@ -137,7 +137,7 @@ export default function CreateLeagueForm() {
             onValueChange={setLeagueType}
             size="sm"
             name="leagueType"
-            label={<span className="text-small">League Type</span>}
+            label={<span className="text-sm">League Type</span>}
             description={
               <span className="opacity-80 dark:opacity-70">
                 League type cannot be changed after creation.
@@ -172,7 +172,7 @@ export default function CreateLeagueForm() {
             variant={isCreationSuccess ? 'flat' : 'solid'}
             color={isCreationSuccess ? 'success' : 'primary'}
             fullWidth
-            className="font-semibold text-small"
+            className="font-semibold text-sm"
             isDisabled={isError || isCreationSuccess}
             isLoading={isPending || isCreationSuccess}
           >
@@ -193,7 +193,7 @@ function CustomRadio({
       {...otherProps}
       classNames={{
         base: cn(
-          'flex m-0 bg-content2 hover:bg-content3 items-center justify-between',
+          'flex m-0 bg-content1 hover:bg-content2 items-center justify-between',
           'flex-row-reverse min-w-[376px] cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent',
           'data-[selected=true]:border-primary'
         ),

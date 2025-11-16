@@ -30,15 +30,15 @@ export default function Upgrade({ league }: { league: League }) {
           style={{
             color: titleColor,
           }}
-          className="align-middle inline text-medium"
+          className="align-middle inline text-md"
         >
           {titleText}
         </p>
-        <p className="text-small">
+        <p className="text-sm">
           {warningLevel === 'light' ? '' : 'This is a free league.'} Upgrade to
           standard level to unlock:
         </p>
-        <ul className="list-disc pl-[20px] text-[var(--text-muted)] text-small">
+        <ul className="list-disc pl-[20px] text-muted text-sm">
           <li>
             <p>More seasons</p>
           </li>

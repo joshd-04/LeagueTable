@@ -126,8 +126,8 @@ export default function RegistrationForm() {
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1">
       <CardBody>
         <div>
-          <p className="font-medium text-medium">Welcome!</p>
-          <p className="opacity-80 dark:opacity-70 text-small">
+          <h1 className="font-medium text-lg">Welcome!</h1>
+          <p className="opacity-80 dark:opacity-70 text-sm">
             Create an account to get started
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function RegistrationForm() {
             />{' '}
           </div>
           <Checkbox isRequired>
-            <p className="text-small">
+            <p className="text-sm">
               I have read and agree with the Terms and Privacy Policy.
             </p>
           </Checkbox>
@@ -266,7 +266,7 @@ export default function RegistrationForm() {
             variant={isRegisterSuccess ? 'flat' : 'shadow'}
             color={isRegisterSuccess ? 'success' : 'primary'}
             fullWidth
-            className="font-semibold text-small"
+            className="font-semibold text-sm"
             isDisabled={isError || isRegisterSuccess}
             isLoading={isPending}
           >
@@ -274,7 +274,7 @@ export default function RegistrationForm() {
           </Button>
           <Link
             href="/register"
-            className="text-small font-medium cursor-pointer place-self-center"
+            className="text-sm font-medium cursor-pointer place-self-center"
           >
             Already have an account? Log in
           </Link>

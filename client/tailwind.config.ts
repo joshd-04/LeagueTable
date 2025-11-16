@@ -6,6 +6,9 @@ const config = {
       fontFamily: {
         instrument: ['var(--font-instrument-sans)'],
       },
+      color: {
+        muted: ['opacity-80 dark:opacity-70'],
+      },
     },
   },
   darkMode: 'class',

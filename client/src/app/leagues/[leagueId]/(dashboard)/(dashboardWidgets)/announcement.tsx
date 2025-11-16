@@ -82,7 +82,7 @@ export default function Announcement({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <div className="flex flex-row justify-between">
-        <p className="align-middle inline text-medium">Latest Announcement</p>
+        <p className="align-middle inline text-md">Latest Announcement</p>
         {userOwnsThisLeague && !isEditingAnnouncement && (
           <Button
             color="transparent"
@@ -104,9 +104,9 @@ export default function Announcement({
       {!isEditingAnnouncement &&
         (league.announcement && league.announcement.text.length > 0 ? (
           <div className="flex flex-col justify-between grow-1">
-            <p className="text-small">{announcement.text}</p>
+            <p className="text-sm">{announcement.text}</p>
             <div className="flex flex-row">
-              <p className="text-small">
+              <p className="text-sm">
                 {new Date(announcement.date).toLocaleTimeString(undefined, {
                   timeStyle: 'short',
                 })}{' '}
@@ -115,10 +115,10 @@ export default function Announcement({
             </div>
           </div>
         ) : (
-          <p className="text-small italic">No announcements yet</p>
+          <p className="text-sm italic">No announcements yet</p>
         ))}
       {isEditingAnnouncement && (
-        <p className="flex flex-col grow text-small">
+        <p className="flex flex-col grow text-sm">
           <TextAreaComponent
             announcement={announcement}
             announcementEditingText={announcementEditingText}

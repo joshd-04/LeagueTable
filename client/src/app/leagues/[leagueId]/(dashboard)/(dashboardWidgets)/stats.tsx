@@ -31,7 +31,7 @@ export default function Stats({
 
   return (
     <div className="p-[20px] h-full w-full row-span-2 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-medium">
+      <p className="text-md">
         <select
           className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
           value={view}
@@ -93,15 +93,13 @@ function StatsTablePlayerBased({
           <tr className="text-left">
             <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[11rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-medium">Name</p>
+              <p className="text-md">Name</p>
             </th>
             <th className="w-[8rem] sticky top-0 bg-[var(--bg)]">
-              <p style={{ color: 'var(--text-muted)' }} className="text-medium">
-                Team
-              </p>
+              <p className="text-md text-muted">Team</p>
             </th>
             <th className="sticky top-0 bg-[var(--bg)]">
-              <p className="text-medium">Value</p>
+              <p className="text-md">Value</p>
             </th>
           </tr>
         </thead>
@@ -113,7 +111,7 @@ function StatsTablePlayerBased({
       </table>
       {(data?.length === 0 || !data) && (
         <p
-          className="italic place-self-center text-small"
+          className="italic place-self-center text-sm"
           style={{
             placeSelf: 'center',
             fontStyle: 'italic',
@@ -134,27 +132,20 @@ function TableRowPlayerBased({
   return (
     <tr>
       <td>
-        <p className="text-medium text-right pr-[10px]">
-          {datapoint.position}.
-        </p>
+        <p className="text-md text-right pr-[10px]">{datapoint.position}.</p>
       </td>
       <td>
-        <p className="text-medium text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-md text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {datapoint.player}
         </p>
       </td>
       <td>
-        <p
-          style={{
-            color: 'var(--text-muted)',
-          }}
-          className="text-medium text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
-        >
+        <p className="text-md text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden text-muted">
           {datapoint.team}
         </p>
       </td>
       <td>
-        <p className="text-right pr-[10px] text-medium">{datapoint.value}</p>
+        <p className="text-right pr-[10px] text-md">{datapoint.value}</p>
       </td>
     </tr>
   );
@@ -172,10 +163,10 @@ function StatsTableTeamBased({
           <tr className="text-left">
             <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[10rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-medium">Team</p>
+              <p className="text-md">Team</p>
             </th>
             <th className="sticky top-0 bg-[var(--bg)] w-[6rem]">
-              <p className="text-medium">Value</p>
+              <p className="text-md">Value</p>
             </th>
           </tr>
         </thead>
@@ -186,7 +177,7 @@ function StatsTableTeamBased({
         </tbody>
       </table>
       {(data?.length === 0 || !data) && (
-        <p className="text-small place-self-center italic">No data yet</p>
+        <p className="text-sm place-self-center italic">No data yet</p>
       )}
     </div>
   );
@@ -200,17 +191,15 @@ function TableRowTeamBased({
   return (
     <tr>
       <td>
-        <p className="text-right pr-[10px] text-medium">
-          {datapoint.position}.
-        </p>
+        <p className="text-right pr-[10px] text-md">{datapoint.position}.</p>
       </td>
       <td>
-        <p className="text-medium text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-md text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {datapoint.team}
         </p>
       </td>
       <td>
-        <p className="text-medium">{datapoint.value}</p>
+        <p className="text-md">{datapoint.value}</p>
       </td>
     </tr>
   );

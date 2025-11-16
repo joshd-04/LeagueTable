@@ -63,12 +63,12 @@ export default function NextFixtures({
       }}
     >
       <div className="flex flex-row items-baseline gap-[4px]">
-        <p className="align-middle inline text-medium">Fixtures </p>
+        <p className="align-middle inline text-md">Fixtures </p>
         {fixtures !== undefined &&
           nextFixtures !== undefined &&
           nextFixtures.length >= 3 &&
           !isLoading && (
-            <p className="text-small inline">
+            <p className="text-sm inline">
               - showing {nextFixtures.length} of {fixtures.totalFixtures}
             </p>
           )}
@@ -94,7 +94,7 @@ export default function NextFixtures({
           </div>
         ))
       ) : (
-        <p className="italic place-self-center text-small">
+        <p className="italic place-self-center text-sm">
           No outstanding fixtures
         </p>
       )}
@@ -138,14 +138,14 @@ function FixtureRow({
         borderColor: rowHover && !editHover ? 'transparent' : 'var(--border)',
       }}
     >
-      <p className="px-[10px] w-max h-min flex-none text-small">
+      <p className="px-[10px] w-max h-min flex-none text-sm">
         MD {fixtureObj.matchweek}
       </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_40px_1fr] flex-grow place-items-end">
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.homeTeamDetails.name}
         </p>
-        <p className="w-full text-center text-small">vs</p>
+        <p className="w-full text-center text-sm">vs</p>
 
         <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.awayTeamDetails.name}

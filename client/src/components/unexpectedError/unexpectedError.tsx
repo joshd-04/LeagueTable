@@ -15,24 +15,10 @@ export default function UnexpectedError() {
           >
             Oops! W&apos;ve run into a problem
           </Subtitle>
-          <p
-            style={{
-              color: 'var(--text-muted)',
-            }}
-            className="text-medium"
-          >
-            Something unexpected happened.
-          </p>
-          <hr className="text-[var(--text-muted)] my-[0.75rem]" />
+          <p className="text-md text-muted">Something unexpected happened.</p>
+          <hr className="text-muted my-[0.75rem]" />
           <div className="flex flex-col w-full gap-1">
-            <p
-              style={{
-                color: 'var(--text-muted)',
-              }}
-              className="text-medium"
-            >
-              Returning home should fix this
-            </p>
+            <p className="text-md text-muted">Returning home should fix this</p>
             <LinkButton
               href="/"
               color="var(--text-muted)"

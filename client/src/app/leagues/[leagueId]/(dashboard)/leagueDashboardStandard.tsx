@@ -1,5 +1,4 @@
 'use client';
-import PersonSVG from '@/assets/svg components/Person';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
@@ -19,6 +18,7 @@ import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
+import { IoPersonSharp } from 'react-icons/io5';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard({
@@ -92,13 +92,15 @@ export default function LeagueDashboardStandard({
         </Heading1>
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px] text-medium">
-          <p>
-            <PersonSVG className="w-[24px] h-[24px] fill-[var(--text)] inline-block align-text-top" />
-            {league.leagueOwner.username === user?.username
-              ? 'You'
-              : league.leagueOwner.username}
-          </p>
+        <div className="flex flex-row justify-center items-center gap-[50px] text-md">
+          <span className="flex flex-row items-center gap-1">
+            <IoPersonSharp className="w-5 h-5" />
+            <p>
+              {league.leagueOwner.username === user?.username
+                ? 'You'
+                : league.leagueOwner.username}
+            </p>
+          </span>
           <p>
             {league.divisionsCount} division
             {league.divisionsCount === 1 ? '' : 's'}

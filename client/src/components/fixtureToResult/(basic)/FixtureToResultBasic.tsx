@@ -90,9 +90,7 @@ export default function FixtureToResultBasic({
                   )} 
               ${fixtureObj.awayTeamDetails.name}`}
             </Subtitle>
-            <p style={{ color: 'var(--text-muted)' }} className="text-medium">
-              Fixture into result
-            </p>
+            <p className="text-md text-muted">Fixture into result</p>
           </div>
 
           <ResultFormBasic
@@ -163,7 +161,7 @@ function ResultFormBasic({
   return (
     <>
       <div className="max-h-[300px] min-h-[300px] overflow-auto ">
-        <div className="flex flex-col gap-[8px] p-[8px] text-small">
+        <div className="flex flex-col gap-[8px] p-[8px] text-sm">
           {matchStory.length === 0 ? (
             <p className="font-bold place-self-center">No events</p>
           ) : (

@@ -48,12 +48,12 @@ function ExtraInfo() {
                 verticalAlign: 'middle',
                 display: 'inline',
               }}
-              className="text-large"
+              className="text-lg"
             >
               Table names
             </p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-small">
+          <p className="opacity-80 dark:opacity-70 text-sm">
             Make sure the different table names are unique
           </p>
         </div>
@@ -65,12 +65,12 @@ function ExtraInfo() {
                 verticalAlign: 'middle',
                 display: 'inline',
               }}
-              className="text-large"
+              className="text-lg"
             >
               Promotion/relegation
             </p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-small">
+          <p className="opacity-80 dark:opacity-70 text-sm">
             Make sure the promotion and relegation numbers match between
             adjacent leagues.
             <br />

@@ -19,7 +19,7 @@ export default function HeadToHead({
 }) {
   return (
     <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-medium">Head-to-head record</p>
+      <p className="text-md">Head-to-head record</p>
       {league.leagueLevel === 'free' ? (
         <HeadToHeadLocked userOwnsThisLeague={userOwnsThisLeague} />
       ) : (
@@ -36,7 +36,7 @@ function HeadToHeadLocked({
 }) {
   if (userOwnsThisLeague) {
     return (
-      <div className="text-small">
+      <div className="text-sm">
         <p className="text-warning">
           Head-to-head is not available for free leagues.
         </p>
@@ -46,7 +46,7 @@ function HeadToHeadLocked({
   }
 
   return (
-    <div className="text-small">
+    <div className="text-sm">
       <p>Head-to-head is not available for this league.</p>
     </div>
   );
@@ -74,10 +74,10 @@ function HeadToHeadBody({
   return (
     <div>
       {isLoading ? (
-        <p className="text-small">Loading...</p>
+        <p className="text-sm">Loading...</p>
       ) : results.length > 0 ? (
         <>
-          <p className="text-small">Last 5 meetings:</p>
+          <p className="text-sm">Last 5 meetings:</p>
           <div>
             <div className="w-[70%] flex flex-col gap-1">
               {results.map((result, i) => (
@@ -87,7 +87,7 @@ function HeadToHeadBody({
           </div>
         </>
       ) : (
-        <p className="text-small">No history found</p>
+        <p className="text-sm">No history found</p>
       )}
     </div>
   );
@@ -116,16 +116,15 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       onClick={(e) => handleResultClick(e)}
       whileTap={{ scale: 0.98 }}
     >
-      <p className="text-small w-max h-min flex-none">Season {result.season}</p>
+      <p className="text-sm w-max h-min flex-none">Season {result.season}</p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
-        <p className="text-medium w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-md w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
         </p>
-        <p className="text-medium w-full text-center">
-          {homeGoals} <span className="text-[var(--text-muted)]">-</span>{' '}
-          {awayGoals}
+        <p className="text-md w-full text-center">
+          {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
-        <p className="text-medium w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-md w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.awayTeamDetails.name}
         </p>
       </div>

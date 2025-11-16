@@ -22,9 +22,7 @@ export default function ErrorMessage() {
             className={`w-[440px] bg-[var(--bg-light)] fixed left-[50%] top-[50px] translate-x-[-50%] rounded-[10px] border-1 border-solid border-[var(--border)] py-[10px] px-[20px] z-10`}
           >
             <Subtitle style={{ color: 'var(--danger)' }}>Error</Subtitle>
-            <p style={{ color: 'var(--text-muted)' }} className="text-medium">
-              {error}
-            </p>
+            <p className="text-md text-muted">{error}</p>
             <Button
               color="var(--danger)"
               bgHoverColor="var(--bg)"

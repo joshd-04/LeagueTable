@@ -45,7 +45,7 @@ export default function LatestResults({
       }}
     >
       <span>
-        <p className="align-middle inline text-medium">Latest Results</p>
+        <p className="align-middle inline text-md">Latest Results</p>
       </span>
       {isLoading ? (
         <>
@@ -64,7 +64,7 @@ export default function LatestResults({
           </div>
         ))
       ) : (
-        <p className="italic place-self-center text-small">No results yet</p>
+        <p className="italic place-self-center text-sm">No results yet</p>
       )}
     </motion.div>
   );
@@ -99,22 +99,16 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
           height: 'min-content',
           flex: 'none',
         }}
-        className="flex-none w-max h-min text-small"
+        className="flex-none w-max h-min text-sm"
       >
         MD {result.matchweek}
       </p>
-      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-medium">
+      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-md">
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
         </p>
-        <p
-          style={{
-            color: 'var(--text-muted)',
-          }}
-          className="w-full text-center font-normal"
-        >
-          {homeGoals} <span className="text-[var(--text-muted)]">-</span>{' '}
-          {awayGoals}
+        <p className="w-full text-center font-normal text-muted">
+          {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
         <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.awayTeamDetails.name}

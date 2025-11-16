@@ -198,7 +198,7 @@ export default function Pagination({
             }}
             className="h-full"
           >
-            <p className="w-full h-full text-medium">
+            <p className="w-full h-full text-md">
               {isTyping ? (
                 <input
                   className="w-[4ch] h-full outline-none px-2 text-center align-middle

@@ -127,7 +127,7 @@ export default function Controls({
   return (
     <div className="p-[20px]  h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
       <span>
-        <p className="text-medium align-middle inline">Controls</p>
+        <p className="text-md align-middle inline">Controls</p>
       </span>
       <Button
         onClick={() => matchweekMutation()}
@@ -138,9 +138,7 @@ export default function Controls({
           league.currentMatchweek === 0
         }
       >
-        <p className="font-bold text-inherit text-small">
-          {matchweekButtonText}
-        </p>
+        <p className="font-bold text-inherit text-sm">{matchweekButtonText}</p>
       </Button>
 
       <Button
@@ -154,7 +152,7 @@ export default function Controls({
           ) && !(league.currentSeason === 0 && league.currentMatchweek === 0)
         }
       >
-        <p className="font-bold text-inherit text-small">{seasonButtonText}</p>
+        <p className="font-bold text-inherit text-sm">{seasonButtonText}</p>
       </Button>
     </div>
   );

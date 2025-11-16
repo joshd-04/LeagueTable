@@ -118,13 +118,13 @@ export default function Notification({
               style={{
                 color: colour,
               }}
-              className="inline align-middle text-medium"
+              className="inline align-middle text-md"
             >
               {title}
             </p>
           </span>
           {notification.description !== undefined && (
-            <p className="text-small ">{description}</p>
+            <p className="text-sm ">{description}</p>
           )}
 
           <SwipeBackground color={colour} duration={notification.duration} />

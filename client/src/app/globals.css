@@ -41,11 +41,12 @@
   }
 } */
 
-@layer base {
-  * {
-    @apply transition-colors duration-250;
+@layer utilities {
+  .text-muted {
+    @apply opacity-80 dark:opacity-70;
   }
 }
+
 /* globals.css */
 
 /* 1. Allow <body> to be the scroll container */

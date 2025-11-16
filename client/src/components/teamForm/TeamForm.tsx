@@ -25,7 +25,7 @@ export default function TeamForm({ form }: { form: string }) {
       {sanitizedForm.split('').map((letter, i) => (
         <p
           key={i}
-          className="text-large rounded-md"
+          className="text-lg rounded-md"
           style={{
             color: letter === '-' ? 'var(--text)' : 'white',
             backgroundColor:

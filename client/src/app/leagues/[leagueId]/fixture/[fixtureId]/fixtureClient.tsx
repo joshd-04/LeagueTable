@@ -49,8 +49,8 @@ export default function FixtureClient({
               fixture.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
-            <p className="text-small">Home</p>
-            <p className="text-small">Away</p>
+            <p className="text-sm">Home</p>
+            <p className="text-sm">Away</p>
           </div>
           <div className="flex flex-row justify-between gap-[20px]">
             <LinkButton
@@ -81,7 +81,7 @@ export default function FixtureClient({
       </LeagueBanner>
       <div className="flex flex-col items-center gap-[20px] mx-[20px]">
         <div className="grid grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="justify-self-end text-medium">
+          <p className="justify-self-end text-md">
             Season {fixture.season} Matchweek {fixture.matchweek}
           </p>
           <LinkButton
@@ -93,7 +93,7 @@ export default function FixtureClient({
           >
             {league.name}
           </LinkButton>
-          <div className="flex flex-row items-center justify-start gap-12 text-medium">
+          <div className="flex flex-row items-center justify-start gap-12 text-md">
             <p>
               {league.tables[fixture.division - 1].name} (div {fixture.division}
               )
@@ -114,7 +114,7 @@ export default function FixtureClient({
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <p className="text-medium">AI insights</p>
+            <p className="text-md">AI insights</p>
           </div>
           <MatchPreview fixture={fixture} />
           <HeadToHead

@@ -78,7 +78,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative transition-colors duration-250 overflow-x-clip overflow-y-auto`}
+        className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative  duration-250 overflow-x-clip overflow-y-auto`}
       >
         <Providers initialUser={user} initialError={error}>
           <NavBar />

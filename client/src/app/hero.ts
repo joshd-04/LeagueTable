@@ -62,9 +62,9 @@ export default heroui({
         divider: 'hsl(0, 0%, 70%)', // --border
         overlay: 'white', // used for modal, popover, etc.
         focus: 'hsl(200, 95%, 0%)', // --accent
-        content1: 'hsl(0, 0%, 90%)', // --bg-light
-        content2: 'hsl(0, 0%, 85%)', // same as bg
-        content3: 'hsl(0, 0%, 80%)', // --bg-dark
+        content1: 'hsl(0, 0%, 85%)', // --bg-light
+        content2: 'hsl(0, 0%, 80%)', // same as bg
+        content3: 'hsl(0, 0%, 75%)', // --bg-dark
         primary: {
           DEFAULT: 'hsl(200, 100%, 50%)',
           foreground: 'black',
