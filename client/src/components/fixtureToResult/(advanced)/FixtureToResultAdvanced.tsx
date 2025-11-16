@@ -107,7 +107,7 @@ export default function FixtureToResultAdvanced({
                   )} 
               ${fixtureObj.awayTeamDetails.name}`}
             </Subtitle>
-            <p className="text-md text-muted">Fixture into result</p>
+            <p className="text-base text-muted">Fixture into result</p>
           </div>
 
           <ResultFormAdvanced

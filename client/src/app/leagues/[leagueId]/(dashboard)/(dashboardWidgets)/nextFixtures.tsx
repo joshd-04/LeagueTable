@@ -63,7 +63,7 @@ export default function NextFixtures({
       }}
     >
       <div className="flex flex-row items-baseline gap-[4px]">
-        <p className="align-middle inline text-md">Fixtures </p>
+        <p className="align-middle inline text-base">Fixtures </p>
         {fixtures !== undefined &&
           nextFixtures !== undefined &&
           nextFixtures.length >= 3 &&

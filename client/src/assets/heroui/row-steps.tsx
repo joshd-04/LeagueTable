@@ -234,7 +234,7 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
                   <div className="max-w-full flex-1 text-start">
                     <div
                       className={cn(
-                        'text-sm text-default-foreground lg:text-md font-medium transition-[color,opacity] duration-300 group-active:opacity-80',
+                        'text-sm text-default-foreground lg:text-base font-medium transition-[color,opacity] duration-300 group-active:opacity-80',
                         {
                           'text-default-500': status === 'inactive',
                         }

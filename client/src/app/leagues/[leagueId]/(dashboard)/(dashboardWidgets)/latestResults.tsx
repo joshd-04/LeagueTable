@@ -45,7 +45,7 @@ export default function LatestResults({
       }}
     >
       <span>
-        <p className="align-middle inline text-md">Latest Results</p>
+        <p className="align-middle inline text-base">Latest Results</p>
       </span>
       {isLoading ? (
         <>
@@ -103,7 +103,7 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       >
         MD {result.matchweek}
       </p>
-      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-md">
+      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
         </p>

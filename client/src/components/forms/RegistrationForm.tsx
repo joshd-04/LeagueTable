@@ -4,11 +4,11 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Checkbox,
   Form,
   Input,
   Link,
-  Spacer,
   Tooltip,
 } from '@heroui/react';
 import { useContext, useState } from 'react';
@@ -134,14 +134,15 @@ export default function RegistrationForm() {
 
   return (
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1">
-      <CardBody>
+      <CardHeader>
         <div>
           <h1 className="font-medium text-lg">Welcome!</h1>
           <p className="opacity-80 dark:opacity-70 text-sm">
             Create an account to get started
           </p>
         </div>
-        <Spacer y={4} />
+      </CardHeader>
+      <CardBody>
         <Form
           onSubmit={handleSubmit}
           validationErrors={serverErrors}

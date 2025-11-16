@@ -118,7 +118,7 @@ export default function Notification({
               style={{
                 color: colour,
               }}
-              className="inline align-middle text-md"
+              className="inline align-middle text-base"
             >
               {title}
             </p>

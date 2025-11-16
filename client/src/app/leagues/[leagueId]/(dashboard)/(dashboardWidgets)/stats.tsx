@@ -31,7 +31,7 @@ export default function Stats({
 
   return (
     <div className="p-[20px] h-full w-full row-span-2 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-md">
+      <p className="text-base">
         <select
           className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
           value={view}
@@ -93,13 +93,13 @@ function StatsTablePlayerBased({
           <tr className="text-left">
             <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[11rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-md">Name</p>
+              <p className="text-base">Name</p>
             </th>
             <th className="w-[8rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-md text-muted">Team</p>
+              <p className="text-base text-muted">Team</p>
             </th>
             <th className="sticky top-0 bg-[var(--bg)]">
-              <p className="text-md">Value</p>
+              <p className="text-base">Value</p>
             </th>
           </tr>
         </thead>
@@ -132,20 +132,20 @@ function TableRowPlayerBased({
   return (
     <tr>
       <td>
-        <p className="text-md text-right pr-[10px]">{datapoint.position}.</p>
+        <p className="text-base text-right pr-[10px]">{datapoint.position}.</p>
       </td>
       <td>
-        <p className="text-md text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-base text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {datapoint.player}
         </p>
       </td>
       <td>
-        <p className="text-md text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden text-muted">
+        <p className="text-base text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden text-muted">
           {datapoint.team}
         </p>
       </td>
       <td>
-        <p className="text-right pr-[10px] text-md">{datapoint.value}</p>
+        <p className="text-right pr-[10px] text-base">{datapoint.value}</p>
       </td>
     </tr>
   );
@@ -163,10 +163,10 @@ function StatsTableTeamBased({
           <tr className="text-left">
             <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
             <th className="w-[10rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-md">Team</p>
+              <p className="text-base">Team</p>
             </th>
             <th className="sticky top-0 bg-[var(--bg)] w-[6rem]">
-              <p className="text-md">Value</p>
+              <p className="text-base">Value</p>
             </th>
           </tr>
         </thead>
@@ -191,15 +191,15 @@ function TableRowTeamBased({
   return (
     <tr>
       <td>
-        <p className="text-right pr-[10px] text-md">{datapoint.position}.</p>
+        <p className="text-right pr-[10px] text-base">{datapoint.position}.</p>
       </td>
       <td>
-        <p className="text-md text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-base text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {datapoint.team}
         </p>
       </td>
       <td>
-        <p className="text-md">{datapoint.value}</p>
+        <p className="text-base">{datapoint.value}</p>
       </td>
     </tr>
   );

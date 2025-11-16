@@ -4,11 +4,11 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Checkbox,
   Form,
   Input,
   Link,
-  Spacer,
   Tooltip,
 } from '@heroui/react';
 import { useState } from 'react';
@@ -97,14 +97,15 @@ export default function LoginForm({
 
   return (
     <Card className="w-[464px] place-self-center px-8 pt-6 pb-10  bg-linear-to-br from-content2 to-content1">
-      <CardBody>
+      <CardHeader>
         <div>
           <h1 className="font-medium text-lg">Welcome Back</h1>
           <p className="opacity-80 dark:opacity-70 text-sm">
             Log in to your account to continue
           </p>
         </div>
-        <Spacer y={4} />
+      </CardHeader>
+      <CardBody>
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 w-full">
             <Input

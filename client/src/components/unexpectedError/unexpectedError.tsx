@@ -15,10 +15,12 @@ export default function UnexpectedError() {
           >
             Oops! W&apos;ve run into a problem
           </Subtitle>
-          <p className="text-md text-muted">Something unexpected happened.</p>
+          <p className="text-base text-muted">Something unexpected happened.</p>
           <hr className="text-muted my-[0.75rem]" />
           <div className="flex flex-col w-full gap-1">
-            <p className="text-md text-muted">Returning home should fix this</p>
+            <p className="text-base text-muted">
+              Returning home should fix this
+            </p>
             <LinkButton
               href="/"
               color="var(--text-muted)"

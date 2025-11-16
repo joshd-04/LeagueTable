@@ -62,7 +62,11 @@ export default function NavBar() {
       {pathname === '/' && !isLoggedIn && (
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
           <NavbarItem>
-            <Link color="foreground" href="#" className="font-semibold text-md">
+            <Link
+              color="foreground"
+              href="#"
+              className="font-semibold text-base"
+            >
               Features
             </Link>
           </NavbarItem>
@@ -70,13 +74,17 @@ export default function NavBar() {
             <Link
               aria-current="page"
               href="#"
-              className="font-semibold text-md"
+              className="font-semibold text-base"
             >
               Use cases
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" href="#" className="font-semibold text-md">
+            <Link
+              color="foreground"
+              href="#"
+              className="font-semibold text-base"
+            >
               FAQ
             </Link>
           </NavbarItem>

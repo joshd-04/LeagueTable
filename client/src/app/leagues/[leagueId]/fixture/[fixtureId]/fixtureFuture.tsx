@@ -71,7 +71,7 @@ export default function FixtureFuture({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="flex flex-row justify-center items-center gap-[50px]">
-          <p className="text-md">
+          <p className="text-base">
             Season {fixture.season} Matchweek {fixture.matchweek}
           </p>
           <LinkButton
@@ -83,12 +83,12 @@ export default function FixtureFuture({
           >
             {league.name}
           </LinkButton>
-          <p className="text-md">Division {fixture.division}</p>
-          {fixture.neutralGround && <p className="text-md">Neutral Ground</p>}
+          <p className="text-base">Division {fixture.division}</p>
+          {fixture.neutralGround && <p className="text-base">Neutral Ground</p>}
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <p className="text-md">AI insights</p>
+            <p className="text-base">AI insights</p>
             <p className="text-sm">
               AI Insights not available yet. Come back when matchweek{' '}
               {fixture.matchweek} starts!

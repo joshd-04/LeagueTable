@@ -33,7 +33,7 @@ export default function SeasonRewind({
   return (
     <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col">
       <div className="flex flex-row justify-between items-start">
-        <p className="align-middle inline text-md">Season rewind</p>
+        <p className="align-middle inline text-base">Season rewind</p>
         {seasonViewing === league.currentSeason ? (
           <Button
             color="transparent"
@@ -98,7 +98,7 @@ export default function SeasonRewind({
                 ? 'var(--text-muted)'
                 : 'var(--text)',
           }}
-          className="mx-[10px] px-[10px] rounded-[10px] text-md"
+          className="mx-[10px] px-[10px] rounded-[10px] text-base"
         >
           Season {seasonViewing}
         </p>

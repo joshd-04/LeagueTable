@@ -93,7 +93,7 @@ export default function LeagueDashboardStandard({
         </Heading1>
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px] text-md">
+        <div className="flex flex-row justify-center items-center gap-[50px] text-base">
           <span className="flex flex-row items-center gap-1">
             <IoPersonSharp className="w-5 h-5" />
             <p>

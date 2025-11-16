@@ -44,7 +44,7 @@ function ExtraInfo() {
         <div className="flex flex-col gap-2">
           <span>
             <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
-            <p className="text-md align-middle inline">Team names</p>
+            <p className="text-base align-middle inline">Team names</p>
           </span>
           <p className="opacity-80 dark:opacity-70 text-sm">
             Make sure the different team names are unique

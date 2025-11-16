@@ -19,7 +19,7 @@ export default function HeadToHead({
 }) {
   return (
     <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-md">Head-to-head record</p>
+      <p className="text-base">Head-to-head record</p>
       {league.leagueLevel === 'free' ? (
         <HeadToHeadLocked userOwnsThisLeague={userOwnsThisLeague} />
       ) : (
@@ -118,13 +118,13 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
     >
       <p className="text-sm w-max h-min flex-none">Season {result.season}</p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
-        <p className="text-md w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-base w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
         </p>
-        <p className="text-md w-full text-center">
+        <p className="text-base w-full text-center">
           {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
-        <p className="text-md w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-base w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.awayTeamDetails.name}
         </p>
       </div>

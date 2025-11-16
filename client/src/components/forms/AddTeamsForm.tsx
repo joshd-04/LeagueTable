@@ -140,7 +140,7 @@ export default function AddTablesForm({
           {divisions.map((division, i) => {
             return (
               <div className="flex flex-col gap-2 w-full" key={i + 1}>
-                <p className="text-md">
+                <p className="text-base">
                   Division {division.divisionNumber} - {division.name}
                 </p>
                 <FormSection

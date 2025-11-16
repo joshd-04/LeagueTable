@@ -95,7 +95,7 @@ export default function ResultClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="text-md justify-self-end">
+          <p className="text-base justify-self-end">
             Season {result.season} Matchweek {result.matchweek}
           </p>
           <LinkButton
@@ -107,14 +107,14 @@ export default function ResultClient({
           >
             {league.name}
           </LinkButton>
-          <p className="text-md justify-self-end">
+          <p className="text-base justify-self-start">
             {league.tables[result.division - 1].name} (div {result.division})
           </p>
-          {result.neutralGround && <p className="text-md">Neutral Ground</p>}
+          {result.neutralGround && <p className="text-base">Neutral Ground</p>}
         </div>
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
           <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <p className="text-md">AI insights</p>
+            <p className="text-base">AI insights</p>
           </div>
           <MatchOutcome result={result} />
           <AsItStood result={result} />

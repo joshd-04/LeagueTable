@@ -13,7 +13,7 @@ export default function MatchOutcome({ result }: { result: Result }) {
   }
   return (
     <div className="p-[20px] h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-md">Match outcome</p>
+      <p className="text-base">Match outcome</p>
       <div
         className="max-h-[24rem] overflow-y-auto flex flex-col items-center  gap-2 "
         style={{
@@ -94,7 +94,7 @@ function MatchOutcomeRowBasic({
       ) : (
         <div></div>
       )}
-      <div className="place-self-center text-md">
+      <div className="place-self-center text-base">
         {goal === 'home' ? (
           <p className=" text-muted">
             <span className="text-[var(--text)] font-bold">{homeGoals}</span>-
@@ -163,7 +163,7 @@ function MatchOutcomeRowAdvanced({
       ) : (
         <div></div>
       )}
-      <div className="place-self-center text-md">
+      <div className="place-self-center text-base">
         {goal.team === 'home' ? (
           <p className=" text-muted">
             <span className="text-[var(--text)] font-bold">{homeGoals}</span>-

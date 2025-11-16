@@ -1,4 +1,5 @@
 import { League } from '@/util/definitions';
+import { Card, CardBody } from '@heroui/react';
 
 export default function Upgrade({ league }: { league: League }) {
   let warningLevel: 'light' | 'moderate' | 'heavy' = 'light';
@@ -12,10 +13,10 @@ export default function Upgrade({ league }: { league: League }) {
 
   const titleColor =
     warningLevel === 'light'
-      ? 'var(--info)'
+      ? 'secondary'
       : warningLevel === 'moderate'
-      ? 'var(--warning)'
-      : 'var(--danger)';
+      ? 'warning'
+      : 'danger';
 
   const titleText =
     warningLevel === 'light'
@@ -24,13 +25,15 @@ export default function Upgrade({ league }: { league: League }) {
       ? 'This is the final season.'
       : 'This league is finished.';
   return (
-    <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <span>
+    <Card className="p-[10px] h-full w-full">
+      <CardBody className="flex flex-col gap-2">
         <p
-          style={{
-            color: titleColor,
-          }}
-          className="align-middle inline text-md"
+          style={
+            {
+              // color: titleColor,
+            }
+          }
+          className={`align-middle inline text-lg text-${titleColor}`}
         >
           {titleText}
         </p>
@@ -55,7 +58,7 @@ export default function Upgrade({ league }: { league: League }) {
             <p>Season rewind</p>
           </li>
         </ul>
-      </span>
-    </div>
+      </CardBody>
+    </Card>
   );
 }

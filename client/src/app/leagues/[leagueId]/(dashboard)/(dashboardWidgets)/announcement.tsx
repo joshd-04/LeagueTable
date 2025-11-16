@@ -76,7 +76,7 @@ export default function Announcement({
             )}
           </div>
           <div className="h-full">
-            {league.announcement && league.announcement.text.length > 0 ? (
+            {announcement && announcement.text.length > 0 ? (
               <div className="flex flex-col justify-between grow-1 h-full">
                 <p className="text-sm">{announcement.text}</p>
                 <div className="flex flex-row">
@@ -208,6 +208,11 @@ function EditAnnouncementModal({
                 variant="flat"
                 value={announcementText}
                 onValueChange={setAnnouncementText}
+                description={
+                  <p className="text-muted">
+                    Do not enter harmful or sensitive content
+                  </p>
+                }
               />
             </ModalBody>
             <ModalFooter>

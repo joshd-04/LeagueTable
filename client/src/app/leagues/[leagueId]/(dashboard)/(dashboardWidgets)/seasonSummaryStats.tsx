@@ -1,6 +1,7 @@
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonSummaryStatsInterface } from '@/util/definitions';
+import { Card, CardBody } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 
 export default function SeasonSummaryStats({
@@ -24,16 +25,18 @@ export default function SeasonSummaryStats({
     data?.data.seasonSummaryStats;
 
   return (
-    <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <span>
-        <p className="text-md align-middle inline">Season stats</p>
-      </span>
-      {stats === undefined || isLoading ? (
-        <SeasonSummarySkeleton />
-      ) : (
-        <StatsLabels stats={stats} />
-      )}
-    </div>
+    <Card className="h-full w-full px-[10px]">
+      <CardBody className="flex flex-col gap-2">
+        <span>
+          <p className="text-base/[40px] align-middle inline">Season stats</p>
+        </span>
+        {stats === undefined || isLoading ? (
+          <SeasonSummarySkeleton />
+        ) : (
+          <StatsLabels stats={stats} />
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -41,20 +44,20 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
   return (
     <div className="flex flex-row flex-wrap justify-baseline flex-grow gap-x-[20px]">
       <span>
-        <p className="inline-block text-md">{stats.goalsScored}</p>{' '}
-        <p className="inline-block text-sm">
+        <p className="inline-block text-base">{stats.goalsScored}</p>{' '}
+        <p className="inline-block text-sm ">
           Goal{stats.goalsScored === 1 ? '' : 's'} Scored
         </p>
       </span>
       <span>
-        <p className="inline-block text-md">{stats.cleansheets}</p>{' '}
+        <p className="inline-block text-base">{stats.cleansheets}</p>{' '}
         <p className="inline-block text-sm">
           Cleansheet{stats.cleansheets === 1 ? '' : 's'}
         </p>
       </span>
       {stats.hattricks !== undefined && (
         <span>
-          <p className="inline-block text-md">{stats.hattricks}</p>{' '}
+          <p className="inline-block text-base">{stats.hattricks}</p>{' '}
           <p className="inline-block text-sm">
             Hattrick{stats.hattricks === 1 ? '' : 's'}
           </p>
@@ -62,7 +65,7 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
       )}
       {stats.ownGoals !== undefined && (
         <span>
-          <p className="inline-block text-md">{stats.ownGoals}</p>{' '}
+          <p className="inline-block text-base">{stats.ownGoals}</p>{' '}
           <p className="inline-block text-sm">
             Own goal{stats.ownGoals === 1 ? '' : 's'}
           </p>
@@ -70,7 +73,7 @@ function StatsLabels({ stats }: { stats: SeasonSummaryStatsInterface }) {
       )}
       {stats.soloGoals !== undefined && (
         <span>
-          <p className="inline-block text-md">{stats.soloGoals}</p>{' '}
+          <p className="inline-block text-base">{stats.soloGoals}</p>{' '}
           <p className="inline-block text-sm">
             Solo goal{stats.soloGoals === 1 ? '' : 's'}
           </p>

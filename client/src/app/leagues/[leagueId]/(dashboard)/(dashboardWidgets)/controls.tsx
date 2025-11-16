@@ -104,14 +104,14 @@ export default function Controls({
   return (
     <Card className="p-[10px]  h-full w-full">
       <CardBody className=" flex flex-col gap-2">
-        <p className="text-md">Controls</p>
+        <p className="text-base">Controls</p>
 
         <Button
           onPress={() => matchweekMutation()}
           color="primary"
           variant={isNextMatchweekButtonDisabled ? 'ghost' : 'shadow'}
           isDisabled={isNextMatchweekButtonDisabled}
-          className="font-semibold text-sm h-full"
+          className="font-semibold text-sm h-full min-h-12"
         >
           {matchweekButtonText}
         </Button>
@@ -121,7 +121,7 @@ export default function Controls({
           color="primary"
           variant={isNextSznButtonDisabled ? 'ghost' : 'shadow'}
           isDisabled={isNextSznButtonDisabled}
-          className="font-semibold text-sm h-full"
+          className="font-semibold text-sm h-full min-h-12"
         >
           {seasonButtonText}
         </Button>

@@ -79,7 +79,7 @@ function CardWhenOwner({
       <div className="absolute -bottom-12 -right-32 w-64 h-64 bg-secondary rounded-full blur-xl opacity-30"></div>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <p className="text-md font-medium">{leagueName}</p>
+          <p className="text-base font-medium">{leagueName}</p>
         </div>
       </CardHeader>
       <CardBody>

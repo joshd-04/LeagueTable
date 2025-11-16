@@ -36,7 +36,7 @@ export default function ResultsClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="justify-self-end text-md">
+          <p className="justify-self-end text-base">
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
           </p>
           <LinkButton
@@ -50,7 +50,7 @@ export default function ResultsClient({
           </LinkButton>
           <p
             style={{ justifySelf: 'start' }}
-            className="justify-self-start text-md"
+            className="justify-self-start text-base"
           >
             <select
               className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"

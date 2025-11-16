@@ -87,7 +87,7 @@ export default function FixturesClient({
       </LeagueBanner>
       <div className="flex flex-col gap-[20px] mx-[20px]">
         <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="text-md justify-self-end">
+          <p className="text-base justify-self-end">
             Season {league.currentSeason} Matchweek {league.currentMatchweek}
           </p>
           <LinkButton
@@ -99,7 +99,7 @@ export default function FixturesClient({
           >
             {league.name}
           </LinkButton>
-          <p className="text-md justify-self-start">
+          <p className="text-base justify-self-start">
             <select
               className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
               value={divisionFilter}
@@ -170,7 +170,7 @@ function FixtureRow({
     >
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
-        <p className="inline text-md text-muted">
+        <p className="inline text-base text-muted">
           {homePoints} pt{homePoints === 1 ? '' : 's'}
         </p>
         <Subtitle
@@ -199,7 +199,7 @@ function FixtureRow({
         >
           {fixture.awayTeamDetails.name}
         </Subtitle>
-        <p className="inline text-md text-muted">
+        <p className="inline text-base text-muted">
           {awayPoints} pt{awayPoints === 1 ? '' : 's'}
         </p>
         <TeamForm form={fixture.awayTeamDetails.form} />
@@ -217,7 +217,7 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
     <div className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline brightness-80">
       <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
         <TeamForm form={fixture.homeTeamDetails.form} />
-        <p className="text-md inline text-muted">
+        <p className="text-base inline text-muted">
           {homePoints} pt{homePoints === 1 ? '' : 's'}
         </p>
         <Subtitle
@@ -248,7 +248,7 @@ function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
         >
           {fixture.awayTeamDetails.name}
         </Subtitle>
-        <p className="inline text-md text-muted">
+        <p className="inline text-base text-muted">
           {awayPoints} pt{awayPoints === 1 ? '' : 's'}
         </p>
         <TeamForm form={fixture.awayTeamDetails.form} />

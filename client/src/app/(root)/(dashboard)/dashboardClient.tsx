@@ -39,12 +39,14 @@ export default function DashboardClient({
 
   useEffect(() => {
     setUser(initialUser);
-    addToast({
-      title: 'We ran into a problem',
-      description: initialError,
-      color: 'danger',
-      shouldShowTimeoutProgress: true,
-    });
+    if (initialError) {
+      addToast({
+        title: 'We ran into a problem',
+        description: initialError,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialUser, initialError]);
 
@@ -283,7 +285,7 @@ export default function DashboardClient({
 function LeagueSectionSkeleton({ title }: { title: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-md">{title}</p>
+      <p className="text-base">{title}</p>
       <div className=" animate-pulse">
         <NoLeaguesFound>
           <i>Loading...</i>
@@ -315,7 +317,7 @@ function LeagueSection({
   return (
     <div className="flex flex-col gap-2">
       {/* <div className="flex flex-row gap-2">
-        <p className="text-md">{title}</p>
+        <p className="text-base">{title}</p>
         <Chip variant="solid" radius="full" size="sm">
           {leaguesList.length}
         </Chip>
@@ -430,7 +432,7 @@ function LeagueRow({
 function NoLeaguesFound({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full h-[80px] bg-[var(--bg)] rounded-[10px] flex flex-col justify-center items-start px-[20px] py-[10px]  border-1 border-solid border-[var(--border)] ">
-      <p className="text-md text-muted">{children}</p>
+      <p className="text-base text-muted">{children}</p>
     </div>
   );
 }
