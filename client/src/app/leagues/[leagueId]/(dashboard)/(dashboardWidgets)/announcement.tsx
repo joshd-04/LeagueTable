@@ -121,9 +121,14 @@ function EditAnnouncementModal({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<QueryObserverResult<any, Error>>;
 }) {
-  const [announcementText, setAnnouncementText] = useState(
-    initialAnnouncement.text
-  );
+  const [announcementText, setAnnouncementText] = useState('');
+
+  // Reset text every time modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setAnnouncementText(initialAnnouncement.text || '');
+    }
+  }, [isOpen, initialAnnouncement.text]);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -177,6 +182,10 @@ function EditAnnouncementModal({
   });
 
   async function handleSubmit(closeModal: () => void) {
+    if (announcementText === initialAnnouncement.text) {
+      closeModal();
+      return;
+    }
     await handleEditAnnouncement();
     closeModal();
   }
@@ -203,7 +212,7 @@ function EditAnnouncementModal({
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>
-                Close
+                Cancel
               </Button>
               <Button
                 className="font-semibold text-sm"

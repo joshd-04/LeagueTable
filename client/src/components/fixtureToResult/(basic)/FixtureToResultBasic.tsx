@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useContext, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 import { AnimatePresence, motion } from 'motion/react';
 import Button from '../../text/Button';
@@ -8,7 +8,7 @@ import { Fixture } from '@/util/definitions';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
-import { GlobalContext } from '@/context/GlobalContextProvider';
+import { addToast } from '@heroui/react';
 
 export default function FixtureToResultBasic({
   fixtureObj,
@@ -22,7 +22,6 @@ export default function FixtureToResultBasic({
   onResolution?: (isSuccess: boolean) => void;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
-  const { setError } = useContext(GlobalContext).errors;
 
   function handleSubmit() {
     const basicOutcome = matchStory;
@@ -47,14 +46,29 @@ export default function FixtureToResultBasic({
         if (onResolution) onResolution(true);
       } else if (response.status === 'fail') {
         const message = response.data.message;
-        setError(message);
+        addToast({
+          title: 'There was a problem',
+          description: message,
+          color: 'warning',
+          shouldShowTimeoutProgress: true,
+        });
         if (onResolution) onResolution(false);
       } else {
-        setError(response.message);
+        addToast({
+          title: 'Something went wrong',
+          description: response.message,
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
       }
     },
     onError: (e) => {
-      setError(e.message);
+      addToast({
+        title: 'We ran into a problem',
+        description: e.message,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 

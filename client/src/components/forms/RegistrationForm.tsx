@@ -1,5 +1,6 @@
 'use client';
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -37,7 +38,6 @@ export default function RegistrationForm() {
 
   const globalContext = useContext(GlobalContext);
   const setUser = globalContext.account.setUser;
-  const setError = globalContext.errors.setError;
 
   const router = useRouter();
 
@@ -65,31 +65,41 @@ export default function RegistrationForm() {
 
   const { mutateAsync: handleRequestMutation, isPending } = useMutation({
     mutationFn: handleSendRequest,
-    onSuccess: (result) => {
-      if (result.status === 'success') {
+    onSuccess: (response) => {
+      if (response.status === 'success') {
         setIsRegisterSuccess(true);
         const user: User = {
-          id: result.data.userId,
-          username: result.data.username,
-          email: result.data.email,
-          accountType: result.data.accountType,
+          id: response.data.userId,
+          username: response.data.username,
+          email: response.data.email,
+          accountType: response.data.accountType,
         };
         setUser(user);
         setTimeout(() => {
           router.push('/');
         }, 300);
-      } else if (result.status === 'fail') {
-        if (result.statusCode === 400) {
+      } else if (response.status === 'fail') {
+        if (response.statusCode === 400) {
           setIsError(true);
-          const errors: { [key: string]: string } = result.data.errors;
+          const errors: { [key: string]: string } = response.data.errors;
           setServerErrors(errors);
         }
       } else {
-        setError(result.message);
+        addToast({
+          title: 'We ran into a problem',
+          description: response.message,
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
       }
     },
     onError: (e) => {
-      setError(e.message);
+      addToast({
+        title: 'We ran into a problem',
+        description: e.message,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 

@@ -3,7 +3,7 @@ import Heading3 from '@/components/text/Heading3';
 
 import Subtitle from '@/components/text/Subtitle';
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import React, { Key, Suspense, useContext, useEffect, useState } from 'react';
+import React, { Suspense, useContext, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { LeagueInterface } from './dashboard';
@@ -13,7 +13,7 @@ import { API_URL } from '@/util/config';
 import FavouriteSVG from '@/assets/svg components/Favourite';
 import FavouritedSVG from '@/assets/svg components/Favourited';
 import { useQuery } from '@tanstack/react-query';
-import { Chip, Tab, Tabs } from '@heroui/react';
+import { addToast, Chip, Tab, Tabs } from '@heroui/react';
 
 interface LeaguesInterface {
   created: LeagueInterface[];
@@ -36,11 +36,15 @@ export default function DashboardClient({
 }) {
   const context = useContext(GlobalContext);
   const { user, setUser } = context.account;
-  const { setError } = context.errors;
 
   useEffect(() => {
     setUser(initialUser);
-    setError(initialError);
+    addToast({
+      title: 'We ran into a problem',
+      description: initialError,
+      color: 'danger',
+      shouldShowTimeoutProgress: true,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialUser, initialError]);
 
@@ -151,13 +155,13 @@ export default function DashboardClient({
         }
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(error);
-        setError(error.message);
-      } else {
-        console.error(error);
-        setError('An unknown error occurred.');
-      }
+      const e = error as Error;
+      addToast({
+        title: 'We ran into a problem',
+        description: e.message || undefined,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     }
   }
 
@@ -292,7 +296,6 @@ function LeagueSectionSkeleton({ title }: { title: string }) {
 function LeagueSection({
   simplifiedLeagues,
   leaguesList,
-  title,
   handleClick,
   handleFavClick,
 }: {

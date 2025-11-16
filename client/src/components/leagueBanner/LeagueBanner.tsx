@@ -1,8 +1,6 @@
 'use client';
 import Image from 'next/image';
 import { League } from '@/util/definitions';
-import { useContext } from 'react';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import Particles from '@/assets/reactbits/backgrounds/Particles';
 
 export default function LeagueBanner({

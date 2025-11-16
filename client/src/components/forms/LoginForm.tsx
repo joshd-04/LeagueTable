@@ -1,5 +1,6 @@
 'use client';
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -10,12 +11,11 @@ import {
   Spacer,
   Tooltip,
 } from '@heroui/react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 export default function LoginForm({
@@ -27,9 +27,6 @@ export default function LoginForm({
   const [password, setPassword] = useState('');
   const [isError, setIsError] = useState(false);
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
-
-  const globalContext = useContext(GlobalContext);
-  const setError = globalContext.errors.setError;
 
   const router = useRouter();
 
@@ -54,20 +51,30 @@ export default function LoginForm({
 
   const { mutateAsync: handleRequestMutation, isPending } = useMutation({
     mutationFn: handleSendRequest,
-    onSuccess: (result) => {
-      if (result.status === 'success') {
+    onSuccess: (response) => {
+      if (response.status === 'success') {
         setIsLoginSuccess(true);
         setTimeout(() => {
           router.push(callbackUrl);
         }, 300);
-      } else if (result.status === 'fail') {
+      } else if (response.status === 'fail') {
         setIsError(true);
       } else {
-        setError(result.message);
+        addToast({
+          title: 'We ran into a problem',
+          description: response.message,
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
       }
     },
     onError: (e) => {
-      setError(e.message);
+      addToast({
+        title: 'We ran into a problem',
+        description: e.message,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 

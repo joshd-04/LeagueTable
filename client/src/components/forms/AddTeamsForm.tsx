@@ -1,20 +1,19 @@
 'use client';
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { API_URL } from '@/util/config';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import useAccount from '@/hooks/useAccount';
 import { useMutation } from '@tanstack/react-query';
-import { useNotifier } from '@/hooks/useNotifier';
-import { Button, Card, CardBody, Form, Input, Spacer } from '@heroui/react';
+import {
+  addToast,
+  Button,
+  Card,
+  CardBody,
+  Form,
+  Input,
+  Spacer,
+} from '@heroui/react';
 
 export default function AddTablesForm({
   leagueName,
@@ -51,10 +50,6 @@ export default function AddTablesForm({
   const [teamInputs, setTeamInputs] =
     useState<{ name: string }[][]>(emptyInputs);
 
-  const globalContext = useContext(GlobalContext);
-  const setError = globalContext.errors.setError;
-
-  const [isError, setIsError] = useState(false);
   const [isFormSuccess, setIsFormSuccess] = useState(false);
 
   const failMessageRef = useRef('');
@@ -67,14 +62,6 @@ export default function AddTablesForm({
     if (!isLoggedIn) router.replace('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const errorNotification = useNotifier({
-    title: 'There was a problem!',
-    description: () => failMessageRef.current,
-    duration: 5000,
-    id: 'tables-creation-error',
-    type: 'error',
-  });
 
   function handleSendRequest() {
     const teamNames: string[] = [];
@@ -105,14 +92,28 @@ export default function AddTablesForm({
         }, 300);
       } else if (result.status === 'fail') {
         failMessageRef.current = result.data.message;
-        errorNotification?.fire();
-        setIsError(true);
+        addToast({
+          title: 'There was a problem',
+          description: "We couldn't add teams to your to your league",
+          color: 'warning',
+          shouldShowTimeoutProgress: true,
+        });
       } else {
-        setError(result.message);
+        addToast({
+          title: 'We ran into a problem',
+          description: 'Something went wrong on our end',
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
       }
     },
     onError: (e) => {
-      setError(e.message);
+      addToast({
+        title: 'We ran into a problem',
+        description: e.message,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 

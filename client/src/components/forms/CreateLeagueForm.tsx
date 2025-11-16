@@ -1,5 +1,6 @@
 'use client';
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -12,12 +13,11 @@ import {
   RadioGroup,
   Spacer,
 } from '@heroui/react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 
 export default function CreateLeagueForm() {
   const [leagueName, setLeagueName] = useState<string>('');
@@ -30,9 +30,6 @@ export default function CreateLeagueForm() {
   const [serverErrors, setServerErrors] = useState<{ [key: string]: string }>(
     {}
   );
-
-  const globalContext = useContext(GlobalContext);
-  const setError = globalContext.errors.setError;
 
   const router = useRouter();
 
@@ -66,11 +63,21 @@ export default function CreateLeagueForm() {
           setServerErrors(errors);
         }
       } else {
-        setError(response.message);
+        addToast({
+          title: 'We ran into a problem',
+          description: response.message,
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
       }
     },
     onError: (e) => {
-      setError(e.message);
+      addToast({
+        title: 'We ran into a problem',
+        description: e.message,
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 

@@ -12,10 +12,6 @@ interface GlobalContextInterface {
     colorTheme: 'light' | 'dark';
     setColorTheme: (colorTheme: 'light' | 'dark') => void;
   };
-  errors: {
-    error: string;
-    setError: (error: string) => void;
-  };
 }
 
 const defaultGlobalContext: GlobalContextInterface = {
@@ -27,10 +23,6 @@ const defaultGlobalContext: GlobalContextInterface = {
     colorTheme: 'dark',
     setColorTheme: () => {},
   },
-  errors: {
-    error: '',
-    setError: () => {},
-  },
 };
 
 export const GlobalContext =
@@ -38,7 +30,6 @@ export const GlobalContext =
 
 export default function GlobalContextProvider({
   initialUser,
-  initialError,
   children,
 }: {
   initialUser: User | undefined | null;
@@ -47,7 +38,6 @@ export default function GlobalContextProvider({
 }) {
   const [user, setUser] = useState<User | undefined | null>(initialUser);
   const [colorTheme, setColorTheme] = useState<'light' | 'dark'>('dark');
-  const [error, setError] = useState(initialError);
 
   // On mount, set the color theme to the user's sytem theme
   // useEffect(() => {
@@ -73,10 +63,6 @@ export default function GlobalContextProvider({
     colorTheme: {
       colorTheme,
       setColorTheme,
-    },
-    errors: {
-      error,
-      setError,
     },
   };
 

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Instrument_Sans, Inter, Roboto } from 'next/font/google';
 import './globals.css';
-import ErrorMessage from '@/components/errorMessage/ErrorMessage';
 import Footer from '@/components/footer/Footer';
 import { cookies } from 'next/headers';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
@@ -84,7 +83,6 @@ export default async function RootLayout({
           <NavBar />
           {children}
           <Footer />
-          <ErrorMessage />
         </Providers>
       </body>
     </html>
