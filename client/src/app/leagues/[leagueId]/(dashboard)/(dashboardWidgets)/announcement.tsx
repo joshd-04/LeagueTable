@@ -1,24 +1,32 @@
-import EditSVG from '@/assets/svg components/Edit';
-import Button from '@/components/text/Button';
-
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
 import {
-  UseMutateAsyncFunction,
+  Button,
+  Card,
+  CardBody,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Textarea,
+  useDisclosure,
+} from '@heroui/react';
+import {
+  QueryObserverResult,
+  RefetchOptions,
   useMutation,
   useQuery,
-  useQueryClient,
 } from '@tanstack/react-query';
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { FaRegEdit } from 'react-icons/fa';
+
+interface IAnnouncement {
+  text: string;
+  date: Date;
+}
 
 export default function Announcement({
   league,
@@ -30,14 +38,15 @@ export default function Announcement({
   const [announcement, setAnnouncement] = useState(
     league.announcement || { text: '', date: new Date() }
   );
-  const [announcementEditingText, setAnnouncementEditingText] = useState(
-    announcement.text
-  );
-  const [isEditingAnnouncement, setIsEditingAnnouncement] = useState(false);
-  const { setError } = useContext(GlobalContext).errors;
-  const queryClient = useQueryClient();
 
-  const { data, isLoading, isSuccess } = useQuery({
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    refetch: refetchAnnouncement,
+  } = useQuery({
     queryFn: () =>
       fetchAPI(`${API_URL}/leagues/${league._id}/announcement`, {
         method: 'GET',
@@ -46,13 +55,84 @@ export default function Announcement({
   });
 
   useEffect(() => {
+    if (isLoading) {
+      console.log('Im fetching the announcement');
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
     if (isLoading === false && isSuccess && data !== undefined) {
       setAnnouncement(data.data.announcement);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  return (
+    <>
+      <Card className="h-full w-full px-[10px] pb-[6px]">
+        <CardBody className="flex flex-col gap-2">
+          <div className="flex flex-row justify-between items-center">
+            <p className="align-middle inline text-base/[40px]">
+              Latest Announcement
+            </p>
+            {userOwnsThisLeague && (
+              <Button variant="flat" onPress={onOpen} isIconOnly>
+                <FaRegEdit className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+          <div className="h-full">
+            {league.announcement && league.announcement.text.length > 0 ? (
+              <div className="flex flex-col justify-between grow-1 h-full">
+                <p className="text-sm">{announcement.text}</p>
+                <div className="flex flex-row">
+                  <p className="text-sm text-muted">
+                    {new Date(announcement.date).toLocaleTimeString(undefined, {
+                      timeStyle: 'short',
+                    })}{' '}
+                    • {new Date(announcement.date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm italic text-muted">No announcements yet</p>
+            )}
+          </div>
+        </CardBody>
+      </Card>
+      <EditAnnouncementModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        initialAnnouncement={announcement}
+        league={league}
+        fetchAnnouncement={refetchAnnouncement}
+      />
+    </>
+  );
+}
+
+function EditAnnouncementModal({
+  isOpen,
+  onOpenChange,
+  initialAnnouncement,
+  league,
+  fetchAnnouncement,
+}: {
+  isOpen: boolean;
+  onOpenChange: () => void;
+  initialAnnouncement: IAnnouncement;
+  league: League;
+  fetchAnnouncement: (
+    options?: RefetchOptions | undefined
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) => Promise<QueryObserverResult<any, Error>>;
+}) {
+  const [announcementText, setAnnouncementText] = useState(
+    initialAnnouncement.text
+  );
+
   const abortControllerRef = useRef<AbortController | null>(null);
+  const { setError } = useContext(GlobalContext).errors;
 
   const { mutateAsync: handleEditAnnouncement } = useMutation({
     mutationFn: () => {
@@ -65,114 +145,60 @@ export default function Announcement({
       return fetchAPI(`${API_URL}/leagues/${league._id}/announcement`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: announcementEditingText }),
+        body: JSON.stringify({ text: announcementText }),
         credentials: 'include',
       });
     },
     onSuccess: () => {
-      setIsEditingAnnouncement(false);
-      queryClient.invalidateQueries({ queryKey: ['announcement'] });
+      fetchAnnouncement();
     },
     onError: (error) => {
-      setIsEditingAnnouncement(false);
       setError(error.message);
     },
   });
 
+  async function handleSubmit(closeModal: () => void) {
+    await handleEditAnnouncement();
+    closeModal();
+  }
+
   return (
-    <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <div className="flex flex-row justify-between">
-        <p className="align-middle inline text-md">Latest Announcement</p>
-        {userOwnsThisLeague && !isEditingAnnouncement && (
-          <Button
-            color="transparent"
-            bgHoverColor="var(--bg-light)"
-            borderlessButton={true}
-            underlineEffect={false}
-            shadowEffect={false}
-            style={{ padding: '10px' }}
-            onClick={() => {
-              setAnnouncementEditingText(announcement.text);
-              setIsEditingAnnouncement((prev) => !prev);
-            }}
-          >
-            <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
-          </Button>
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">
+              Edit Announcement
+            </ModalHeader>
+            <ModalBody>
+              <Textarea
+                // className="max-w-xs"
+                label="Announcement"
+                placeholder="Enter your new announcement"
+                labelPlacement="inside"
+                isClearable
+                variant="flat"
+                value={announcementText}
+                onValueChange={setAnnouncementText}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>
+                Close
+              </Button>
+              <Button
+                className="font-semibold text-sm"
+                color="primary"
+                onPress={() => {
+                  handleSubmit(onClose);
+                }}
+              >
+                Save
+              </Button>
+            </ModalFooter>
+          </>
         )}
-      </div>
-
-      {!isEditingAnnouncement &&
-        (league.announcement && league.announcement.text.length > 0 ? (
-          <div className="flex flex-col justify-between grow-1">
-            <p className="text-sm">{announcement.text}</p>
-            <div className="flex flex-row">
-              <p className="text-sm">
-                {new Date(announcement.date).toLocaleTimeString(undefined, {
-                  timeStyle: 'short',
-                })}{' '}
-                • {new Date(announcement.date).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm italic">No announcements yet</p>
-        ))}
-      {isEditingAnnouncement && (
-        <p className="flex flex-col grow text-sm">
-          <TextAreaComponent
-            announcement={announcement}
-            announcementEditingText={announcementEditingText}
-            setAnnouncementEditingText={setAnnouncementEditingText}
-            setIsEditingAnnouncement={setIsEditingAnnouncement}
-            handleEditAnnouncement={handleEditAnnouncement}
-          />
-        </p>
-      )}
-    </div>
-  );
-}
-
-function TextAreaComponent({
-  announcement,
-  announcementEditingText,
-  setAnnouncementEditingText,
-  setIsEditingAnnouncement,
-  handleEditAnnouncement,
-}: {
-  announcement: {
-    text: string;
-    date: Date;
-  };
-  announcementEditingText: string;
-  setAnnouncementEditingText: Dispatch<SetStateAction<string>>;
-  setIsEditingAnnouncement: Dispatch<SetStateAction<boolean>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handleEditAnnouncement: UseMutateAsyncFunction<any, Error, void, unknown>;
-}) {
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-  useEffect(() => {
-    if (textAreaRef.current !== null) {
-      textAreaRef.current.focus();
-      textAreaRef.current.setSelectionRange(
-        announcementEditingText.length,
-        announcementEditingText.length
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return (
-    <textarea
-      className="bg-[var(--bg-light)] w-full h-full flex-grow outline-none border-1 border-[var(--border)] rounded-[10px] p-[10px]"
-      value={announcementEditingText}
-      onChange={(e) => setAnnouncementEditingText(e.target.value)}
-      ref={textAreaRef}
-      onBlur={() => {
-        if (announcement.text !== announcementEditingText)
-          handleEditAnnouncement();
-        else setIsEditingAnnouncement(false);
-      }}
-      maxLength={150}
-      rows={3}
-    />
+      </ModalContent>
+    </Modal>
   );
 }

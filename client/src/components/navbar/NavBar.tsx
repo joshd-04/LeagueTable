@@ -120,7 +120,8 @@ export default function NavBar() {
                 as={Link}
                 href="/create-league"
                 color="primary"
-                variant="solid"
+                variant="shadow"
+                className="font-semibold text-sm"
               >
                 <p>Create league</p>
               </Button>

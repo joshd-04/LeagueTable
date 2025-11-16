@@ -6,7 +6,16 @@ export default function TanstackQueryContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false, // ← THIS
+        // refetchOnMount: false, // optional: only fetch if stale
+        // refetchOnReconnect: false, // optional
+        // staleTime: 5 * 60 * 1000, // 5 minutes — adjust as needed
+      },
+    },
+  });
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

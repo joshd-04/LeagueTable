@@ -3,7 +3,6 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
 import { useContext, useEffect, useState } from 'react';
-import Announcement from './(dashboardWidgets)/announcement';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
 import Controls from './(dashboardWidgets)/controls';
@@ -19,6 +18,7 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
 import { IoPersonSharp } from 'react-icons/io5';
+import Announcement from './(dashboardWidgets)/announcement';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard({

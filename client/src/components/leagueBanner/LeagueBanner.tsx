@@ -79,7 +79,7 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
 }
 
 function LeagueBannerStandard({ children }: { children: React.ReactNode }) {
-  const { colorTheme } = useContext(GlobalContext).colorTheme;
+  // Brightness values can be adjustable in league settings
   return (
     <div className="relative">
       <Image
@@ -87,9 +87,7 @@ function LeagueBannerStandard({ children }: { children: React.ReactNode }) {
         alt={'Banner'}
         width={2560}
         height={338}
-        className={`${
-          colorTheme === 'dark' ? 'brightness-[50%]' : 'brightness-[100%]'
-        } transition-all`}
+        className={' brightness-100 dark:brightness-50 transition-all'}
       />
       {children}
     </div>
