@@ -6,7 +6,6 @@ import { useContext, useEffect, useState } from 'react';
 import Upgrade from './(dashboardWidgets)/upgrade';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
-import Controls from './(dashboardWidgets)/controls';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import Stats from './(dashboardWidgets)/stats';
 import Heading1 from '@/components/text/Heading1';
@@ -17,6 +16,7 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
 import { IoPersonSharp } from 'react-icons/io5';
+import Controls from './(dashboardWidgets)/controls';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardFree({

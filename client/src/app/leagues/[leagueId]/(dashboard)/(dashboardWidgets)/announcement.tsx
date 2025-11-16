@@ -1,8 +1,8 @@
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -20,7 +20,7 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaRegEdit } from 'react-icons/fa';
 
 interface IAnnouncement {
@@ -126,7 +126,6 @@ function EditAnnouncementModal({
   );
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const { setError } = useContext(GlobalContext).errors;
 
   const { mutateAsync: handleEditAnnouncement } = useMutation({
     mutationFn: () => {
@@ -143,11 +142,37 @@ function EditAnnouncementModal({
         credentials: 'include',
       });
     },
-    onSuccess: () => {
-      fetchAnnouncement();
+    onSuccess: (response) => {
+      if (response.status === 'success') {
+        fetchAnnouncement();
+        addToast({
+          title: 'Announcement set!',
+          color: 'success',
+          shouldShowTimeoutProgress: true,
+        });
+      } else if (response.status === 'fail') {
+        addToast({
+          title: 'Unable to set announcement',
+          description: 'Something went wrong',
+          color: 'warning',
+          shouldShowTimeoutProgress: true,
+        });
+      } else {
+        addToast({
+          title: 'Could not update announcement',
+          description: 'Something went wrong on our end',
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
+      }
     },
-    onError: (error) => {
-      setError(error.message);
+    onError: () => {
+      addToast({
+        title: 'Could not update announcement',
+        description: 'Something went wrong on our end',
+        color: 'danger',
+        shouldShowTimeoutProgress: true,
+      });
     },
   });
 

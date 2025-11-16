@@ -5,7 +5,6 @@ import { Fixture, League } from '@/util/definitions';
 import { useContext, useEffect, useState } from 'react';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
-import Controls from './(dashboardWidgets)/controls';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import NewsFeed from './(dashboardWidgets)/newsFeed';
 import SeasonRewind from './(dashboardWidgets)/seasonRewind';
@@ -19,6 +18,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
 import { IoPersonSharp } from 'react-icons/io5';
 import Announcement from './(dashboardWidgets)/announcement';
+import Controls from './(dashboardWidgets)/controls';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard({
@@ -75,6 +75,7 @@ export default function LeagueDashboardStandard({
     queryClient.invalidateQueries({ queryKey: ['stats'] });
     queryClient.invalidateQueries({ queryKey: ['seasonSummaryStats'] });
     queryClient.invalidateQueries({ queryKey: ['table'] });
+    console.log('invalidated');
   }
 
   return (

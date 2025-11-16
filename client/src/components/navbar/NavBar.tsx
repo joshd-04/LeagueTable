@@ -1,5 +1,6 @@
 'use client';
 import {
+  addToast,
   Avatar,
   Button,
   Dropdown,
@@ -152,7 +153,13 @@ export default function NavBar() {
                   <p className="font-semibold">Signed in as</p>
                   <p className="font-semibold">{user?.email}</p>
                 </DropdownItem>
-                <DropdownItem key="reportbug" textValue="Report a bug">
+                <DropdownItem
+                  key="reportbug"
+                  textValue="Report a bug"
+                  onPress={() => {
+                    addToast({ title: 'Random stuff' });
+                  }}
+                >
                   Upgrade to PRO
                 </DropdownItem>
               </DropdownSection>

@@ -52,11 +52,13 @@
 /* 1. Allow <body> to be the scroll container */
 html {
   height: 100%;
+  /* width: 98vw; */
   overflow: hidden; /* Block <html> from scrolling */
 }
 
 body {
   height: 100%;
+  /* width: 98vw; */
   overflow-y: auto; /* Enable scroll on <body> */
   overflow-x: hidden;
   scrollbar-gutter: stable; /* Prevent layout shift */
@@ -66,4 +68,8 @@ body {
 /* 2. Ensure sticky works */
 .sticky {
   position: sticky !important;
+}
+
+.heroui-toast {
+  right: calc(16px + var(--scrollbar-width, 0px)) !important;
 }

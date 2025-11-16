@@ -3,7 +3,7 @@ import GlobalContextProvider from '@/context/GlobalContextProvider';
 import { NotificationContextProvider } from '@/context/NotificationContextProvider';
 import TanstackQueryContextProvider from '@/context/TanstackQueryContextProvider';
 import { User } from '@/util/definitions';
-import { HeroUIProvider } from '@heroui/react';
+import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
@@ -38,6 +38,7 @@ export default function Providers({
             initialError={initialError}
           >
             <NotificationContextProvider>
+              <ToastProvider />
               {children}
             </NotificationContextProvider>
           </GlobalContextProvider>

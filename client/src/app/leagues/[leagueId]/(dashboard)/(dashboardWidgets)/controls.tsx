@@ -1,20 +1,11 @@
 'use client';
-import Button from '@/components/text/Button';
 
-import { GlobalContext } from '@/context/GlobalContextProvider';
-import { useNotifier } from '@/hooks/useNotifier';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
+import { addToast, Button, Card, CardBody } from '@heroui/react';
 import { useMutation } from '@tanstack/react-query';
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
 export default function Controls({
   league,
@@ -31,9 +22,7 @@ export default function Controls({
   const [matchweekButtonText, setMatchweekButtonText] = useState(
     `Start matchweek ${currentMatchweek + 1}`
   );
-  const [seasonButtonText, setSeasonButtonText] = useState('Start next season');
-
-  const { setError } = useContext(GlobalContext).errors;
+  const [seasonButtonText] = useState('Start next season');
 
   const currentMatchweekRef = useRef(league.currentMatchweek);
   useEffect(() => {
@@ -41,24 +30,6 @@ export default function Controls({
     setCurrentMatchweek(league.currentMatchweek);
     setMatchweekButtonText(`Start matchweek ${league.currentMatchweek + 1}`);
   }, [league.currentMatchweek]);
-
-  const notiMatchweekSuccess = useNotifier({
-    id: 'matchweek',
-    type: 'success',
-    // use the ref so the generator reads the latest value when fired
-    title: () => `Matchweek ${currentMatchweekRef.current + 1} is underway!`,
-    duration: 3000,
-  });
-  const notiMatchweekError = useNotifier({
-    id: 'matchweek',
-    type: 'error',
-    title: 'Matchweek Error',
-    description: () =>
-      `There was a problem starting matchweek ${
-        currentMatchweekRef.current + 1
-      } :(`,
-    duration: 3000,
-  });
 
   function handleStartNextMatchweek() {
     return fetchAPI(`${API_URL}/leagues/${league._id}/start-next-matchweek`, {
@@ -71,30 +42,21 @@ export default function Controls({
     mutationFn: handleStartNextMatchweek,
     onSuccess: () => {
       invalidateDashboardQueries();
-      notiMatchweekSuccess?.fire();
+      addToast({
+        title: 'Success!',
+        description: `Matchweek ${currentMatchweek + 1} is underway`,
+        shouldShowTimeoutProgress: true,
+        color: 'success',
+      });
     },
-    onError: (e) => {
-      setMatchweekButtonText('Something went wrong');
-      notiMatchweekError?.fire();
-      setError(e.message);
-      setTimeout(() => {
-        setMatchweekButtonText(`Start matchweek ${currentMatchweek + 1}`);
-      }, 3000);
+    onError: () => {
+      addToast({
+        title: 'Something went wrong',
+        description: `We could not start matchweek ${currentMatchweek + 1}`,
+        shouldShowTimeoutProgress: true,
+        color: 'danger',
+      });
     },
-  });
-
-  const notiSeasonSuccess = useNotifier({
-    id: 'season',
-    type: 'success',
-    title: 'Next Season is underway',
-    duration: 3000,
-  });
-  const notiSeasonError = useNotifier({
-    id: 'season',
-    type: 'error',
-    title: 'Season Error',
-    description: 'There was an error starting the next season :(',
-    duration: 3000,
   });
 
   function handleStartNextSeason() {
@@ -112,48 +74,58 @@ export default function Controls({
       if (setSeasonViewing) {
         setSeasonViewing((prev) => prev + 1);
       }
-      notiSeasonSuccess?.fire();
+      addToast({
+        title: 'Success!',
+        description: `The next season is underway`,
+        shouldShowTimeoutProgress: true,
+        color: 'success',
+      });
     },
-    onError: (e) => {
-      setSeasonButtonText('Something went wrong');
-      notiSeasonError?.fire();
-      setError(e.message);
-      setTimeout(() => {
-        setSeasonButtonText(`Start next season`);
-      }, 3000);
+    onError: () => {
+      addToast({
+        title: 'Something went wrong',
+        description: `We could not start the next season`,
+        shouldShowTimeoutProgress: true,
+        color: 'danger',
+      });
     },
   });
 
-  return (
-    <div className="p-[20px]  h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <span>
-        <p className="text-md align-middle inline">Controls</p>
-      </span>
-      <Button
-        onClick={() => matchweekMutation()}
-        color="var(--primary)"
-        bgHoverColor="var(--accent)"
-        disabled={
-          league.currentMatchweek === league.finalMatchweek ||
-          league.currentMatchweek === 0
-        }
-      >
-        <p className="font-bold text-inherit text-sm">{matchweekButtonText}</p>
-      </Button>
+  const isNextMatchweekButtonDisabled =
+    league.currentMatchweek === league.finalMatchweek ||
+    league.currentMatchweek === 0;
 
-      <Button
-        onClick={() => seasonMutation()}
-        color="var(--primary)"
-        bgHoverColor="var(--accent)"
-        disabled={
-          !(
-            league.currentMatchweek === league.finalMatchweek &&
-            league.fixtures.length === 0
-          ) && !(league.currentSeason === 0 && league.currentMatchweek === 0)
-        }
-      >
-        <p className="font-bold text-inherit text-sm">{seasonButtonText}</p>
-      </Button>
-    </div>
+  const isNextSznButtonDisabled =
+    !(
+      league.currentMatchweek === league.finalMatchweek &&
+      league.fixtures.length === 0
+    ) && !(league.currentSeason === 0 && league.currentMatchweek === 0);
+
+  return (
+    <Card className="p-[10px]  h-full w-full">
+      <CardBody className=" flex flex-col gap-2">
+        <p className="text-md">Controls</p>
+
+        <Button
+          onPress={() => matchweekMutation()}
+          color="primary"
+          variant={isNextMatchweekButtonDisabled ? 'ghost' : 'shadow'}
+          isDisabled={isNextMatchweekButtonDisabled}
+          className="font-semibold text-sm h-full"
+        >
+          {matchweekButtonText}
+        </Button>
+
+        <Button
+          onPress={() => seasonMutation()}
+          color="primary"
+          variant={isNextSznButtonDisabled ? 'ghost' : 'shadow'}
+          isDisabled={isNextSznButtonDisabled}
+          className="font-semibold text-sm h-full"
+        >
+          {seasonButtonText}
+        </Button>
+      </CardBody>
+    </Card>
   );
 }
