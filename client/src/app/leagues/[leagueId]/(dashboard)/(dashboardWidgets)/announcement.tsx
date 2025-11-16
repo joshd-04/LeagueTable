@@ -55,12 +55,6 @@ export default function Announcement({
   });
 
   useEffect(() => {
-    if (isLoading) {
-      console.log('Im fetching the announcement');
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
     if (isLoading === false && isSuccess && data !== undefined) {
       setAnnouncement(data.data.announcement);
     }

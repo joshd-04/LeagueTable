@@ -135,6 +135,10 @@ function TableComponent({
     direction: 'descending',
   });
 
+  useEffect(() => {
+    setSortDescriptor({ column: 'position', direction: 'descending' });
+  }, [divisionViewing]);
+
   const isSortedByPosition = sortDescriptor.column === 'position';
 
   interface TableColumn {
