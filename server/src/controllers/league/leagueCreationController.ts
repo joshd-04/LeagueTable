@@ -61,7 +61,7 @@ export async function leagueCreationController(
     }
 
     // If the user has a free account, league can have max of 2 seasons
-    const leagueLevel = accountType === 'free' ? 'free' : 'standard';
+    const leagueLevel = accountType;
     let maxSeasonLimit: number | null;
     if (leagueLevel === 'free') {
       maxSeasonLimit = 2;

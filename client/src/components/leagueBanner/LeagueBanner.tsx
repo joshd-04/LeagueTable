@@ -12,8 +12,13 @@ export default function LeagueBanner({
 }) {
   if (league.leagueLevel === 'free')
     return <LeagueBannerFree>{children}</LeagueBannerFree>;
-  if (league.leagueLevel === 'standard')
+  else if (league.leagueLevel === 'pro')
     return <LeagueBannerStandard>{children}</LeagueBannerStandard>;
+  else if (league.leagueLevel === 'pro+')
+    return <LeagueBannerStandard>{children}</LeagueBannerStandard>;
+  else {
+    return <div>Invalid leagueLevel</div>;
+  }
 }
 
 function LeagueBannerFree({ children }: { children: React.ReactNode }) {

@@ -98,7 +98,7 @@ export default async function Page({ params }) {
   if (response.status === 'success') {
     const league: League = response.data.league;
 
-    if (league.leagueLevel === 'standard') {
+    if (league.leagueLevel === 'pro' || league.leagueLevel === 'pro+') {
       // paid features
 
       return <LeagueDashboardStandard initialLeague={league} />;

@@ -2,7 +2,7 @@ import { Document, Types } from 'mongoose';
 
 export interface ILeagueSchema extends Document {
   name: string;
-  leagueLevel: 'free' | 'standard';
+  leagueLevel: 'free' | 'pro' | 'pro+';
   announcement?: {
     date: Date;
     text: string;
@@ -94,7 +94,7 @@ export interface IUserSchema extends Document {
   username: string;
   email: string;
   passwordHash: string;
-  accountType: 'free' | 'pro';
+  accountType: 'free' | 'pro' | 'pro+';
   leaguesCreated: [];
   favouriteLeagues: [];
   followedLeagues: [];

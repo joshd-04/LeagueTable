@@ -1,10 +1,29 @@
 'use client';
 
+import ProChip from '@/components/chips/ProChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonStats } from '@/util/definitions';
+import {
+  Card,
+  CardBody,
+  Select,
+  SelectItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+interface IStat {
+  key: string;
+  label: string;
+  unit: string;
+}
 
 export default function Stats({
   league,
@@ -15,9 +34,22 @@ export default function Stats({
   seasonViewing?: number;
   divisionViewing: number;
 }) {
-  const [view, setView] = useState(
-    league.leagueType === 'basic' ? 'cleansheets' : 'topScorers'
+  const allPossibleStats: IStat[] = [
+    { key: 'topScorers', label: 'Top scorers', unit: 'Goals' },
+    { key: 'mostAssists', label: 'Most assists', unit: 'Assists' },
+    { key: 'cleansheets', label: 'Cleansheets', unit: 'Cleansheets' },
+  ];
+
+  const [availableStats, setAvailableStats] = useState<IStat[]>([]);
+
+  const [selectedStat, setSelectedStat] = useState<IStat | undefined>(
+    league.leagueOwner.accountType === 'pro' &&
+      league.leagueLevel === 'pro' &&
+      league.leagueType === 'advanced'
+      ? allPossibleStats.find((s) => s.key === 'topScorers')
+      : allPossibleStats.find((s) => s.key === 'cleansheets')
   );
+
   const { data, isLoading } = useQuery({
     queryFn: () =>
       fetchAPI(
@@ -29,156 +61,161 @@ export default function Stats({
 
   const stats: SeasonStats | undefined = data?.data.stats;
 
+  // Derive the selected keys ONLY from what's currently available
+  const selectedKeys =
+    selectedStat && availableStats.some((s) => s.key === selectedStat.key)
+      ? new Set([selectedStat.key])
+      : new Set<string>(); // empty set if not available yet
+
+  useEffect(() => {
+    if (!stats) {
+      return;
+    }
+    const statNames = Object.keys(stats);
+
+    const filteredStats = allPossibleStats.filter((stat) =>
+      statNames.includes(stat.key)
+    );
+
+    setAvailableStats(filteredStats);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stats]);
+
   return (
-    <div className="p-[20px] h-full w-full row-span-2 bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-base">
-        <select
-          className="bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
-          value={view}
-          onChange={(e) => setView(e.target.value)}
+    <Card className="p-[10px] h-full w-full row-span-2">
+      <CardBody className="flex flex-col gap-2">
+        <Select
+          className="max-w-xs"
+          style={{ cursor: 'pointer' }}
+          size="sm"
+          items={availableStats}
+          label="Select a stat"
+          selectionMode="single"
+          selectedKeys={selectedKeys}
+          onChange={(e) => {
+            const stat = availableStats.find((s) => s.key === e.target.value);
+            setSelectedStat(stat);
+          }}
         >
-          {league.leagueType === 'advanced' && (
-            <option value="topScorers">Top scorers</option>
-          )}
-          {league.leagueType === 'advanced' && (
-            <option value="mostAssists">Most assists</option>
-          )}
-          <option value="cleansheets">Cleansheets</option>
-        </select>
-      </p>
-      {stats === undefined || isLoading ? (
-        <TableRowSkeleton
-          numRows={league.tables[divisionViewing - 1].numberOfTeams}
-        />
-      ) : (
-        (view === 'topScorers' && (
-          <StatsTablePlayerBased
-            data={
-              stats.topScorers.find((x) => x.division === divisionViewing)?.data
-            }
+          {availableStats.map((stat) => (
+            <SelectItem
+              key={stat.key}
+              endContent={
+                ['cleansheets'].includes(stat.key) ? null : <ProChip />
+              }
+            >
+              {stat.label}
+            </SelectItem>
+          ))}
+        </Select>
+        {stats === undefined || selectedStat === undefined || isLoading ? (
+          <TableRowSkeleton
+            numRows={league.tables[divisionViewing - 1].numberOfTeams}
           />
-        )) ||
-        (view === 'mostAssists' && (
-          <StatsTablePlayerBased
-            data={
-              stats.mostAssists.find((x) => x.division === divisionViewing)
-                ?.data
-            }
-          />
-        )) ||
-        (view === 'cleansheets' && (
-          <StatsTableTeamBased
-            data={
-              stats.cleansheets.find((x) => x.division === divisionViewing)
-                ?.data
-            }
-          />
-        ))
-      )}
-    </div>
+        ) : (
+          (selectedStat.key === 'topScorers' && (
+            <StatsTablePlayerBased
+              stat={selectedStat}
+              data={
+                stats.topScorers.find((x) => x.division === divisionViewing)
+                  ?.data
+              }
+            />
+          )) ||
+          (selectedStat.key === 'mostAssists' && (
+            <StatsTablePlayerBased
+              stat={selectedStat}
+              data={
+                stats.mostAssists.find((x) => x.division === divisionViewing)
+                  ?.data
+              }
+            />
+          )) ||
+          (selectedStat.key === 'cleansheets' && (
+            <StatsTableTeamBased
+              stat={selectedStat}
+              data={
+                stats.cleansheets.find((x) => x.division === divisionViewing)
+                  ?.data
+              }
+            />
+          ))
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
 function StatsTablePlayerBased({
+  stat,
   data,
 }: {
+  stat: IStat;
   data:
     | { position: number; player: string; team: string; value: number }[]
     | undefined;
 }) {
   return (
-    <div className="max-h-[21rem] overflow-y-auto">
-      <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">
-        <thead>
-          <tr className="text-left">
-            <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
-            <th className="w-[11rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-base">Name</p>
-            </th>
-            <th className="w-[8rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-base text-muted">Team</p>
-            </th>
-            <th className="sticky top-0 bg-[var(--bg)]">
-              <p className="text-base">Value</p>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.map((datapoint, i) => (
-            <TableRowPlayerBased key={i} datapoint={datapoint} />
-          ))}
-        </tbody>
-      </table>
-      {(data?.length === 0 || !data) && (
-        <p
-          className="italic place-self-center text-sm"
-          style={{
-            placeSelf: 'center',
-            fontStyle: 'italic',
-          }}
-        >
-          No data yet
-        </p>
-      )}
+    <div className="max-h-[21rem] overflow-y-auto w-full">
+      <Table
+        aria-label="Example static collection table w-full"
+        fullWidth
+        classNames={{
+          wrapper: `border-none shadow-none drop-shadow-none outline-none px-0`,
+        }}
+      >
+        <TableHeader>
+          <TableColumn>#</TableColumn>
+          <TableColumn>Name</TableColumn>
+          <TableColumn>Team</TableColumn>
+          <TableColumn>{stat.unit}</TableColumn>
+        </TableHeader>
+        <TableBody items={data}>
+          {(item) => (
+            <TableRow key={item.position}>
+              <TableCell>{item.position}</TableCell>
+              <TableCell>{item.player}</TableCell>
+              <TableCell>{item.team}</TableCell>
+              <TableCell>{item.value}</TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }
 
-function TableRowPlayerBased({
-  datapoint,
-}: {
-  datapoint: { position: number; player: string; team: string; value: number };
-}) {
-  return (
-    <tr>
-      <td>
-        <p className="text-base text-right pr-[10px]">{datapoint.position}.</p>
-      </td>
-      <td>
-        <p className="text-base text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {datapoint.player}
-        </p>
-      </td>
-      <td>
-        <p className="text-base text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden text-muted">
-          {datapoint.team}
-        </p>
-      </td>
-      <td>
-        <p className="text-right pr-[10px] text-base">{datapoint.value}</p>
-      </td>
-    </tr>
-  );
-}
-
 function StatsTableTeamBased({
+  stat,
   data,
 }: {
+  stat: IStat;
   data: { position: number; team: string; value: number }[] | undefined;
 }) {
   return (
     <div className="max-h-[21rem] overflow-y-auto">
-      <table className="text-[var(--text)] table table-fixed w-full font-[family-name:var(--font-instrument-sans)] bg-[var(--bg)] rounded-[10px] border-separate border-spacing-x-[2px]">
-        <thead>
-          <tr className="text-left">
-            <th className="w-[2rem] sticky top-0 bg-[var(--bg)]"></th>
-            <th className="w-[10rem] sticky top-0 bg-[var(--bg)]">
-              <p className="text-base">Team</p>
-            </th>
-            <th className="sticky top-0 bg-[var(--bg)] w-[6rem]">
-              <p className="text-base">Value</p>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.map((x, i) => (
-            <TableRowTeamBased key={i} datapoint={x} />
-          ))}
-        </tbody>
-      </table>
-      {(data?.length === 0 || !data) && (
-        <p className="text-sm place-self-center italic">No data yet</p>
-      )}
+      <Table
+        aria-label="Example static collection table w-full"
+        fullWidth
+        classNames={{
+          wrapper: `border-none shadow-none drop-shadow-none outline-none px-0`,
+        }}
+      >
+        <TableHeader>
+          <TableColumn>#</TableColumn>
+          <TableColumn>Team</TableColumn>
+          <TableColumn>{stat.unit}</TableColumn>
+        </TableHeader>
+        <TableBody items={data}>
+          {(item) => (
+            <TableRow key={item.position}>
+              <TableCell>{item.position}</TableCell>
+              <TableCell>{item.team}</TableCell>
+              <TableCell>{item.value}</TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

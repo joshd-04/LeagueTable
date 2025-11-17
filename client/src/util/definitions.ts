@@ -2,12 +2,12 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  accountType: 'free' | 'pro';
+  accountType: 'free' | 'pro' | 'pro+';
 }
 
 export interface League {
   _id: string;
-  leagueLevel: 'free' | 'standard';
+  leagueLevel: 'free' | 'pro' | 'pro+';
   announcement?: { text: string; date: Date };
   newsFeed?: { season: number; matchweek: number; news: string[] };
   setup: {
@@ -21,11 +21,7 @@ export interface League {
   divisionsCount: number;
   fixtures: string[];
   leagueOwner: {
-    accountType: 'free' | 'pro';
-    email: string;
-    favouriteLeagues: string[];
-    followedLeagues: string[];
-    leaguesCreated: string[];
+    accountType: 'free' | 'pro' | 'pro+';
     username: string;
     _id: string;
   };

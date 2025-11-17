@@ -151,7 +151,11 @@ export default function NavBar() {
                 src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
               />
             </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownMenu
+              aria-label="Profile Actions"
+              variant="flat"
+              disabledKeys={['currentaccounttype']}
+            >
               <DropdownSection showDivider>
                 <DropdownItem
                   key="profile"
@@ -161,11 +165,18 @@ export default function NavBar() {
                   <p className="font-semibold">Signed in as</p>
                   <p className="font-semibold">{user?.email}</p>
                 </DropdownItem>
+                <DropdownItem key="currentaccounttype" textValue="Account type">
+                  Account type: {user?.accountType}
+                </DropdownItem>
                 <DropdownItem
-                  key="reportbug"
-                  textValue="Report a bug"
+                  key="upgradetopro"
+                  textValue="Upgrade to pro"
                   onPress={() => {
-                    addToast({ title: 'Random stuff' });
+                    addToast({
+                      title: 'Functionality not added yet',
+                      description:
+                        'This button is for testing/debugging purposes.',
+                    });
                   }}
                 >
                   Upgrade to PRO

@@ -39,7 +39,7 @@ export default function Upgrade({ league }: { league: League }) {
         </p>
         <p className="text-sm">
           {warningLevel === 'light' ? '' : 'This is a free league.'} Upgrade to
-          standard level to unlock:
+          Pro to unlock:
         </p>
         <ul className="list-disc pl-[20px] text-muted text-sm">
           <li>

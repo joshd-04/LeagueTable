@@ -54,7 +54,7 @@ export async function leagueFetcherController(
       }
       league = await League.findById(leagueId).populate([
         { path: 'tables.teams' },
-        { path: 'leagueOwner' },
+        { path: 'leagueOwner', select: 'username accountType' },
         {
           path: 'fixtures',
           populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],

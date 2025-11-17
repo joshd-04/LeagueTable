@@ -8,6 +8,7 @@ export default function ProPlusChip() {
         content: 'drop-shadow-xs shadow-black text-black px-1',
       }}
       variant="shadow"
+      size="sm"
     >
       <p className="text-xs font-instrument font-semibold">
         Pro<span className="font-extrabold">+</span>

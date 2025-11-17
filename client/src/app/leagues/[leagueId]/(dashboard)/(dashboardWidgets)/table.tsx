@@ -71,7 +71,7 @@ export default function TableWidget({
     });
 
   return (
-    <Card className="p-[20px] col-span-2 row-span-2 h-full w-full  flex flex-col gap-1">
+    <Card className="p-[10px] col-span-2 row-span-2 h-full w-full  flex flex-col gap-1">
       <CardBody className="flex flex-col gap-2">
         <div className="flex flex-row justify-between w-full items-center">
           <p className="align-middle inline text-xl">Table</p>

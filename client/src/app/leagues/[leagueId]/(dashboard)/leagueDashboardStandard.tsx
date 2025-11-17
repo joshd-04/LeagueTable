@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import NewsFeed from './(dashboardWidgets)/newsFeed';
-import Stats from './(dashboardWidgets)/stats';
+import StatsOld from './(dashboardWidgets)/statsOld';
 import Heading1 from '@/components/text/Heading1';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import { fetchAPI } from '@/util/api';
@@ -20,6 +20,7 @@ import Controls from './(dashboardWidgets)/controls';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
 import SeasonRewind from './(dashboardWidgets)/seasonRewind';
+import Stats from './(dashboardWidgets)/stats';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard({

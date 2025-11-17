@@ -5,7 +5,16 @@ const userSchema: Schema<IUserSchema> = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
   email: { type: String, unique: true, required: true },
   passwordHash: { type: String, required: true },
-  accountType: { type: String, required: true },
+  accountType: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (v) {
+        return ['free', 'pro', 'pro+'].includes(v);
+      },
+      message: "accountType must be 'free' 'pro' or 'pro+'",
+    },
+  },
   leaguesCreated: [
     { type: Schema.Types.ObjectId, ref: 'leagues', required: true },
   ],

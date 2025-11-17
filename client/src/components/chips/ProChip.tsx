@@ -8,6 +8,7 @@ export default function ProChip() {
         content: 'drop-shadow-xs shadow-black text-black px-1',
       }}
       variant="shadow"
+      size="sm"
     >
       <p className="text-xs font-instrument font-semibold">Pro</p>
     </Chip>

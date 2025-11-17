@@ -1,5 +1,4 @@
 import ProChip from '@/components/chips/ProChip';
-import ProPlusChip from '@/components/chips/ProPlusChip';
 import { League } from '@/util/definitions';
 import {
   Button,
@@ -70,15 +69,18 @@ export default function SeasonRewind({
               : 'border-primary bg-primary'
           }`}
         >
-          <p className="text-sm text-center font-semibold">
-            Season {seasonViewing}
+          <p
+            className={`text-sm text-center font-semibold ${
+              seasonViewing > 0 ? '' : 'text-warning'
+            }`}
+          >
+            {seasonViewing > 0
+              ? `Season ${seasonViewing}`
+              : 'League not started'}
           </p>
           <div className="bg-content1 rounded-xl">
             <ButtonGroup color="primary" variant="flat">
-              <Button
-                onPress={decrementSeason}
-                isDisabled={seasonViewing === 1}
-              >
+              <Button onPress={decrementSeason} isDisabled={seasonViewing <= 1}>
                 <FaBackward /> Back
               </Button>
               <Button

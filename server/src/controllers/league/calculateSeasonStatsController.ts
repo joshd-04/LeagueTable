@@ -4,6 +4,7 @@ import {
   IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
+  IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
 
@@ -52,10 +53,13 @@ export async function calculateSeasonStatsController(
 
     // Check if league exists
     try {
-      league = await League.findById(leagueId).populate({
-        path: 'results',
-        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
-      });
+      league = await League.findById(leagueId).populate([
+        {
+          path: 'results',
+          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+        },
+        { path: 'leagueOwner', select: 'username accountType' },
+      ]);
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -80,13 +84,34 @@ export async function calculateSeasonStatsController(
       stats.cleansheets.push({ division: i + 1, data: [] });
     }
 
-    if (league.leagueType === 'advanced') {
+    /* 
+    For top scorers and top assisters:
+    1. League type must be 'advanced'
+    2. The league level must be atleast pro
+    3. The league owner must still be a pro user
+    
+    If the league type is advanced and the league level is pro, but the user is no longer a pro user, do not give them pro data.
+    */
+
+    if (
+      league.leagueType === 'advanced' &&
+      ['pro', 'pro+'].includes(league.leagueLevel) &&
+      ['pro', 'pro+'].includes(
+        (league.leagueOwner as unknown as IUserSchema).accountType
+      )
+    ) {
       stats.topScorers = [];
       stats.mostAssists = [];
       for (let i = 0; i < league.divisionsCount; i++) {
         stats.topScorers.push({ division: i + 1, data: [] });
         stats.mostAssists.push({ division: i + 1, data: [] });
       }
+    } else if (
+      league.leagueType === 'advanced' &&
+      ['pro', 'pro+'].includes(league.leagueLevel)
+    ) {
+      stats.topScorers = [];
+      stats.mostAssists = [];
     }
 
     // Get this season's results

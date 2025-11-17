@@ -3,7 +3,16 @@ import { ILeagueSchema } from '../util/definitions';
 
 const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
   name: { type: String, required: true },
-  leagueLevel: { type: String, required: true },
+  leagueLevel: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (v) {
+        return ['free', 'pro', 'pro+'].includes(v);
+      },
+      message: "leagueLevel must be 'free' 'pro' or 'pro+'",
+    },
+  },
   // 'Standard' league features only:
   announcement: { text: { type: String }, date: { type: Date } },
   newsFeed: [
