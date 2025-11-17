@@ -53,7 +53,7 @@ export default function SeasonRewind({
               <p className="text-xs">OFF</p>
             </Chip>
           ) : (
-            <Chip color="primary" variant="shadow">
+            <Chip color="primary" variant="solid">
               <p className="text-xs">ON</p>
             </Chip>
           )}
