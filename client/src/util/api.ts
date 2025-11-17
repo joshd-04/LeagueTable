@@ -15,7 +15,11 @@ export async function fetchAPI(
   url: string | URL | globalThis.Request,
   options: RequestInit
 ) {
-  const response = await fetch(url, options);
-  const data = await response.json();
-  return data;
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    return data;
+  } catch (e) {
+    throw e;
+  }
 }

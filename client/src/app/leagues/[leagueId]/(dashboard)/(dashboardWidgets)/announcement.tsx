@@ -40,6 +40,10 @@ export default function Announcement({
     league.announcement || { text: '', date: new Date() }
   );
 
+  const disableOverride = !['pro', 'pro+'].includes(
+    league.leagueOwner.accountType
+  );
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const {
@@ -64,17 +68,25 @@ export default function Announcement({
 
   return (
     <>
-      <Card className="h-full w-full px-[10px] py-[6px]">
+      <Card
+        className="h-full w-full px-[10px] py-[6px]"
+        isDisabled={disableOverride}
+      >
         <CardBody className="flex flex-col gap-2">
           <div className="flex flex-row justify-between items-center">
-            <span className="flex flex-row gap-2">
+            <span className="flex flex-row gap-2 items-center">
               <ProChip />
               <p className="align-middle inline text-base">
                 Latest Announcement
               </p>
             </span>
             {userOwnsThisLeague && (
-              <Button variant="flat" onPress={onOpen} isIconOnly>
+              <Button
+                variant="flat"
+                onPress={onOpen}
+                isIconOnly
+                isDisabled={disableOverride}
+              >
                 <FaRegEdit className="w-4 h-4" />
               </Button>
             )}
@@ -162,7 +174,7 @@ function EditAnnouncementModal({
       } else if (response.status === 'fail') {
         addToast({
           title: 'Unable to set announcement',
-          description: 'Something went wrong',
+          description: response.data.message || undefined,
           color: 'warning',
           shouldShowTimeoutProgress: true,
         });

@@ -23,6 +23,10 @@ export default function SeasonRewind({
 }) {
   const isViewingCurrentSeason = league.currentSeason === seasonViewing;
 
+  const disableOverride = !['pro', 'pro+'].includes(
+    league.leagueOwner.accountType
+  );
+
   function decrementSeason() {
     if (seasonViewing > 1) {
       setSeasonViewing((prev) => prev - 1);
@@ -40,10 +44,14 @@ export default function SeasonRewind({
   }
 
   return (
-    <Card className="h-full w-full px-[10px] py-[6px]" fullWidth>
+    <Card
+      className="h-full w-full px-[10px] py-[6px]"
+      fullWidth
+      isDisabled={disableOverride}
+    >
       <CardHeader className="flex flex-col items-start">
         <div className="flex flex-row justify-between items-start w-full">
-          <span className="flex flex-row gap-2">
+          <span className="flex flex-row gap-2 items-center">
             <ProChip />
             <p className="align-middle inline text-base">Season rewind</p>
           </span>
@@ -80,19 +88,26 @@ export default function SeasonRewind({
           </p>
           <div className="bg-content1 rounded-xl">
             <ButtonGroup color="primary" variant="flat">
-              <Button onPress={decrementSeason} isDisabled={seasonViewing <= 1}>
+              <Button
+                onPress={decrementSeason}
+                isDisabled={disableOverride || seasonViewing <= 1}
+              >
                 <FaBackward /> Back
               </Button>
               <Button
                 onPress={resetSeason}
-                isDisabled={seasonViewing === league.currentSeason}
+                isDisabled={
+                  disableOverride || seasonViewing === league.currentSeason
+                }
               >
                 Reset
               </Button>
 
               <Button
                 onPress={incrementSeason}
-                isDisabled={seasonViewing === league.currentSeason}
+                isDisabled={
+                  disableOverride || seasonViewing === league.currentSeason
+                }
               >
                 Next
                 <FaForward />

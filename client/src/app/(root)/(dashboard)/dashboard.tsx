@@ -28,6 +28,7 @@ export default async function Dashboard({
     following: LeagueInterface[];
   } = { created: [], favourites: [], following: [] };
   const cookieStore = await cookies();
+  console.log('aaa');
 
   const associatedLeagues = await fetchAPI(`${API_URL}/leagues/associated`, {
     method: 'GET',

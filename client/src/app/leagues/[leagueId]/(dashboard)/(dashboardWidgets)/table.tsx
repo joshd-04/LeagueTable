@@ -1,3 +1,4 @@
+import ProChip from '@/components/chips/ProChip';
 import TeamForm from '@/components/teamForm/TeamForm';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -5,6 +6,7 @@ import { League, Team } from '@/util/definitions';
 import {
   Card,
   CardBody,
+  cn,
   Select,
   SelectItem,
   SortDescriptor,
@@ -14,6 +16,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Tooltip,
 } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -25,6 +28,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { RxQuestionMarkCircled } from 'react-icons/rx';
 
 export default function TableWidget({
   league,
@@ -48,6 +52,9 @@ export default function TableWidget({
     queryKey: ['table', divisionViewing, seasonViewing],
   });
   const teams: Team[] | undefined = data?.data.teams;
+
+  const displayAsProLeague =
+    league.leagueLevel !== 'free' && league.leagueOwner.accountType !== 'free';
 
   const scrollableRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +81,36 @@ export default function TableWidget({
     <Card className="p-[10px] col-span-2 row-span-2 h-full w-full  flex flex-col gap-1">
       <CardBody className="flex flex-col gap-2">
         <div className="flex flex-row justify-between w-full items-center">
-          <p className="align-middle inline text-xl">Table</p>
+          <span className="flex flex-row gap-2 items-center">
+            {displayAsProLeague && <ProChip />}
+            <div className="flex flex-row gap-1 items-start">
+              <p className="align-middle inline text-xl">Table</p>
+              {displayAsProLeague && (
+                <Tooltip
+                  content={
+                    <div className="p-[6px] py-[10px] flex flex-col gap-2">
+                      <div className="flex flex-row gap-2 items-center">
+                        <ProChip />
+                        <p className="text-base">Table Features</p>
+                      </div>
+                      <div className="flex flex-col gap-1 text-muted">
+                        <p className="text-xs">
+                          This table has extra features, such as:
+                        </p>
+                        <ul className="text-xs list-disc pl-4">
+                          <li>Custom sorting</li>
+                          <li>Recent Form</li>
+                        </ul>
+                      </div>
+                    </div>
+                  }
+                  className="bg-content2"
+                >
+                  <RxQuestionMarkCircled className="w-4 h-4 text-muted cursor-pointer" />
+                </Tooltip>
+              )}
+            </div>
+          </span>
           <Select
             className="max-w-xs"
             style={{ cursor: 'pointer' }}
@@ -94,7 +130,7 @@ export default function TableWidget({
           </Select>
         </div>
         <TableComponent
-          isFreeLeague={league.leagueLevel === 'free'}
+          displayAsProLeague={displayAsProLeague}
           teams={teams}
           isLoading={isLoading}
           league={league}
@@ -107,14 +143,14 @@ export default function TableWidget({
 }
 
 function TableComponent({
-  isFreeLeague,
+  displayAsProLeague,
   teams,
   league,
   divisionViewing,
   isLoading,
   ref,
 }: {
-  isFreeLeague: boolean;
+  displayAsProLeague: boolean;
   teams: Team[] | undefined;
   league: League;
   divisionViewing: number;
@@ -165,6 +201,8 @@ function TableComponent({
     (user: TableRow, columnKey: keyof TableRow) => {
       const cellValue = user[columnKey];
       switch (columnKey) {
+        case 'points':
+          return <p className="font-bold">{cellValue}</p>;
         case 'form':
           if (cellValue) return <TeamForm form={cellValue.toString()} />;
           else return cellValue;
@@ -187,8 +225,11 @@ function TableComponent({
     { key: 'goalsAgainst', label: 'GA' },
     { key: 'goalDifference', label: 'GD' },
     { key: 'points', label: 'Pts' },
-    { key: 'form', label: 'Form' },
   ];
+
+  if (displayAsProLeague) {
+    columns.push({ key: 'form', label: 'Form' });
+  }
 
   useEffect(() => {
     if (teams === undefined) {
@@ -215,8 +256,6 @@ function TableComponent({
     });
     setRows(rowsData);
   }, [teams]);
-
-  const isSortingEnabled = !isFreeLeague;
 
   function handleSortChange(descriptor: SortDescriptor) {
     setSortDescriptor(descriptor);
@@ -321,7 +360,7 @@ function TableComponent({
             <TableColumn
               key={column.key}
               allowsSorting={
-                isSortingEnabled && (column.key !== 'form' ? true : false)
+                displayAsProLeague && (column.key !== 'form' ? true : false)
               }
             >
               {column.label}

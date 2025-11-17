@@ -1,6 +1,7 @@
 'use client';
 
 import ProChip from '@/components/chips/ProChip';
+import ProPlusChip from '@/components/chips/ProPlusChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonStats } from '@/util/definitions';
@@ -23,6 +24,7 @@ interface IStat {
   key: string;
   label: string;
   unit: string;
+  accessLevel: 'free' | 'pro' | 'pro+';
 }
 
 export default function Stats({
@@ -34,10 +36,27 @@ export default function Stats({
   seasonViewing?: number;
   divisionViewing: number;
 }) {
+  const accountType = league.leagueOwner.accountType;
+
   const allPossibleStats: IStat[] = [
-    { key: 'topScorers', label: 'Top scorers', unit: 'Goals' },
-    { key: 'mostAssists', label: 'Most assists', unit: 'Assists' },
-    { key: 'cleansheets', label: 'Cleansheets', unit: 'Cleansheets' },
+    {
+      key: 'topScorers',
+      label: 'Top scorers',
+      unit: 'Goals',
+      accessLevel: 'pro',
+    },
+    {
+      key: 'mostAssists',
+      label: 'Most assists',
+      unit: 'Assists',
+      accessLevel: 'pro',
+    },
+    {
+      key: 'cleansheets',
+      label: 'Cleansheets',
+      unit: 'Cleansheets',
+      accessLevel: 'free',
+    },
   ];
 
   const [availableStats, setAvailableStats] = useState<IStat[]>([]);
@@ -90,18 +109,35 @@ export default function Stats({
           size="sm"
           items={availableStats}
           label="Select a stat"
+          disallowEmptySelection
           selectionMode="single"
           selectedKeys={selectedKeys}
           onChange={(e) => {
             const stat = availableStats.find((s) => s.key === e.target.value);
             setSelectedStat(stat);
           }}
+          disabledKeys={availableStats
+            .filter((s) => {
+              if (
+                (accountType === 'pro' || accountType === 'free') &&
+                s.accessLevel === 'pro+'
+              )
+                return true;
+              if (accountType === 'free' && s.accessLevel === 'pro')
+                return true;
+              return false;
+            })
+            .map((s) => s.key)}
         >
           {availableStats.map((stat) => (
             <SelectItem
               key={stat.key}
               endContent={
-                ['cleansheets'].includes(stat.key) ? null : <ProChip />
+                stat.accessLevel === 'pro+' ? (
+                  <ProPlusChip />
+                ) : stat.accessLevel === 'pro' ? (
+                  <ProChip />
+                ) : null
               }
             >
               {stat.label}

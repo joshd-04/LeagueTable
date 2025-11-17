@@ -4,9 +4,11 @@ import {
   IFixtureSchema,
   ILeagueSchema,
   ITeamsSchema,
+  IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
 import { findLeaguePosition, isTeam, sortTeams } from '../../util/helpers';
+import User from '../../models/userModel';
 
 export async function setAnnouncementController(
   req: Request,
@@ -48,9 +50,40 @@ export async function setAnnouncementController(
     if (league.leagueLevel === 'free') {
       return next(
         new ErrorHandling(403, {
-          message: `Upgrade to standard level to unlock announcements.`,
+          message: `Upgrade to Pro level to unlock announcements.`,
         })
       );
+    }
+
+    let leagueOwner: IUserSchema | null;
+
+    try {
+      leagueOwner = await User.findById(league.leagueOwner, 'accountType -_id');
+    } catch {
+      return next(
+        new ErrorHandling(404, {
+          message: `League owner account not found.`,
+        })
+      );
+    }
+
+    if (!leagueOwner) {
+      return next(
+        new ErrorHandling(404, {
+          message: `League owner account not found.`,
+        })
+      );
+    }
+    const { accountType } = leagueOwner;
+
+    if (!['pro', 'pro+'].includes(accountType)) {
+      res.status(403).json({
+        status: 'fail',
+        data: {
+          message: 'Upgrade to Pro to set announcements',
+        },
+      });
+      return;
     }
 
     const announcementText = req.body.text;

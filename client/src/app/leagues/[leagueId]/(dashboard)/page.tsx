@@ -1,113 +1,147 @@
+// app/leagues/[leagueId]/page.tsx
 import { fetchAPI } from '@/util/api';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { cookies } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
 import SetupIncomplete from '../setupIncomplete';
 import LeagueDashboardFree from './leagueDashboardFree';
 import LeagueDashboardStandard from './leagueDashboardStandard';
-
 import { League } from '@/util/definitions';
-import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { [key: string]: string };
-}): Promise<Metadata> {
-  const { leagueId } = await params;
+// Helper to reduce duplication
+async function fetchLeagueAndUser(leagueId: string) {
   const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
 
-  const [league, user] = await Promise.all([
+  const [leagueRes, userRes] = await Promise.allSettled([
     fetchAPI(`${API_URL}/leagues/${leagueId}`, {
       method: 'GET',
-      headers: {
-        Cookie: cookieStore.toString(), // pass request cookies
-      },
-      cache: 'no-store', // optional: prevent caching
+      headers: { Cookie: cookieHeader },
+      cache: 'no-store',
     }),
     fetchAPI(`${API_URL}/me`, {
       method: 'GET',
-      headers: {
-        Cookie: cookieStore.toString(), // pass request cookies
-      },
-      cache: 'no-store', // optional: prevent caching
+      headers: { Cookie: cookieHeader },
+      cache: 'no-store',
     }),
   ]);
 
-  if (league.status === 'error') {
-    return {
-      title: 'League Not Found',
-    };
-  }
-  const leagueObj = league.data.league as League;
-  if (league.statusCode === 403) {
-    return {
-      title: `Setup incomplete • ${leagueObj.name} • ${WEBSITE_NAME}`,
-    };
-  }
-
-  if (user.status !== 'success') {
-    return {
-      title: `${leagueObj.name} • ${WEBSITE_NAME}`,
-      description: `View fixtures, results, tables & more for ${leagueObj.name} created by ${leagueObj.leagueOwner.username}`,
-    };
-  }
-
-  const userId = user.data._id;
-  const leagueOwnerId = leagueObj.leagueOwner._id;
-
-  const userOwnsThisLeague = userId === leagueOwnerId;
-
-  if (userOwnsThisLeague) {
-    return {
-      title: `${leagueObj.name} • Dashboard • ${WEBSITE_NAME}`,
-      description: `View and manage fixtures, results, tables & more for ${leagueObj.name}.`,
-    };
-  }
-  return {
-    title: `${leagueObj.name} • ${WEBSITE_NAME}`,
-    description: `View fixtures, results, tables & more for ${leagueObj.name} created by ${leagueObj.leagueOwner.username}`,
-  };
+  return { leagueRes, userRes, cookieHeader };
 }
 
-// This is the league fetcher
-// @ts-expect-error idk
-export default async function Page({ params }) {
-  const cookieStore = await cookies();
+// ──────────────────────────────────────────────────
+// generateMetadata – now safe from crashes
+// ──────────────────────────────────────────────────
+export async function generateMetadata({
+  params,
+}: {
+  params: { leagueId: string };
+}): Promise<Metadata> {
   const { leagueId } = await params;
 
-  const response = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {
-    method: 'GET',
-    headers: {
-      Cookie: cookieStore.toString(), // pass request cookies
-    },
-    cache: 'no-store', // optional: prevent caching
-  });
+  try {
+    const { leagueRes, userRes } = await fetchLeagueAndUser(leagueId);
 
-  if (response.statusCode === 403) {
+    // If league fetch failed entirely → 404
+    if (leagueRes.status === 'rejected') {
+      return { title: 'League Not Found' };
+    }
+
+    const leagueResponse = leagueRes.value;
+
+    // API returned 404 or similar
+    if (
+      leagueResponse.status === 'error' ||
+      leagueResponse.statusCode === 404
+    ) {
+      return { title: 'League Not Found' };
+    }
+
+    const league: League = leagueResponse.data.league;
+
+    // Handle 403 (setup incomplete)
+    if (leagueResponse.statusCode === 403) {
+      return {
+        title: `Setup incomplete • ${league.name} • ${WEBSITE_NAME}`,
+      };
+    }
+
+    // Default public view
+    let title = `${league.name} • ${WEBSITE_NAME}`;
+    let description = `View fixtures, results, tables & more for ${league.name} created by ${league.leagueOwner.username}`;
+
+    // If user is logged in, personalize
+    if (userRes.status === 'fulfilled' && userRes.value.status === 'success') {
+      const user = userRes.value.data;
+      if (user._id === league.leagueOwner._id) {
+        title = `${league.name} • Dashboard • ${WEBSITE_NAME}`;
+        description = `Manage your league ${league.name} — fixtures, results, tables and more.`;
+      }
+    }
+
+    return { title, description };
+  } catch (error) {
+    // Any unexpected crash → let error.tsx handle it
+    return { title: 'Something went wrong' };
+  }
+}
+
+// ──────────────────────────────────────────────────
+// Main page – now 100% safe
+// ──────────────────────────────────────────────────
+export default async function Page({
+  params,
+}: {
+  params: { leagueId: string };
+}) {
+  const { leagueId } = await params;
+
+  let leagueResponse;
+  try {
+    const cookieStore = await cookies();
+    leagueResponse = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+      method: 'GET',
+      headers: { Cookie: cookieStore.toString() },
+      cache: 'no-store',
+    });
+  } catch (error) {
+    // Network down, timeout, DNS, etc. → trigger error.tsx
+    throw error; // This is CRUCIAL — re-throw so error boundary catches it
+  }
+
+  // 404 → trigger your nice not-found.tsx
+  if (
+    !leagueResponse ||
+    leagueResponse.status === 'error' ||
+    leagueResponse.statusCode === 404
+  ) {
+    notFound();
+  }
+
+  // 403 → setup incomplete page
+  if (leagueResponse.statusCode === 403) {
     return (
       <SetupIncomplete
         leagueId={leagueId}
-        leagueName={response.data.league.name}
-        leagueOwner={response.data.league.leagueOwner}
-        property={response.data.property} // the missing property causing the request to fail
+        leagueName={leagueResponse.data.league.name}
+        leagueOwner={leagueResponse.data.league.leagueOwner}
+        property={leagueResponse.data.property}
       />
     );
   }
 
-  if (response.status === 'success') {
-    const league: League = response.data.league;
-
-    if (league.leagueLevel === 'pro' || league.leagueLevel === 'pro+') {
-      // paid features
-
-      return <LeagueDashboardStandard initialLeague={league} />;
-    } else {
-      // free
-
-      return <LeagueDashboardFree initialLeague={league} />;
-    }
-  } else {
-    return redirect('/');
+  // Auth failed or not logged in → redirect to home (public view)
+  if (leagueResponse.status !== 'success') {
+    redirect('/');
   }
+
+  const league: League = leagueResponse.data.league;
+
+  // Render correct dashboard
+  if (league.leagueLevel === 'pro' || league.leagueLevel === 'pro+') {
+    return <LeagueDashboardStandard initialLeague={league} />;
+  }
+
+  return <LeagueDashboardFree initialLeague={league} />;
 }
