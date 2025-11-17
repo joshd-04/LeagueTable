@@ -1,3 +1,4 @@
+import ProChip from '@/components/chips/ProChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
@@ -66,7 +67,12 @@ export default function Announcement({
       <Card className="h-full w-full px-[10px] py-[6px]">
         <CardBody className="flex flex-col gap-2">
           <div className="flex flex-row justify-between items-center">
-            <p className="align-middle inline text-base">Latest Announcement</p>
+            <span className="flex flex-row gap-2">
+              <ProChip />
+              <p className="align-middle inline text-base">
+                Latest Announcement
+              </p>
+            </span>
             {userOwnsThisLeague && (
               <Button variant="flat" onPress={onOpen} isIconOnly>
                 <FaRegEdit className="w-4 h-4" />
@@ -194,7 +200,9 @@ function EditAnnouncementModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Edit Announcement
+              <span className="flex flex-row gap-2">
+                <ProChip /> <p>Edit Announcement</p>
+              </span>
             </ModalHeader>
             <ModalBody>
               <Textarea

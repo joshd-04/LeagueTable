@@ -1,3 +1,5 @@
+import ProChip from '@/components/chips/ProChip';
+import ProPlusChip from '@/components/chips/ProPlusChip';
 import { League } from '@/util/definitions';
 import {
   Button,
@@ -42,7 +44,10 @@ export default function SeasonRewind({
     <Card className="h-full w-full px-[10px] py-[6px]" fullWidth>
       <CardHeader className="flex flex-col items-start">
         <div className="flex flex-row justify-between items-start w-full">
-          <p className="align-middle inline text-base">Season rewind</p>
+          <span className="flex flex-row gap-2">
+            <ProChip />
+            <p className="align-middle inline text-base">Season rewind</p>
+          </span>
           {seasonViewing === league.currentSeason ? (
             <Chip color="default" variant="flat">
               <p className="text-xs">OFF</p>
@@ -61,7 +66,7 @@ export default function SeasonRewind({
         <div
           className={`w-min border-2 rounded-xl ${
             isViewingCurrentSeason
-              ? 'border-default bg-default'
+              ? 'border-content3 bg-content3'
               : 'border-primary bg-primary'
           }`}
         >
