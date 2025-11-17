@@ -25,10 +25,10 @@ export default function SeasonSummaryStats({
     data?.data.seasonSummaryStats;
 
   return (
-    <Card className="h-full w-full px-[10px]">
+    <Card className="h-full w-full px-[10px] py-[6px]">
       <CardBody className="flex flex-col gap-2">
         <span>
-          <p className="text-base/[40px] align-middle inline">Season stats</p>
+          <p className="text-base align-middle inline">Season stats</p>
         </span>
         {stats === undefined || isLoading ? (
           <SeasonSummarySkeleton />

@@ -4,8 +4,8 @@ import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
 import { useContext, useEffect, useState } from 'react';
 import Upgrade from './(dashboardWidgets)/upgrade';
-import LatestResults from './(dashboardWidgets)/latestResults';
-import NextFixtures from './(dashboardWidgets)/nextFixtures';
+
+import NextFixturesOld from './(dashboardWidgets)/nextFixturesOld';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import Stats from './(dashboardWidgets)/stats';
 import Heading1 from '@/components/text/Heading1';
@@ -17,6 +17,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
 import { IoPersonSharp } from 'react-icons/io5';
 import Controls from './(dashboardWidgets)/controls';
+import LatestResults from './(dashboardWidgets)/latestResults';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardFree({
@@ -111,7 +112,7 @@ export default function LeagueDashboardFree({
         <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-[20px]">
           <Upgrade league={league} />
           <LatestResults league={league} />
-          <NextFixtures
+          <NextFixturesOld
             league={league}
             userOwnsThisLeague={userOwnsThisLeague}
             setShowFixtureToResult={setShowFixtureToResult}

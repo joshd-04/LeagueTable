@@ -3,8 +3,7 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
 import { useContext, useEffect, useState } from 'react';
-import LatestResults from './(dashboardWidgets)/latestResults';
-import NextFixtures from './(dashboardWidgets)/nextFixtures';
+import NextFixturesOld from './(dashboardWidgets)/nextFixturesOld';
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import NewsFeed from './(dashboardWidgets)/newsFeed';
 import SeasonRewind from './(dashboardWidgets)/seasonRewind';
@@ -19,6 +18,8 @@ import TableWidget from './(dashboardWidgets)/table';
 import { IoPersonSharp } from 'react-icons/io5';
 import Announcement from './(dashboardWidgets)/announcement';
 import Controls from './(dashboardWidgets)/controls';
+import LatestResults from './(dashboardWidgets)/latestResults';
+import NextFixtures from './(dashboardWidgets)/nextFixtures';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard({

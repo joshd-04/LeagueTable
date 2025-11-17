@@ -63,12 +63,10 @@ export default function Announcement({
 
   return (
     <>
-      <Card className="h-full w-full px-[10px] pb-[6px]">
+      <Card className="h-full w-full px-[10px] py-[6px]">
         <CardBody className="flex flex-col gap-2">
           <div className="flex flex-row justify-between items-center">
-            <p className="align-middle inline text-base/[40px]">
-              Latest Announcement
-            </p>
+            <p className="align-middle inline text-base">Latest Announcement</p>
             {userOwnsThisLeague && (
               <Button variant="flat" onPress={onOpen} isIconOnly>
                 <FaRegEdit className="w-4 h-4" />

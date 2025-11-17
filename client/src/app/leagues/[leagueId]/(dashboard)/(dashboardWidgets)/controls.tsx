@@ -102,7 +102,7 @@ export default function Controls({
     ) && !(league.currentSeason === 0 && league.currentMatchweek === 0);
 
   return (
-    <Card className="p-[10px]  h-full w-full">
+    <Card className="px-[10px] py-[6px] h-full w-full">
       <CardBody className=" flex flex-col gap-2">
         <p className="text-base">Controls</p>
 

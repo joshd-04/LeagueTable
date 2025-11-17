@@ -9,10 +9,8 @@ import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { Card, CardBody } from '@heroui/react';
-import { FaRegEdit } from 'react-icons/fa';
 
-export default function NextFixtures({
+export default function NextFixturesOld({
   league,
   seasonViewing = league.currentSeason,
   userOwnsThisLeague,
@@ -49,67 +47,58 @@ export default function NextFixtures({
   const router = useRouter();
 
   return (
-    <Card
-      className={`px-[10px] py-[6px] h-full w-full ${
-        !isHoveringOuterPanel ? 'data-[pressed=true]:scale-100' : ''
-      }`}
+    <motion.div
+      className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 flex flex-col gap-1 hover:cursor-pointer
+    "
       onMouseEnter={() => setIsHoveringOuterPanel(true)}
       onMouseLeave={() => setIsHoveringOuterPanel(false)}
-      isPressable
+      whileTap={{ scale: isHoveringOuterPanel ? 0.98 : 1 }}
       onClick={(e) => {
         e.stopPropagation();
         router.push(`/leagues/${league._id}/fixtures`);
       }}
       style={{
-        background: isHoveringOuterPanel
-          ? 'hsl(var(--heroui-content3)/1)'
-          : 'hsl(var(--heroui-content1)/1)',
+        background: isHoveringOuterPanel ? 'var(--bg-light)' : 'var(--bg)',
         borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
       }}
     >
-      <CardBody className="flex flex-col gap-2">
-        <div className="flex flex-row items-baseline gap-[4px]">
-          <p className="align-middle inline text-base">Fixtures </p>
-          {fixtures !== undefined &&
-            nextFixtures !== undefined &&
-            nextFixtures.length >= 3 &&
-            !isLoading && (
-              <p className="text-sm inline text-muted">
-                - showing {nextFixtures.length} of {fixtures.totalFixtures}
-              </p>
-            )}
-        </div>
-        {isLoading || nextFixtures === undefined || fixtures === undefined ? (
-          <>
-            <FixtureRowSkeleton />
-            <FixtureRowSkeleton />
-            <FixtureRowSkeleton />
-          </>
-        ) : nextFixtures.length > 0 ? (
-          <div className="flex flex-col gap-1">
-            {nextFixtures.map((f, i) => (
-              <div
-                key={i}
-                onMouseEnter={() => setIsHoveringOuterPanel(false)}
-                onMouseLeave={() => setIsHoveringOuterPanel(true)}
-              >
-                <FixtureRow
-                  userOwnsThisLeague={userOwnsThisLeague}
-                  fixtureObj={f}
-                  setShowFixtureToResult={setShowFixtureToResult}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="h-full flex flex-col justify-center">
-            <p className="italic place-self-center text-sm text-muted align-middle pb-6">
-              No outstanding fixtures
+      <div className="flex flex-row items-baseline gap-[4px]">
+        <p className="align-middle inline text-base">Fixtures </p>
+        {fixtures !== undefined &&
+          nextFixtures !== undefined &&
+          nextFixtures.length >= 3 &&
+          !isLoading && (
+            <p className="text-sm inline">
+              - showing {nextFixtures.length} of {fixtures.totalFixtures}
             </p>
+          )}
+      </div>
+      {isLoading || nextFixtures === undefined || fixtures === undefined ? (
+        <>
+          <FixtureRowSkeleton />
+          <FixtureRowSkeleton />
+          <FixtureRowSkeleton />
+        </>
+      ) : nextFixtures.length > 0 ? (
+        nextFixtures.map((f, i) => (
+          <div
+            key={i}
+            onMouseEnter={() => setIsHoveringOuterPanel(false)}
+            onMouseLeave={() => setIsHoveringOuterPanel(true)}
+          >
+            <FixtureRow
+              userOwnsThisLeague={userOwnsThisLeague}
+              fixtureObj={f}
+              setShowFixtureToResult={setShowFixtureToResult}
+            />
           </div>
-        )}
-      </CardBody>
-    </Card>
+        ))
+      ) : (
+        <p className="italic place-self-center text-sm">
+          No outstanding fixtures
+        </p>
+      )}
+    </motion.div>
   );
 }
 
@@ -134,7 +123,7 @@ function FixtureRow({
 
   return (
     <motion.div
-      className={`bg-content2  rounded-[10px] h-[36px]  hover:cursor-pointer flex flex-row justify-baseline items-center`}
+      className={`bg-[var(--bg)]  rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center`}
       onClick={(e) => handleFixtureClick(e)}
       whileTap={{ scale: 0.98 }}
       onMouseEnter={() => setRowHover(true)}
@@ -142,10 +131,11 @@ function FixtureRow({
       style={{
         backgroundColor:
           rowHover && editHover
-            ? 'hsl(var(--heroui-content2)/1)'
+            ? 'var(--bg)'
             : rowHover
-            ? 'hsl(var(--heroui-content3)/1)'
-            : 'hsl(var(--heroui-content2)/1)',
+            ? 'var(--bg-light)'
+            : 'var(--bg)',
+        borderColor: rowHover && !editHover ? 'transparent' : 'var(--border)',
       }}
     >
       <p className="px-[10px] w-max h-min flex-none text-sm">
@@ -155,7 +145,7 @@ function FixtureRow({
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.homeTeamDetails.name}
         </p>
-        <p className="w-full text-center text-sm text-muted">vs</p>
+        <p className="w-full text-center text-sm">vs</p>
 
         <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.awayTeamDetails.name}
@@ -165,13 +155,21 @@ function FixtureRow({
         <div
           onMouseEnter={() => setEditHover(true)}
           onMouseLeave={() => setEditHover(false)}
-          className="px-[10px] hover:bg-content3 h-full flex flex-col justify-center items-center rounded-[10px] ml-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowFixtureToResult(fixtureObj);
-          }}
         >
-          <FaRegEdit className="w-4 h-4 " />
+          <Button
+            color="transparent"
+            bgHoverColor="var(--bg-light)"
+            borderlessButton={true}
+            underlineEffect={false}
+            shadowEffect={false}
+            style={{ padding: '10px' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowFixtureToResult(fixtureObj);
+            }}
+          >
+            <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
+          </Button>
         </div>
       )}
     </motion.div>

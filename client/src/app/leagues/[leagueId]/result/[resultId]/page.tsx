@@ -12,7 +12,7 @@ export async function generateMetadata({
 }: {
   params: { [key: string]: string };
 }): Promise<Metadata> {
-  const { leagueId, resultId } = params;
+  const { leagueId, resultId } = await params;
 
   const [result, league] = await Promise.all([
     fetchAPI(`${API_URL}/leagues/${leagueId}/results/${resultId}`, {

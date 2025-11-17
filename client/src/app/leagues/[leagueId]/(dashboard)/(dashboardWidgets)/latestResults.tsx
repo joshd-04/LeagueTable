@@ -5,6 +5,7 @@ import { MouseEvent, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { API_URL } from '@/util/config';
 import { fetchAPI } from '@/util/api';
+import { Card, CardBody } from '@heroui/react';
 
 export default function LatestResults({
   league,
@@ -29,44 +30,61 @@ export default function LatestResults({
 
   const mostRecentResults: Result[] = data?.data.results.slice(0, 3);
 
+  function handleCardClick() {
+    router.push(`/leagues/${league._id}/results`);
+  }
+
   return (
-    <motion.div
-      className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 flex flex-col gap-1 hover:cursor-pointer"
+    <Card
+      className={`px-[10px] py-[6px] h-full w-full ${
+        !isHoveringOuterPanel ? 'data-[pressed=true]:scale-100' : ''
+      }`}
       onMouseEnter={() => setIsHoveringOuterPanel(true)}
       onMouseLeave={() => setIsHoveringOuterPanel(false)}
-      whileTap={{ scale: isHoveringOuterPanel ? 0.98 : 1 }}
+      isPressable
       onClick={(e) => {
+        console.log('click');
         e.stopPropagation();
-        router.push(`/leagues/${league._id}/results`);
+        handleCardClick();
       }}
       style={{
-        background: isHoveringOuterPanel ? 'var(--bg-light)' : 'var(--bg)',
+        background: isHoveringOuterPanel
+          ? 'hsl(var(--heroui-content3)/1)'
+          : 'hsl(var(--heroui-content1)/1)',
         borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
       }}
     >
-      <span>
-        <p className="align-middle inline text-base">Latest Results</p>
-      </span>
-      {isLoading ? (
-        <>
-          <ResultRowSkeleton />
-          <ResultRowSkeleton />
-          <ResultRowSkeleton />
-        </>
-      ) : mostRecentResults.length > 0 ? (
-        mostRecentResults.map((result, i) => (
-          <div
-            key={i}
-            onMouseEnter={() => setIsHoveringOuterPanel(false)}
-            onMouseLeave={() => setIsHoveringOuterPanel(true)}
-          >
-            <ResultRow result={result} league={league} />
+      <CardBody className="flex flex-col gap-2">
+        <span>
+          <p className="align-middle inline text-base">Latest Results</p>
+        </span>
+        {isLoading ? (
+          <div>
+            <ResultRowSkeleton />
+            <ResultRowSkeleton />
+            <ResultRowSkeleton />
           </div>
-        ))
-      ) : (
-        <p className="italic place-self-center text-sm">No results yet</p>
-      )}
-    </motion.div>
+        ) : mostRecentResults.length > 0 ? (
+          <div className="flex flex-col gap-1">
+            {mostRecentResults.map((result, i) => (
+              <div
+                key={i}
+                onMouseEnter={() => setIsHoveringOuterPanel(false)}
+                onMouseLeave={() => setIsHoveringOuterPanel(true)}
+              >
+                <ResultRow result={result} league={league} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="h-full flex flex-col justify-center">
+            <p className="italic place-self-center text-sm text-muted align-middle pb-6">
+              No results yet
+            </p>
+          </div>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -89,18 +107,11 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
 
   return (
     <motion.div
-      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center px-[10px]"
+      className="bg-content2 hover:bg-content3 h-[36px] border-0 border-divider  flex flex-row justify-baseline items-center rounded-[10px] hover:cursor-pointer transition-colors duration-250"
       onClick={(e) => handleResultClick(e)}
       whileTap={{ scale: 0.98 }}
     >
-      <p
-        style={{
-          width: 'max-content',
-          height: 'min-content',
-          flex: 'none',
-        }}
-        className="flex-none w-max h-min text-sm"
-      >
+      <p className="flex-none w-max h-min text-sm px-[10px]">
         MD {result.matchweek}
       </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
@@ -131,6 +142,43 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
         </Button>
       )} */}
     </motion.div>
+  );
+
+  return (
+    <div
+      className="bg-content2 hover:bg-content3 h-[36px] border-0 border-divider  flex flex-row justify-baseline items-center px-[10px]"
+      onClick={(e) => handleResultClick(e)}
+      role="button"
+    >
+      <p className="flex-none w-max h-min text-sm">MD {result.matchweek}</p>
+      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
+        <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+          {result.homeTeamDetails.name}
+        </p>
+        <p className="w-full text-center font-normal text-muted">
+          {homeGoals} <span className="text-muted">-</span> {awayGoals}
+        </p>
+        <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+          {result.awayTeamDetails.name}
+        </p>
+      </div>
+      {/* {userOwnsThisLeague && (
+        <Button
+          color="transparent"
+          bgHoverColor="var(--bg-dark)"
+          borderlessButton={true}
+          underlineEffect={false}
+          shadowEffect={false}
+          style={{ padding: '10px' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowFixtureToResult(fixtureObj);
+          }}
+        >
+          <EditSVG className="w-[16px] h-[16px] fill-[var(--text)]" />
+        </Button>
+      )} */}
+    </div>
   );
 }
 
