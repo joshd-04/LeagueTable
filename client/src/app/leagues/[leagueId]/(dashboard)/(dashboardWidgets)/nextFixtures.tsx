@@ -1,6 +1,4 @@
 'use client';
-import EditSVG from '@/assets/svg components/Edit';
-import Button from '@/components/text/Button';
 
 import { Fixture, League } from '@/util/definitions';
 import { useParams, useRouter } from 'next/navigation';

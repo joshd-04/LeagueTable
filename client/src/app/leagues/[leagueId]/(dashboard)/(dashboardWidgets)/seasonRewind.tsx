@@ -1,9 +1,15 @@
-import ArrowBackSVG from '@/assets/svg components/ArrowBack';
-import ArrowForwardSVG from '@/assets/svg components/ArrowForward';
-import Button from '@/components/text/Button';
-
 import { League } from '@/util/definitions';
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+} from '@heroui/react';
 import { Dispatch, SetStateAction } from 'react';
+import { FaBackward } from 'react-icons/fa';
+import { FaForward } from 'react-icons/fa6';
 
 export default function SeasonRewind({
   league,
@@ -14,6 +20,8 @@ export default function SeasonRewind({
   seasonViewing: number;
   setSeasonViewing: Dispatch<SetStateAction<number>>;
 }) {
+  const isViewingCurrentSeason = league.currentSeason === seasonViewing;
+
   function decrementSeason() {
     if (seasonViewing > 1) {
       setSeasonViewing((prev) => prev - 1);
@@ -31,102 +39,114 @@ export default function SeasonRewind({
   }
 
   return (
-    <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col">
-      <div className="flex flex-row justify-between items-start">
-        <p className="align-middle inline text-base">Season rewind</p>
-        {seasonViewing === league.currentSeason ? (
-          <Button
-            color="transparent"
-            bgHoverColor="transparent"
-            style={{
-              padding: 0,
-              textAlign: 'start',
-            }}
-            shadowEffect={false}
-            borderlessButton={true}
-            underlineEffect={false}
-            onClick={() => {}}
-            disabled
-          >
-            <p className="bg-divider h-min px-[8px] rounded-[10px] font-bold text-sm">
-              OFF
-            </p>
-          </Button>
-        ) : (
-          <Button
-            color="transparent"
-            bgHoverColor="transparent"
-            style={{
-              padding: 0,
-              textAlign: 'start',
-            }}
-            shadowEffect={false}
-            borderlessButton={true}
-            underlineEffect={false}
-            onClick={() => resetSeason()}
-          >
-            <p className="text-black bg-success h-min px-[8px] rounded-[10px] font-bold text-sm">
-              ON
-            </p>
-          </Button>
-        )}
-      </div>
-      <p className="text-sm">
-        View results, tables & stats from previous seasons
-      </p>
-      <div className="my-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center shadow-[var(--shadow)]">
-        <Button
-          color="transparent"
-          bgHoverColor="var(--accent)"
-          borderlessButton={true}
-          underlineEffect={false}
-          onClick={decrementSeason}
-          disabled={seasonViewing === 1}
-          shadowEffect={false}
-        >
-          <ArrowBackSVG
-            className="w-[24px] h-[24px]"
-            style={{
-              fill: seasonViewing === 1 ? 'var(--border)' : 'var(--primary)',
-            }}
-          />
-        </Button>
-        <p
-          style={{
-            color:
-              seasonViewing === league.currentSeason
-                ? 'var(--text-muted)'
-                : 'var(--text)',
-          }}
-          className="mx-[10px] px-[10px] rounded-[10px] text-base"
-        >
-          Season {seasonViewing}
+    <Card className="h-full w-full px-[10px] py-[6px]" fullWidth>
+      <CardHeader className="flex flex-col items-start">
+        <div className="flex flex-row justify-between items-start w-full">
+          <p className="align-middle inline text-base">Season rewind</p>
+          {seasonViewing === league.currentSeason ? (
+            <Chip color="default" variant="flat">
+              <p className="text-xs">OFF</p>
+            </Chip>
+          ) : (
+            <Chip color="primary" variant="shadow">
+              <p className="text-xs">ON</p>
+            </Chip>
+          )}
+        </div>
+        <p className="text-sm text-muted">
+          View results, tables & stats from previous seasons
         </p>
-        <Button
-          color="transparent"
-          bgHoverColor="var(--accent)"
-          borderlessButton={true}
-          underlineEffect={false}
-          onClick={incrementSeason}
-          disabled={seasonViewing === league.currentSeason}
-          shadowEffect={false}
+      </CardHeader>
+      <CardBody className="flex flex-col gap-2">
+        <div
+          className={`w-min border-2 rounded-xl ${
+            isViewingCurrentSeason
+              ? 'border-default bg-default'
+              : 'border-primary bg-primary'
+          }`}
         >
-          <ArrowForwardSVG
-            className="w-[24px] h-[24px]"
+          <p className="text-sm text-center font-semibold">
+            Season {seasonViewing}
+          </p>
+          <div className="bg-content1 rounded-xl">
+            <ButtonGroup color="primary" variant="flat">
+              <Button
+                onPress={decrementSeason}
+                isDisabled={seasonViewing === 1}
+              >
+                <FaBackward /> Back
+              </Button>
+              <Button
+                onPress={resetSeason}
+                isDisabled={seasonViewing === league.currentSeason}
+              >
+                Reset
+              </Button>
+
+              <Button
+                onPress={incrementSeason}
+                isDisabled={seasonViewing === league.currentSeason}
+              >
+                Next
+                <FaForward />
+              </Button>
+            </ButtonGroup>
+          </div>
+        </div>
+        {/* <div className="my-[20px] bg-[var(--bg-light)] w-fit rounded-[10px] grid grid-cols-[repeat(3,max-content)] grid-rows-1 place-items-center shadow-[var(--shadow)]">
+          <Button
+            color="transparent"
+            bgHoverColor="var(--accent)"
+            borderlessButton={true}
+            underlineEffect={false}
+            onClick={decrementSeason}
+            disabled={seasonViewing === 1}
+            shadowEffect={false}
+          >
+            <ArrowBackSVG
+              className="w-[24px] h-[24px]"
+              style={{
+                fill: seasonViewing === 1 ? 'var(--border)' : 'var(--primary)',
+              }}
+            />
+          </Button>
+          <p
             style={{
-              fill:
+              color:
                 seasonViewing === league.currentSeason
-                  ? 'var(--border)'
-                  : 'var(--primary)',
+                  ? 'var(--text-muted)'
+                  : 'var(--text)',
             }}
-          />
-        </Button>
-      </div>
-      <p className="text-sm">
-        {league.currentSeason === seasonViewing
-          ? `You are viewing the current season`
-          : `${league.name} is currently on season ${league.currentSeason}`}
-      </p>
-    </div>
+            className="mx-[10px] px-[10px] rounded-[10px] text-base"
+          >
+            Season {seasonViewing}
+          </p>
+          <Button
+            color="transparent"
+            bgHoverColor="var(--accent)"
+            borderlessButton={true}
+            underlineEffect={false}
+            onClick={incrementSeason}
+            disabled={seasonViewing === league.currentSeason}
+            shadowEffect={false}
+          >
+            <ArrowForwardSVG
+              className="w-[24px] h-[24px]"
+              style={{
+                fill:
+                  seasonViewing === league.currentSeason
+                    ? 'var(--border)'
+                    : 'var(--primary)',
+              }}
+            />
+          </Button>
+        </div> */}
+        <p className="text-sm">
+          {isViewingCurrentSeason
+            ? `You are viewing the current season`
+            : `${league.name} is currently on season ${league.currentSeason}`}
+        </p>
+      </CardBody>
+    </Card>
   );
 }
