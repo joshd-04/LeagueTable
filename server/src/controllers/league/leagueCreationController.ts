@@ -75,6 +75,11 @@ export async function leagueCreationController(
         "Invalid league type. leagueType can only be 'basic' or 'advanced'";
     }
 
+    if (leagueLevel === 'free' && leagueType === 'advanced') {
+      errors.leagueType =
+        'Advanced leagues are not available on the free tier.';
+    }
+
     if (divisionsCount < 1) {
       errors.divisionsCount = 'Must be greater than 0.';
     }

@@ -170,7 +170,12 @@ function StatsTablePlayerBased({
           <TableColumn>Team</TableColumn>
           <TableColumn>{stat.unit}</TableColumn>
         </TableHeader>
-        <TableBody items={data}>
+        <TableBody
+          items={data}
+          emptyContent={
+            <p className="italic text-muted text-sm">No data to display</p>
+          }
+        >
           {(item) => (
             <TableRow key={item.position}>
               <TableCell>{item.position}</TableCell>
@@ -206,7 +211,12 @@ function StatsTableTeamBased({
           <TableColumn>Team</TableColumn>
           <TableColumn>{stat.unit}</TableColumn>
         </TableHeader>
-        <TableBody items={data}>
+        <TableBody
+          items={data}
+          emptyContent={
+            <p className="italic text-muted text-sm">No data to display</p>
+          }
+        >
           {(item) => (
             <TableRow key={item.position}>
               <TableCell>{item.position}</TableCell>
@@ -217,28 +227,6 @@ function StatsTableTeamBased({
         </TableBody>
       </Table>
     </div>
-  );
-}
-
-function TableRowTeamBased({
-  datapoint,
-}: {
-  datapoint: { position: number; team: string; value: number };
-}) {
-  return (
-    <tr>
-      <td>
-        <p className="text-right pr-[10px] text-base">{datapoint.position}.</p>
-      </td>
-      <td>
-        <p className="text-base text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {datapoint.team}
-        </p>
-      </td>
-      <td>
-        <p className="text-base">{datapoint.value}</p>
-      </td>
-    </tr>
   );
 }
 

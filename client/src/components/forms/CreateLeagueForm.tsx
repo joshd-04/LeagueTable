@@ -13,11 +13,14 @@ import {
   RadioGroup,
   Spacer,
 } from '@heroui/react';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
+import ProChip from '../chips/ProChip';
+import ProPlusChip from '../chips/ProPlusChip';
+import useAccount from '@/hooks/useAccount';
 
 export default function CreateLeagueForm() {
   const [leagueName, setLeagueName] = useState<string>('');
@@ -153,25 +156,26 @@ export default function CreateLeagueForm() {
             isRequired
           >
             <CustomRadio
+              title={'Basic'}
               description={
-                <span className="opacity-80 dark:opacity-70">
+                <span className="opacity-80 dark:opacity-70 text-xs">
                   Simple, streamlined experience
                 </span>
               }
               value="basic"
-            >
-              Basic
-            </CustomRadio>
+              isPro
+            />
+
             <CustomRadio
+              title={'Advanced'}
               description={
-                <span className="opacity-80 dark:opacity-70">
+                <span className="opacity-80 dark:opacity-70 text-xs">
                   Includes goals & assists tracking
                 </span>
               }
               value="advanced"
-            >
-              Advanced
-            </CustomRadio>
+              isProPlus
+            />
           </RadioGroup>
           <Spacer y={1} />
           <Button
@@ -192,9 +196,27 @@ export default function CreateLeagueForm() {
 }
 
 function CustomRadio({
-  children,
+  title,
+  description,
+  isPro,
+  isProPlus,
   ...otherProps
-}: React.ComponentProps<typeof Radio>) {
+}: React.ComponentProps<typeof Radio> & {
+  title: ReactNode;
+  description?: ReactNode;
+  isPro?: boolean;
+  isProPlus?: boolean;
+}) {
+  const accountType = useAccount().user?.accountType;
+  if (!accountType) return <div>Account Type not found</div>;
+
+  let toBeDisabled = false;
+  if (isProPlus && !['pro+'].includes(accountType)) {
+    toBeDisabled = true;
+  } else if (isPro && !['pro', 'pro+'].includes(accountType)) {
+    toBeDisabled = true;
+  }
+
   return (
     <Radio
       {...otherProps}
@@ -202,11 +224,19 @@ function CustomRadio({
         base: cn(
           'flex m-0 bg-content1 hover:bg-content2 items-center justify-between',
           'flex-row-reverse min-w-[376px] cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent',
-          'data-[selected=true]:border-primary'
+          'data-[selected=true]:border-primary transition-colors duration-250'
         ),
+        labelWrapper: cn('w-full'),
       }}
+      isDisabled={toBeDisabled}
     >
-      {children}
+      <div className="flex flex-row justify-between items-center w-full">
+        <div className="flex flex-col">
+          {title}
+          {description}
+        </div>
+        {isProPlus ? <ProPlusChip /> : isPro && <ProChip />}
+      </div>
     </Radio>
   );
 }

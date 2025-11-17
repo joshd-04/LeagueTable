@@ -156,3 +156,5 @@ export interface NotificationInterface {
   description?: string | (() => string);
   duration: number;
 }
+
+export type AccountTypeInterface = 'free' | 'pro' | 'pro+';
