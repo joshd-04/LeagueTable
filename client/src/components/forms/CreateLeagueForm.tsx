@@ -163,7 +163,6 @@ export default function CreateLeagueForm() {
                 </span>
               }
               value="basic"
-              isPro
             />
 
             <CustomRadio
@@ -174,7 +173,7 @@ export default function CreateLeagueForm() {
                 </span>
               }
               value="advanced"
-              isProPlus
+              isPro
             />
           </RadioGroup>
           <Spacer y={1} />
