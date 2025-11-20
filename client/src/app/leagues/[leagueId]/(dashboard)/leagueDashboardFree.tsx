@@ -1,14 +1,13 @@
 'use client';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { useContext, useEffect, useState } from 'react';
 import Upgrade from './(dashboardWidgets)/upgrade';
 
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
-import StatsOld from './(dashboardWidgets)/statsOld';
 import Heading1 from '@/components/text/Heading1';
-import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
+
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
@@ -47,10 +46,6 @@ export default function LeagueDashboardFree({
       setLeague(leagueQueryData.data.league);
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
-
-  // Will store the string of the fixture to be turned into a result, otherwise null
-  const [showFixtureToResult, setShowFixtureToResult] =
-    useState<Fixture | null>(null);
 
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
@@ -116,9 +111,8 @@ export default function LeagueDashboardFree({
           <NextFixtures
             league={league}
             userOwnsThisLeague={userOwnsThisLeague}
-            setShowFixtureToResult={setShowFixtureToResult}
+            invalidateDashboardQueries={invalidateDashboardQueries}
           />
-
           {userOwnsThisLeague ? (
             <Controls
               league={league}
@@ -139,14 +133,6 @@ export default function LeagueDashboardFree({
           <div></div>
         </div>
       </div>
-      {showFixtureToResult !== null && (
-        <FixtureToResult
-          leagueType={league.leagueType}
-          fixtureObj={showFixtureToResult}
-          setShowFixtureToResult={setShowFixtureToResult}
-          invalidateDashboardQueries={invalidateDashboardQueries}
-        />
-      )}
     </div>
   );
 }

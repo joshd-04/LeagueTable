@@ -1,14 +1,12 @@
 'use client';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { useContext, useEffect, useState } from 'react';
 
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
 import NewsFeed from './(dashboardWidgets)/newsFeed';
-import StatsOld from './(dashboardWidgets)/statsOld';
 import Heading1 from '@/components/text/Heading1';
-import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
@@ -49,10 +47,6 @@ export default function LeagueDashboardStandard({
       setLeague(leagueQueryData.data.league);
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
-
-  // Will store the string of the fixture to be turned into a result, otherwise null
-  const [showFixtureToResult, setShowFixtureToResult] =
-    useState<Fixture | null>(null);
 
   const [seasonViewing, setSeasonViewing] = useState(league.currentSeason);
 
@@ -126,7 +120,7 @@ export default function LeagueDashboardStandard({
             league={league}
             userOwnsThisLeague={userOwnsThisLeague}
             seasonViewing={seasonViewing}
-            setShowFixtureToResult={setShowFixtureToResult}
+            invalidateDashboardQueries={invalidateDashboardQueries}
           />
 
           {userOwnsThisLeague ? (
@@ -157,14 +151,6 @@ export default function LeagueDashboardStandard({
           />
         </div>
       </div>
-      {showFixtureToResult !== null && (
-        <FixtureToResult
-          leagueType={league.leagueType}
-          fixtureObj={showFixtureToResult}
-          setShowFixtureToResult={setShowFixtureToResult}
-          invalidateDashboardQueries={invalidateDashboardQueries}
-        />
-      )}
     </div>
   );
 }

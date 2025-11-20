@@ -12,6 +12,7 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
 import { useRouter } from 'next/navigation';
+import { useDisclosure } from '@heroui/react';
 
 export default function FixtureClient({
   league,
@@ -23,8 +24,14 @@ export default function FixtureClient({
   const context = useContext(GlobalContext);
   const { user } = context.account;
   const { isLoggedIn } = useAccount();
-  const [showFixtureToResult, setShowFixtureToResult] =
-    useState<Fixture | null>(null);
+
+  const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
+
+  const {
+    isOpen: isFixtureToResultOpen,
+    onOpen: onFixtureToResultOpen,
+    onClose: onFixtureToResultClose,
+  } = useDisclosure();
 
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
@@ -105,7 +112,10 @@ export default function FixtureClient({
                 bgHoverColor="var(--accent)"
                 borderlessButton={true}
                 underlineEffect={false}
-                onClick={() => setShowFixtureToResult(fixture)}
+                onClick={() => {
+                  setSelectedFixture(fixture);
+                  onFixtureToResultOpen();
+                }}
               >
                 Upload result
               </Button>
@@ -123,14 +133,14 @@ export default function FixtureClient({
             userOwnsThisLeague={userOwnsThisLeague}
           />
         </div>
-        {showFixtureToResult && (
-          <FixtureToResult
-            leagueType={league.leagueType}
-            fixtureObj={fixture}
-            setShowFixtureToResult={setShowFixtureToResult}
-            onResolution={handleFixtureToResultCompletion}
-          />
-        )}
+        <FixtureToResult
+          leagueType={league.leagueType}
+          fixtureObj={selectedFixture}
+          isModalOpen={isFixtureToResultOpen}
+          onModalClose={onFixtureToResultClose}
+          setSelectedFixture={setSelectedFixture}
+          onResolution={handleFixtureToResultCompletion}
+        />
       </div>
     </div>
   );

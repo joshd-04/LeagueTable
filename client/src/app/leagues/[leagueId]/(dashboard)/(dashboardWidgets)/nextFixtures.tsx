@@ -7,21 +7,29 @@ import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { Card, CardBody } from '@heroui/react';
+import { Card, CardBody, useDisclosure } from '@heroui/react';
 import { FaRegEdit } from 'react-icons/fa';
+import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 
 export default function NextFixtures({
   league,
   seasonViewing = league.currentSeason,
   userOwnsThisLeague,
-  setShowFixtureToResult,
+  invalidateDashboardQueries,
 }: {
   league: League;
   seasonViewing?: number;
   userOwnsThisLeague: boolean;
-
-  setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
+  invalidateDashboardQueries: () => void;
 }) {
+  const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
+
+  const {
+    isOpen: isFixtureToResultOpen,
+    onOpen: onFixtureToResultOpen,
+    onClose: onFixtureToResultClose,
+  } = useDisclosure();
+
   const { data, isLoading } = useQuery({
     queryFn: () =>
       fetchAPI(
@@ -47,78 +55,91 @@ export default function NextFixtures({
   const router = useRouter();
 
   return (
-    <Card
-      className={`px-[10px] py-[6px] h-full w-full ${
-        !isHoveringOuterPanel ? 'data-[pressed=true]:scale-100' : ''
-      }`}
-      onMouseEnter={() => setIsHoveringOuterPanel(true)}
-      onMouseLeave={() => setIsHoveringOuterPanel(false)}
-      isPressable
-      onClick={(e) => {
-        e.stopPropagation();
-        router.push(`/leagues/${league._id}/fixtures`);
-      }}
-      style={{
-        background: isHoveringOuterPanel
-          ? 'hsl(var(--heroui-content3)/1)'
-          : 'hsl(var(--heroui-content1)/1)',
-        borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
-      }}
-    >
-      <CardBody className="flex flex-col gap-2">
-        <div className="flex flex-row items-baseline gap-[4px]">
-          <p className="align-middle inline text-base">Fixtures </p>
-          {fixtures !== undefined &&
-            nextFixtures !== undefined &&
-            nextFixtures.length >= 3 &&
-            !isLoading && (
-              <p className="text-sm inline text-muted">
-                - showing {nextFixtures.length} of {fixtures.totalFixtures}
+    <>
+      <Card
+        className={`px-[10px] py-[6px] h-full w-full ${
+          !isHoveringOuterPanel ? 'data-[pressed=true]:scale-100' : ''
+        }`}
+        onMouseEnter={() => setIsHoveringOuterPanel(true)}
+        onMouseLeave={() => setIsHoveringOuterPanel(false)}
+        isPressable
+        onClick={(e) => {
+          e.stopPropagation();
+          router.push(`/leagues/${league._id}/fixtures`);
+        }}
+        style={{
+          background: isHoveringOuterPanel
+            ? 'hsl(var(--heroui-content3)/1)'
+            : 'hsl(var(--heroui-content1)/1)',
+          borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
+        }}
+      >
+        <CardBody className="flex flex-col gap-2">
+          <div className="flex flex-row items-baseline gap-[4px]">
+            <p className="align-middle inline text-base">Fixtures </p>
+            {fixtures !== undefined &&
+              nextFixtures !== undefined &&
+              nextFixtures.length >= 3 &&
+              !isLoading && (
+                <p className="text-sm inline text-muted">
+                  - showing {nextFixtures.length} of {fixtures.totalFixtures}
+                </p>
+              )}
+          </div>
+          {isLoading || nextFixtures === undefined || fixtures === undefined ? (
+            <>
+              <FixtureRowSkeleton />
+              <FixtureRowSkeleton />
+              <FixtureRowSkeleton />
+            </>
+          ) : nextFixtures.length > 0 ? (
+            <div className="flex flex-col gap-1">
+              {nextFixtures.map((f, i) => (
+                <div
+                  key={i}
+                  onMouseEnter={() => setIsHoveringOuterPanel(false)}
+                  onMouseLeave={() => setIsHoveringOuterPanel(true)}
+                >
+                  <FixtureRow
+                    userOwnsThisLeague={userOwnsThisLeague}
+                    fixtureObj={f}
+                    setSelectedFixture={setSelectedFixture}
+                    onFixtureToResultOpen={onFixtureToResultOpen}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-full flex flex-col justify-center">
+              <p className="italic place-self-center text-sm text-muted align-middle pb-6">
+                No outstanding fixtures
               </p>
-            )}
-        </div>
-        {isLoading || nextFixtures === undefined || fixtures === undefined ? (
-          <>
-            <FixtureRowSkeleton />
-            <FixtureRowSkeleton />
-            <FixtureRowSkeleton />
-          </>
-        ) : nextFixtures.length > 0 ? (
-          <div className="flex flex-col gap-1">
-            {nextFixtures.map((f, i) => (
-              <div
-                key={i}
-                onMouseEnter={() => setIsHoveringOuterPanel(false)}
-                onMouseLeave={() => setIsHoveringOuterPanel(true)}
-              >
-                <FixtureRow
-                  userOwnsThisLeague={userOwnsThisLeague}
-                  fixtureObj={f}
-                  setShowFixtureToResult={setShowFixtureToResult}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="h-full flex flex-col justify-center">
-            <p className="italic place-self-center text-sm text-muted align-middle pb-6">
-              No outstanding fixtures
-            </p>
-          </div>
-        )}
-      </CardBody>
-    </Card>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+      <FixtureToResult
+        leagueType={league.leagueType}
+        fixtureObj={selectedFixture}
+        isModalOpen={isFixtureToResultOpen}
+        onModalClose={onFixtureToResultClose}
+        setSelectedFixture={setSelectedFixture}
+        invalidateDashboardQueries={invalidateDashboardQueries}
+      />
+    </>
   );
 }
 
 function FixtureRow({
   userOwnsThisLeague,
   fixtureObj,
-  setShowFixtureToResult,
+  setSelectedFixture,
+  onFixtureToResultOpen,
 }: {
   userOwnsThisLeague: boolean;
   fixtureObj: Fixture;
-  setShowFixtureToResult: Dispatch<SetStateAction<Fixture | null>>;
+  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  onFixtureToResultOpen: () => void;
 }) {
   const router = useRouter();
   const { leagueId } = useParams();
@@ -166,7 +187,9 @@ function FixtureRow({
           className="px-[10px] hover:bg-content3 h-full flex flex-col justify-center items-center rounded-[10px] ml-1"
           onClick={(e) => {
             e.stopPropagation();
-            setShowFixtureToResult(fixtureObj);
+            setSelectedFixture(fixtureObj);
+            // Open the form modal
+            onFixtureToResultOpen();
           }}
         >
           <FaRegEdit className="w-4 h-4 " />

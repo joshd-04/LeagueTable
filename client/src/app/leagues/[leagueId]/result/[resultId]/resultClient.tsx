@@ -30,6 +30,7 @@ export default function ResultClient({
     (acc, team) => (team === 'away' ? acc + 1 : acc),
     0
   );
+  console.log(result);
 
   // so the user can edit the result
   let userOwnsThisLeague = false;

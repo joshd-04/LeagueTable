@@ -1,10 +1,10 @@
 'use client';
 import { Fixture, League } from '@/util/definitions';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
-import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
+
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
@@ -21,8 +21,6 @@ export default function FixtureFuture({
   const context = useContext(GlobalContext);
   const { user } = context.account;
   const { isLoggedIn } = useAccount();
-  const [showFixtureToResult, setShowFixtureToResult] =
-    useState<Fixture | null>(null);
 
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
@@ -101,13 +99,6 @@ export default function FixtureFuture({
             userOwnsThisLeague={userOwnsThisLeague}
           />
         </div>
-        {showFixtureToResult && (
-          <FixtureToResult
-            leagueType={league.leagueType}
-            fixtureObj={fixture}
-            setShowFixtureToResult={setShowFixtureToResult}
-          />
-        )}
       </div>
     </div>
   );
