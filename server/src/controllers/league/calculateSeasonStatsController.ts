@@ -93,12 +93,13 @@ export async function calculateSeasonStatsController(
     If the league type is advanced and the league level is pro, but the user is no longer a pro user, do not give them pro data.
     */
 
+    const accountType = (league.leagueOwner as unknown as IUserSchema)
+      .accountType;
+
     if (
       league.leagueType === 'advanced' &&
       ['pro', 'pro+'].includes(league.leagueLevel) &&
-      ['pro', 'pro+'].includes(
-        (league.leagueOwner as unknown as IUserSchema).accountType
-      )
+      ['pro', 'pro+'].includes(accountType)
     ) {
       stats.topScorers = [];
       stats.mostAssists = [];
@@ -177,7 +178,12 @@ export async function calculateSeasonStatsController(
             stats.cleansheets[division - 1].data[index].value += 1;
           }
         }
-        if (league.leagueType !== 'advanced') return;
+        // advanced leagues are pro leagues, ensure the account is atleast pro
+        if (
+          league.leagueType !== 'advanced' ||
+          !['pro', 'pro+'].includes(accountType)
+        )
+          return;
         result.detailedOutcome?.forEach((goal) => {
           if (stats.topScorers !== undefined && !goal.isOwnGoal) {
             let team: string;
