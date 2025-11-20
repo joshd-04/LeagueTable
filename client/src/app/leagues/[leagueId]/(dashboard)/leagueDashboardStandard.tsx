@@ -123,7 +123,7 @@ export default function LeagueDashboardStandard({
             invalidateDashboardQueries={invalidateDashboardQueries}
           />
 
-          {userOwnsThisLeague ? (
+          {userOwnsThisLeague && seasonViewing === league.currentSeason ? (
             <Controls
               league={league}
               invalidateDashboardQueries={invalidateDashboardQueries}
