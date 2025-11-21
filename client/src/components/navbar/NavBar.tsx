@@ -27,6 +27,8 @@ import { useRouter } from 'next/navigation';
 import DarkModeSVG from '@/assets/svg components/DarkMode';
 import LightModeSVG from '@/assets/svg components/LightMode';
 import { useTheme } from 'next-themes';
+import ProChip from '../chips/ProChip';
+import ProPlusChip from '../chips/ProPlusChip';
 
 export default function NavBar() {
   const { user, setUser } = useContext(GlobalContext).account;
@@ -55,8 +57,13 @@ export default function NavBar() {
   return (
     <Navbar>
       <NavbarBrand>
-        <Link href="/" className="text-inherit ">
+        <Link
+          href="/"
+          className="text-inherit flex flex-row gap-1 items-center"
+        >
           <Logo />
+          {user?.accountType === 'pro' && <ProChip />}
+          {user?.accountType === 'pro+' && <ProPlusChip />}
         </Link>
       </NavbarBrand>
       {pathname === '/' && !isLoggedIn && (
