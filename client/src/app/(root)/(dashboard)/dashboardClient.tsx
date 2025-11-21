@@ -2,14 +2,29 @@
 import Heading3 from '@/components/text/Heading3';
 
 import { GlobalContext } from '@/context/GlobalContextProvider';
-import React, { Suspense, useContext, useEffect, useState } from 'react';
+import React, {
+  ReactNode,
+  Suspense,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { LeagueInterface } from './dashboard';
 import { User } from '@/util/definitions';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useQuery } from '@tanstack/react-query';
-import { addToast, Chip, Tab, Tabs } from '@heroui/react';
+import {
+  addToast,
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Link,
+  Tab,
+  Tabs,
+} from '@heroui/react';
 import LeagueCard from './(widgets)/LeagueCard';
 
 interface LeaguesInterface {
@@ -370,6 +385,11 @@ export default function DashboardClient({
                     handleClick={handleClick}
                     handleFavClick={handleFavClick}
                     handleFollowClick={handleFollowClick}
+                    noLeaguesFoundContent={
+                      <p className="text-base text-muted">
+                        You haven&apos;t favorited any leagues yet
+                      </p>
+                    }
                   />
                 </Tab>
                 <Tab
@@ -399,19 +419,35 @@ export default function DashboardClient({
                     handleClick={handleClick}
                     handleFavClick={handleFavClick}
                     handleFollowClick={handleFollowClick}
+                    noLeaguesFoundContent={
+                      <div className="flex flex-col items-start gap-2">
+                        <p className="text-base text-muted">
+                          You haven&apos;t created any leagues yet
+                        </p>
+                        <Button
+                          as={Link}
+                          href="/create-league"
+                          color="primary"
+                          variant="shadow"
+                          className="font-semibold text-sm"
+                        >
+                          <p>Create league</p>
+                        </Button>
+                      </div>
+                    }
                   />
                 </Tab>
                 <Tab
-                  key="bookmarks"
+                  key="following"
                   title={
                     <div className="flex items-center space-x-2">
-                      <span>Bookmarks</span>
+                      <span>Following</span>
                       <Chip
                         variant="solid"
                         radius="full"
                         size="sm"
                         className={
-                          selectedLeagueTab === 'bookmarks'
+                          selectedLeagueTab === 'following'
                             ? 'bg-foreground text-primary'
                             : ''
                         }
@@ -428,6 +464,11 @@ export default function DashboardClient({
                     handleClick={handleClick}
                     handleFavClick={handleFavClick}
                     handleFollowClick={handleFollowClick}
+                    noLeaguesFoundContent={
+                      <p className="text-base text-muted">
+                        You aren&apos;t following any leagues yet
+                      </p>
+                    }
                   />
                 </Tab>
               </Tabs>
@@ -459,6 +500,7 @@ function LeagueSection({
   handleClick,
   handleFavClick,
   handleFollowClick,
+  noLeaguesFoundContent,
 }: {
   simplifiedLeagues: {
     created: string[];
@@ -470,6 +512,7 @@ function LeagueSection({
   handleClick: (leagueId: string) => void;
   handleFavClick: (leagueId: string, action: 'favorite' | 'unfavorite') => void;
   handleFollowClick: (leagueId: string, action: 'follow' | 'unfollow') => void;
+  noLeaguesFoundContent: ReactNode;
 }) {
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -498,7 +541,7 @@ function LeagueSection({
           </Suspense>
         ))
       ) : (
-        <NoLeaguesFound>No leagues were found</NoLeaguesFound>
+        <NoLeaguesFound>{noLeaguesFoundContent}</NoLeaguesFound>
       )}
     </div>
   );
@@ -506,8 +549,8 @@ function LeagueSection({
 
 function NoLeaguesFound({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-[80px] bg-[var(--bg)] rounded-[10px] flex flex-col justify-center items-start px-[20px] py-[10px]  border-1 border-solid border-[var(--border)] ">
-      <p className="text-base text-muted">{children}</p>
-    </div>
+    <Card className="col-span-2 px-[12px] py-[8px]">
+      <CardBody>{children}</CardBody>
+    </Card>
   );
 }

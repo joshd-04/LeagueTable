@@ -45,7 +45,7 @@ export default function LeagueCard({
 
   return (
     <Card
-      className={`px-[20px] py-[10px]  hover:cursor-pointer hover:bg-content2 ${
+      className={`px-[12px] py-[8px]  hover:cursor-pointer hover:bg-content2 ${
         !isHoveringOuterPanel ? 'data-[pressed=true]:scale-100' : ''
       }`}
       onMouseEnter={() => setIsHoveringOuterPanel(true)}
