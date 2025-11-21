@@ -1,2 +1,2 @@
 export const individualTeamPagesEnabled = false;
-export const bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete = false;
+export const bookmarkOrFavoriteOptionsAvailableWhenSetupIncomplete = false;

@@ -4,7 +4,7 @@ import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete } from '@/util/featureToggle';
+import { bookmarkOrFavoriteOptionsAvailableWhenSetupIncomplete } from '@/util/featureToggle';
 import {
   Button,
   Card,
@@ -39,8 +39,8 @@ export default function SetupIncomplete({
   - or they need to add teams
 
   User does not own the league:
-  - show bookmark/favourite buttons if logged in
-  - do not show favourite buttons if not logged in
+  - show bookmark/favorite buttons if logged in
+  - do not show favorite buttons if not logged in
 
   */
 
@@ -55,7 +55,7 @@ export default function SetupIncomplete({
       />
     );
   } else {
-    return bookmarkOrFavouriteOptionsAvailableWhenSetupIncomplete &&
+    return bookmarkOrFavoriteOptionsAvailableWhenSetupIncomplete &&
       isLoggedIn ? (
       <CardWhenNotOwnerButtons leagueName={leagueName} leagueId={leagueId} />
     ) : (
@@ -156,8 +156,8 @@ function CardWhenNotOwnerButtons({
   leagueName: string;
   leagueId: string;
 }) {
-  async function addToFavourites() {
-    const response = await fetchAPI(`${API_URL}/users/favourites`, {
+  async function addToFavorites() {
+    const response = await fetchAPI(`${API_URL}/users/favorites`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -231,9 +231,9 @@ function CardWhenNotOwnerButtons({
           fullWidth
           className="border-small border-divider/50 bg-content1/10 "
           variant="light"
-          onPress={addToFavourites}
+          onPress={addToFavorites}
         >
-          Add to favourites
+          Add to favorites
         </Button>
       </CardFooter>
     </Card>

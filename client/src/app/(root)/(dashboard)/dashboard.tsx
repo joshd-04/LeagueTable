@@ -11,8 +11,10 @@ export interface LeagueInterface {
   currentMatchweek: number;
   numDivisions: number;
   numTeams: number;
-  owner: { _id: string; name: string; accountType: 'free' | 'pro' };
-  actions: string[];
+  owner: { _id: string; name: string; accountType: 'free' | 'pro' | 'pro+' };
+  actions?: string[];
+  leagueLevel: 'free' | 'pro' | 'pro+';
+  leagueType: 'basic' | 'advnaced';
 }
 
 export default async function Dashboard({
@@ -24,11 +26,10 @@ export default async function Dashboard({
 }) {
   const leagues: {
     created: LeagueInterface[];
-    favourites: LeagueInterface[];
+    favorites: LeagueInterface[];
     following: LeagueInterface[];
-  } = { created: [], favourites: [], following: [] };
+  } = { created: [], favorites: [], following: [] };
   const cookieStore = await cookies();
-  console.log('aaa');
 
   const associatedLeagues = await fetchAPI(`${API_URL}/leagues/associated`, {
     method: 'GET',
@@ -39,7 +40,7 @@ export default async function Dashboard({
   });
 
   leagues.created = associatedLeagues.data.created as LeagueInterface[];
-  leagues.favourites = associatedLeagues.data.favourites as LeagueInterface[];
+  leagues.favorites = associatedLeagues.data.favorites as LeagueInterface[];
   leagues.following = associatedLeagues.data.following as LeagueInterface[];
 
   return (

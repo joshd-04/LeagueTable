@@ -16,10 +16,37 @@ export async function fetchAPI(
   options: RequestInit
 ) {
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      ...options,
+      signal: AbortSignal.timeout(8000),
+    });
     const data = await response.json();
     return data;
-  } catch (e) {
-    throw e;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    // Network error, timeout, JSON parse error, etc.
+    console.error('fetchAPI failed:', err);
+
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+      return {
+        status: 'error',
+        statusCode: 500,
+        message: 'Request timeout - server may be down',
+      };
+    }
+
+    if (err.message?.includes('Failed to fetch')) {
+      return {
+        status: 'error',
+        statusCode: 500,
+        message: 'Backend unreachable. Server may be down.',
+      };
+    }
+
+    return {
+      status: 'error',
+      statusCode: 500,
+      message: err.message || 'Network error',
+    };
   }
 }

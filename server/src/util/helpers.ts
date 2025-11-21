@@ -131,7 +131,7 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
   /* compareFn: positive = swap, negative = dont swap, equal = equal
   descending order: b-a
 
-  Favour teams with:
+  Favor teams with:
   1. More points
   2. Better goal difference
   3. Goals scored

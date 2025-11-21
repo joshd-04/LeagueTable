@@ -96,6 +96,6 @@ export interface IUserSchema extends Document {
   passwordHash: string;
   accountType: 'free' | 'pro' | 'pro+';
   leaguesCreated: [];
-  favouriteLeagues: [];
+  favoriteLeagues: [];
   followedLeagues: [];
 }

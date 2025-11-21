@@ -4,7 +4,7 @@ import { ErrorHandling } from '../../util/errorChecking';
 import { Types } from 'mongoose';
 import League from '../../models/leagueModel';
 
-export async function favouriteLeagueController(
+export async function favoriteLeagueController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -32,36 +32,36 @@ export async function favouriteLeagueController(
       );
       return;
     }
-    // Check if league is currently favourited
-    const currentlyFavourited = await User.exists({
+    // Check if league is currently favorited
+    const currentlyFavorited = await User.exists({
       _id: userId,
-      favouriteLeagues: leagueId,
+      favoriteLeagues: leagueId,
     });
-    if (currentlyFavourited) {
+    if (currentlyFavorited) {
       next(
         new ErrorHandling(400, {
-          message: 'This league is already favourited',
+          message: 'This league is already favorited',
         })
       );
       return;
     }
 
-    // Add league to favourites
+    // Add league to favorites
     await User.findByIdAndUpdate(userId, {
-      $push: { favouriteLeagues: leagueId },
+      $push: { favoriteLeagues: leagueId },
     });
   } catch (e: any) {
     next(
       new ErrorHandling(
         500,
         undefined,
-        'Error whilst adding to favourite leagues list'
+        'Error whilst adding to favorite leagues list'
       )
     );
     return;
   }
   res.status(200).json({
     status: 'success',
-    data: { message: 'Sucessfully added league to favourites' },
+    data: { message: 'Sucessfully added league to favorites' },
   });
 }

@@ -34,9 +34,9 @@ import {
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import {
-  favouriteLeagueController,
+  favoriteLeagueController,
   followLeagueController,
-  unfavouriteLeagueController,
+  unfavoriteLeagueController,
   unfollowLeagueController,
 } from './controllers/user';
 import morgan from 'morgan';
@@ -54,11 +54,11 @@ const port = BACKEND_PORT;
 export const requiredFields: RequiredFields = {
   '/api/register': ['username', 'email', 'password'],
   '/api/login': ['username', 'email', 'password'],
-  '/api/leagues': ['name',  'leagueType', 'divisionsCount'],
+  '/api/leagues': ['name', 'leagueType', 'divisionsCount'],
   '/api/leagues/:id/tables': ['tables'],
   '/api/leagues/:id/teams': ['teams'],
   '/api/result': ['fixtureId', 'basicOutcome'],
-  '/api/users/favourites': ['leagueId'],
+  '/api/users/favorites': ['leagueId'],
   '/api/users/following': ['leagueId'],
   '/api/leagues/:id/announcement': ['text'],
 };
@@ -101,7 +101,7 @@ app.post(
   leagueCreationController
 );
 
-// Gets all league id's with minimal info that are associated with you e.g. yours or favourites etc
+// Gets all league id's with minimal info that are associated with you e.g. yours or favorites etc
 app.get(
   '/api/leagues/associated',
   protectedRoute,
@@ -166,17 +166,17 @@ app.post(
 
 // User endpoints
 app.patch(
-  '/api/users/favourites',
+  '/api/users/favorites',
   protectedRoute,
   enforceRequiredFields,
-  favouriteLeagueController
+  favoriteLeagueController
 );
 
 app.delete(
-  '/api/users/favourites',
+  '/api/users/favorites',
   protectedRoute,
   enforceRequiredFields,
-  unfavouriteLeagueController
+  unfavoriteLeagueController
 );
 
 app.patch(

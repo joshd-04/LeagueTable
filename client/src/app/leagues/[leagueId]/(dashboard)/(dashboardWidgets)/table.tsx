@@ -6,7 +6,6 @@ import { League, Team } from '@/util/definitions';
 import {
   Card,
   CardBody,
-  cn,
   Select,
   SelectItem,
   SortDescriptor,

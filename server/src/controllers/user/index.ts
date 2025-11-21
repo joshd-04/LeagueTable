@@ -1,4 +1,4 @@
-export { favouriteLeagueController } from './favouriteLeagueController';
+export { favoriteLeagueController } from './favoriteLeagueController';
 export { followLeagueController } from './followLeagueController';
-export { unfavouriteLeagueController } from './unfavouriteLeagueController';
+export { unfavoriteLeagueController } from './unfavoriteLeagueController';
 export { unfollowLeagueController } from './unfollowLeagueController';

@@ -267,7 +267,7 @@ function FormSection({
         labelPlacement="inside"
         type="number"
         step={1}
-        minValue={1}
+        minValue={2}
         maxValue={24}
         isWheelDisabled
         variant="bordered"

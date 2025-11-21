@@ -66,7 +66,7 @@ export async function followLeagueController(
       new ErrorHandling(
         500,
         undefined,
-        'Error whilst adding to favourite leagues list'
+        'Error whilst adding to favorite leagues list'
       )
     );
     return;

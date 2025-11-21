@@ -18,7 +18,7 @@ const userSchema: Schema<IUserSchema> = new mongoose.Schema({
   leaguesCreated: [
     { type: Schema.Types.ObjectId, ref: 'leagues', required: true },
   ],
-  favouriteLeagues: [
+  favoriteLeagues: [
     { type: Schema.Types.ObjectId, ref: 'leagues', required: true },
   ],
   followedLeagues: [

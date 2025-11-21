@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 
-export default function FavouriteSVG({
+export default function FavoriteSVG({
   className,
   style,
 }: {

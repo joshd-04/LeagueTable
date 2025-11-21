@@ -71,7 +71,6 @@ export default function LeagueDashboardStandard({
     queryClient.invalidateQueries({ queryKey: ['stats'] });
     queryClient.invalidateQueries({ queryKey: ['seasonSummaryStats'] });
     queryClient.invalidateQueries({ queryKey: ['table'] });
-    console.log('invalidated');
   }
 
   return (

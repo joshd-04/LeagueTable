@@ -123,7 +123,7 @@ export async function registrationController(
       email,
       accountType: 'free',
       leaguesCreated: [],
-      favouriteLeagues: [],
+      favoriteLeagues: [],
       followedLeagues: [],
     });
 

@@ -1,8 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import {
-  ILeagueSchema,
-  IUserSchema,
-} from '../../util/definitions';
+import { ILeagueSchema, IUserSchema } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
 import User from '../../models/userModel';
 
@@ -22,9 +19,10 @@ export async function myAssociatedLeaguesFetcherController(
     const user = await User.findById(userId).populate([
       {
         path: 'leaguesCreated',
+        populate: { path: 'leagueOwner' },
       },
       {
-        path: 'favouriteLeagues',
+        path: 'favoriteLeagues',
         populate: { path: 'leagueOwner' },
       },
       {
@@ -42,10 +40,13 @@ export async function myAssociatedLeaguesFetcherController(
     }
 
     const createdLeagues: ILeagueSchema[] = user.leaguesCreated;
-    const favouriteLeagues: ILeagueSchema[] = user.favouriteLeagues;
+    const favoriteLeagues: ILeagueSchema[] = user.favoriteLeagues;
     const followedLeagues: ILeagueSchema[] = user.followedLeagues;
 
     const filteredCreatedLeagues = createdLeagues.map((league) => {
+      // @ts-ignore
+      const leagueOwner: IUserSchema = league.leagueOwner;
+
       const actions: string[] = [];
       if (!league.setup.tablesAdded) actions.push('tables');
       if (!league.setup.teamsAdded) actions.push('teams');
@@ -61,17 +62,20 @@ export async function myAssociatedLeaguesFetcherController(
           0
         ),
         owner: {
-          name: 'You',
-          _id: user._id,
-          accountType: user.accountType,
+          name: leagueOwner.username,
+          _id: leagueOwner._id,
+          accountType: leagueOwner.accountType,
         },
-        actions: actions,
+        actions: actions || [],
+        leagueLevel: league.leagueLevel,
+        leagueType: league.leagueType,
       };
     });
 
-    const filteredFavouriteLeagues = favouriteLeagues.map((league) => {
+    const filteredFavoriteLeagues = favoriteLeagues.map((league) => {
       // @ts-ignore
       const leagueOwner: IUserSchema = league.leagueOwner;
+      console.log(leagueOwner, 'xx');
       return {
         _id: league._id,
         name: league.name,
@@ -87,6 +91,8 @@ export async function myAssociatedLeaguesFetcherController(
           _id: leagueOwner._id,
           accountType: leagueOwner.accountType,
         },
+        leagueLevel: league.leagueLevel,
+        leagueType: league.leagueType,
       };
     });
     const filteredFollowedLeagues = followedLeagues.map((league) => {
@@ -107,6 +113,8 @@ export async function myAssociatedLeaguesFetcherController(
           _id: leagueOwner._id,
           accountType: leagueOwner.accountType,
         },
+        leagueLevel: league.leagueLevel,
+        leagueType: league.leagueType,
       };
     });
 
@@ -114,7 +122,7 @@ export async function myAssociatedLeaguesFetcherController(
       status: 'success',
       data: {
         created: filteredCreatedLeagues,
-        favourites: filteredFavouriteLeagues,
+        favorites: filteredFavoriteLeagues,
         following: filteredFollowedLeagues,
       },
     });

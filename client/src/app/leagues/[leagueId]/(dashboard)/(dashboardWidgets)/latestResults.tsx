@@ -43,7 +43,6 @@ export default function LatestResults({
       onMouseLeave={() => setIsHoveringOuterPanel(false)}
       isPressable
       onClick={(e) => {
-        console.log('click');
         e.stopPropagation();
         handleCardClick();
       }}
@@ -51,7 +50,6 @@ export default function LatestResults({
         background: isHoveringOuterPanel
           ? 'hsl(var(--heroui-content3)/1)'
           : 'hsl(var(--heroui-content1)/1)',
-        borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
       }}
     >
       <CardBody className="flex flex-col gap-2">
