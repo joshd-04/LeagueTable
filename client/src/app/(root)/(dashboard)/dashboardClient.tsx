@@ -354,7 +354,7 @@ export default function DashboardClient({
               <Tabs
                 radius="md"
                 color="primary"
-                variant="solid"
+                variant="light"
                 selectedKey={selectedLeagueTab}
                 onSelectionChange={(key) => setSelectedLeagueTab(String(key))}
               >

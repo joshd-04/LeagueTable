@@ -2,7 +2,7 @@
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { LeagueInterface } from '../dashboard';
-import { Card, CardBody, CardHeader } from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip } from '@heroui/react';
 import { IoPersonSharp, IoWarning } from 'react-icons/io5';
 import ProChip from '@/components/chips/ProChip';
 import ProPlusChip from '@/components/chips/ProPlusChip';
@@ -43,6 +43,8 @@ export default function LeagueCard({
 
   const { user } = useContext(GlobalContext).account;
 
+  const doesUserOwnThisLeague = user?.username === league.owner.name;
+
   return (
     <Card
       className={`px-[12px] py-[8px]  hover:cursor-pointer hover:bg-content2 ${
@@ -59,34 +61,29 @@ export default function LeagueCard({
       }}
     >
       <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-row justify-between items-center w-full">
+        <div className="flex flex-row justify-between items-start w-full">
           <div className="flex flex-col justify-baseline items-start">
             <h2 className="text-lg">{league.name}</h2>
-            {leagueCategory === 'created' ? (
-              <span className="text-sm">
-                {league.actions && league.actions.length > 0 ? (
-                  <span className="flex flex-row items-center gap-1">
-                    <IoWarning className="w-5 h-5 text-warning" />
-
-                    <p className="text-warning">Action required</p>
-                  </span>
-                ) : (
-                  <span className="text-muted">
-                    Season {league.currentSeason} matchweek{' '}
-                    {league.currentMatchweek}
-                  </span>
-                )}
-              </span>
-            ) : (
-              <span className="flex flex-row items-center gap-1">
-                <IoPersonSharp className="w-4 h-4 text-muted" />
-                <p className="text-muted text-sm">
-                  {league.owner.name === user?.username
-                    ? 'You'
-                    : league.owner.name}
+            <div className="flex flex-row gap-2">
+              <Chip size="sm" variant="flat">
+                <span className="flex flex-row items-center gap-1">
+                  <IoPersonSharp className="w-4 h-4" />
+                  <p className="text-xs">
+                    {doesUserOwnThisLeague ? 'You' : league.owner.name}
+                  </p>
+                </span>
+              </Chip>
+              <Chip
+                size="sm"
+                variant="flat"
+                color={league.leagueType === 'basic' ? 'default' : 'secondary'}
+              >
+                <p className="text-xs">
+                  {league.leagueType[0].toUpperCase() +
+                    league.leagueType.slice(1)}
                 </p>
-              </span>
-            )}
+              </Chip>
+            </div>
           </div>
           {league.leagueLevel === 'pro' && <ProChip />}
           {league.leagueLevel === 'pro+' && <ProPlusChip />}
@@ -94,18 +91,20 @@ export default function LeagueCard({
       </CardHeader>
       <CardBody className="flex flex-row justify-between items-end w-full transition-all duration-250">
         <div className="flex flex-col w-full justify-start items-start">
-          {leagueCategory !== 'created' && (
-            <p className=" text-sm">
-              {league.actions && league.actions.length > 0 ? (
-                <span className="text-warning">action required</span>
+          <p className=" text-sm">
+            {league.actions && league.actions.length > 0 ? (
+              doesUserOwnThisLeague ? (
+                <span className="text-warning">Action required</span>
               ) : (
-                <span className="text-muted">
-                  Season {league.currentSeason} matchweek{' '}
-                  {league.currentMatchweek}
-                </span>
-              )}
-            </p>
-          )}
+                <span className="text-muted">League not ready yet</span>
+              )
+            ) : (
+              <span className="text-muted">
+                Season {league.currentSeason} matchweek{' '}
+                {league.currentMatchweek}
+              </span>
+            )}
+          </p>
 
           {!league.actions?.includes('tables') && (
             <p className="text-muted text-sm">

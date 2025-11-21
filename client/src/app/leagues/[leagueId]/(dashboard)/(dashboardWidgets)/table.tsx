@@ -27,7 +27,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { RxQuestionMarkCircled } from 'react-icons/rx';
+import { AiOutlineExclamationCircle } from 'react-icons/ai';
+import { FaLock } from 'react-icons/fa';
+import { RxExclamationTriangle, RxQuestionMarkCircled } from 'react-icons/rx';
 
 export default function TableWidget({
   league,
@@ -86,28 +88,21 @@ export default function TableWidget({
               <p className="align-middle inline text-xl">Table</p>
               {displayAsProLeague && (
                 <Tooltip
-                  content={
-                    <div className="p-[6px] py-[10px] flex flex-col gap-2">
-                      <div className="flex flex-row gap-2 items-center">
-                        <ProChip />
-                        <p className="text-base">Table Features</p>
-                      </div>
-                      <div className="flex flex-col gap-1 text-muted">
-                        <p className="text-xs">
-                          This table has extra features, such as:
-                        </p>
-                        <ul className="text-xs list-disc pl-4">
-                          <li>Custom sorting</li>
-                          <li>Recent Form</li>
-                        </ul>
-                      </div>
-                    </div>
-                  }
+                  content={<TableFeaturesTooltipContent />}
                   className="bg-content2"
                 >
                   <RxQuestionMarkCircled className="w-4 h-4 text-muted cursor-pointer" />
                 </Tooltip>
               )}
+              {['pro', 'pro+'].includes(league.leagueLevel) &&
+                !['pro', 'pro+'].includes(league.leagueOwner.accountType) && (
+                  <Tooltip
+                    content={<TableFeaturesRestrictedTooltipContent />}
+                    className="bg-content2"
+                  >
+                    <AiOutlineExclamationCircle className="w-4 h-4 text-warning cursor-pointer" />
+                  </Tooltip>
+                )}
             </div>
           </span>
           <Select
@@ -203,8 +198,11 @@ function TableComponent({
         case 'points':
           return <p className="font-bold">{cellValue}</p>;
         case 'form':
-          if (cellValue) return <TeamForm form={cellValue.toString()} />;
-          else return cellValue;
+          if (cellValue) {
+            if (displayAsProLeague)
+              return <TeamForm form={cellValue.toString()} />;
+            else return <TeamFormLocked />;
+          } else return cellValue;
         default:
           return cellValue;
       }
@@ -226,7 +224,8 @@ function TableComponent({
     { key: 'points', label: 'Pts' },
   ];
 
-  if (displayAsProLeague) {
+  // If its supposed to have the team form, display it but display a locked symbol if the league owner is no longer pro
+  if (['pro', 'pro+'].includes(league.leagueLevel)) {
     columns.push({ key: 'form', label: 'Form' });
   }
 
@@ -401,6 +400,58 @@ function TableRowSkeleton({ numRows }: { numRows: number }) {
           ></div>
         );
       })}
+    </div>
+  );
+}
+
+function TeamFormLocked() {
+  return (
+    <div className="relative w-max">
+      <span className="blur-xs text-muted">
+        <TeamForm form="WDLWW" />
+      </span>
+      <div className="absolute left-[50%] top-[50%] translate-[-50%] flex flex-row gap-1 items-center">
+        <FaLock className="w-4 h-4" />
+        <p>Locked</p>
+      </div>
+    </div>
+  );
+}
+
+function TableFeaturesTooltipContent() {
+  return (
+    <div className="p-[6px] py-[10px] flex flex-col gap-2">
+      <div className="flex flex-row gap-2 items-center">
+        <ProChip />
+        <p className="text-base">Table Features</p>
+      </div>
+      <div className="flex flex-col gap-1 text-muted">
+        <p className="text-xs">This table has extra features, such as:</p>
+        <ul className="text-xs list-disc pl-4">
+          <li>Custom sorting</li>
+          <li>Recent Form</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function TableFeaturesRestrictedTooltipContent() {
+  return (
+    <div className="p-[6px] py-[10px] flex flex-col gap-2">
+      <div className="flex flex-row gap-2 items-center">
+        <AiOutlineExclamationCircle className="w-6 h-6 text-warning" />
+        <p className="text-base text-warning">Table Features Restricted</p>
+      </div>
+      <div className="flex flex-col gap-1 text-muted">
+        <p className="text-xs">
+          This table no longer has its extra features, such as:
+        </p>
+        <ul className="text-xs list-disc pl-4">
+          <li>Custom sorting</li>
+          <li>Recent Form</li>
+        </ul>
+      </div>
     </div>
   );
 }
