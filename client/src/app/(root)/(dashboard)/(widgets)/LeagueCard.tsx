@@ -68,9 +68,7 @@ export default function LeagueCard({
               <Chip size="sm" variant="flat">
                 <span className="flex flex-row items-center gap-1">
                   <IoPersonSharp className="w-4 h-4" />
-                  <p className="text-xs">
-                    {doesUserOwnThisLeague ? 'You' : league.owner.name}
-                  </p>
+                  {doesUserOwnThisLeague ? 'You' : league.owner.name}
                 </span>
               </Chip>
               <Chip
@@ -90,31 +88,32 @@ export default function LeagueCard({
         </div>
       </CardHeader>
       <CardBody className="flex flex-row justify-between items-end w-full transition-all duration-250">
-        <div className="flex flex-col w-full justify-start items-start">
-          <p className=" text-sm">
-            {league.actions && league.actions.length > 0 ? (
-              doesUserOwnThisLeague ? (
-                <span className="text-warning">Action required</span>
-              ) : (
-                <span className="text-muted">League not ready yet</span>
-              )
-            ) : (
-              <span className="text-muted">
-                Season {league.currentSeason} matchweek{' '}
-                {league.currentMatchweek}
+        <div className="flex flex-col w-full justify-start items-start text-sm">
+          {league.actions && league.actions.length > 0 ? (
+            doesUserOwnThisLeague ? (
+              <span className="flex flex-row items-center gap-1">
+                <IoWarning className="w-5 h-5 text-warning" />
+
+                <p className="text-warning">Action required</p>
               </span>
-            )}
-          </p>
+            ) : (
+              <span className="text-muted">League not ready yet</span>
+            )
+          ) : (
+            <span className="text-muted">
+              Season {league.currentSeason} matchweek {league.currentMatchweek}
+            </span>
+          )}
 
           {!league.actions?.includes('tables') && (
-            <p className="text-muted text-sm">
+            <p className="text-muted">
               {league.numDivisions} division
               {league.numDivisions > 1 ? 's' : ''}
             </p>
           )}
           {!league.actions?.includes('tables') &&
             !league.actions?.includes('teams') && (
-              <p className="text-muted text-sm">{league.numTeams} teams</p>
+              <p className="text-muted">{league.numTeams} teams</p>
             )}
         </div>
         <div className="flex flex-row">
