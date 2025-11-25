@@ -124,9 +124,11 @@ export default function LeagueDashboardFree({
           {/* <NewsFeed /> */}
           <div></div>
           <TableWidget
+            key={league._id}
             league={league}
             divisionViewing={divisionViewing}
             setDivisionViewing={setDivisionViewing}
+            userOwnsThisLeague={userOwnsThisLeague}
           />
           <Stats league={league} divisionViewing={divisionViewing} />
           {/* <SeasonRewind /> */}

@@ -36,11 +36,13 @@ export default function TableWidget({
   seasonViewing = league.currentSeason,
   divisionViewing,
   setDivisionViewing,
+  userOwnsThisLeague,
 }: {
   league: League;
   seasonViewing?: number;
   divisionViewing: number;
   setDivisionViewing: Dispatch<SetStateAction<number>>;
+  userOwnsThisLeague: boolean;
 }) {
   const { data, isLoading } = useQuery({
     queryFn: () =>
@@ -54,8 +56,15 @@ export default function TableWidget({
   });
   const teams: Team[] | undefined = data?.data.teams;
 
-  const displayAsProLeague =
-    league.leagueLevel !== 'free' && league.leagueOwner.accountType !== 'free';
+  const [displayAsProLeague, setDisplayAsProLeague] = useState(
+    league.leagueLevel !== 'free' && league.leagueOwner.accountType !== 'free'
+  );
+
+  useEffect(() => {
+    setDisplayAsProLeague(
+      league.leagueLevel !== 'free' && league.leagueOwner.accountType !== 'free'
+    );
+  }, [league]);
 
   const scrollableRef = useRef<HTMLDivElement>(null);
 
@@ -124,11 +133,13 @@ export default function TableWidget({
           </Select>
         </div>
         <TableComponent
+          key={league._id}
           displayAsProLeague={displayAsProLeague}
           teams={teams}
           isLoading={isLoading}
           league={league}
           divisionViewing={divisionViewing}
+          userOwnsThisLeague={userOwnsThisLeague}
           ref={scrollableRef}
         />
       </CardBody>
@@ -142,6 +153,7 @@ function TableComponent({
   league,
   divisionViewing,
   isLoading,
+  userOwnsThisLeague,
   ref,
 }: {
   displayAsProLeague: boolean;
@@ -149,6 +161,7 @@ function TableComponent({
   league: League;
   divisionViewing: number;
   isLoading: boolean;
+  userOwnsThisLeague: boolean;
   ref: RefObject<HTMLDivElement | null>;
 }) {
   // CONFIG
@@ -201,7 +214,8 @@ function TableComponent({
           if (cellValue) {
             if (displayAsProLeague)
               return <TeamForm form={cellValue.toString()} />;
-            else return <TeamFormLocked />;
+            else
+              return <TeamFormLocked userOwnsThisLeague={userOwnsThisLeague} />;
           } else return cellValue;
         default:
           return cellValue;
@@ -404,15 +418,51 @@ function TableRowSkeleton({ numRows }: { numRows: number }) {
   );
 }
 
-function TeamFormLocked() {
+function TeamFormLocked({
+  userOwnsThisLeague,
+}: {
+  userOwnsThisLeague: boolean;
+}) {
+  if (userOwnsThisLeague) {
+    return (
+      <Tooltip
+        className="bg-content2 max-w-[240px]"
+        content={
+          <div className="p-[6px] py-[10px] flex flex-col gap-2">
+            <div className="flex flex-row items-center gap-1">
+              <ProChip />
+              <h4>Premium feature</h4>
+            </div>
+            <p className="text-muted text-xs">
+              Upgrade your account to Pro to unlock team form
+            </p>
+          </div>
+        }
+      >
+        <div className="relative w-max">
+          <span className="blur-xs  text-muted">
+            <TeamForm form="WDLWW" />
+          </span>
+          <div className="absolute left-[50%] top-[50%] translate-[-50%]">
+            <div className=" flex flex-row gap-1 items-center">
+              <FaLock className="w-4 h-4" />
+              <p>Locked</p>
+            </div>
+          </div>
+        </div>
+      </Tooltip>
+    );
+  }
   return (
     <div className="relative w-max">
       <span className="blur-xs text-muted">
         <TeamForm form="WDLWW" />
       </span>
-      <div className="absolute left-[50%] top-[50%] translate-[-50%] flex flex-row gap-1 items-center">
-        <FaLock className="w-4 h-4" />
-        <p>Locked</p>
+      <div className="absolute left-[50%] top-[50%] translate-[-50%]">
+        <div className=" flex flex-row gap-1 items-center">
+          <FaLock className="w-4 h-4" />
+          <p>Locked</p>
+        </div>
       </div>
     </div>
   );

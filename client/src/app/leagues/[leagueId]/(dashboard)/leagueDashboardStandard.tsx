@@ -133,10 +133,12 @@ export default function LeagueDashboardStandard({
           )}
           <NewsFeed />
           <TableWidget
+            key={league._id}
             league={league}
             seasonViewing={seasonViewing}
             divisionViewing={divisionViewing}
             setDivisionViewing={setDivisionViewing}
+            userOwnsThisLeague={userOwnsThisLeague}
           />
           <Stats
             league={league}

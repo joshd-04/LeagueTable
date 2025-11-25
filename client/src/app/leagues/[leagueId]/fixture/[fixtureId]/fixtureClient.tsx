@@ -12,7 +12,7 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
 import { useRouter } from 'next/navigation';
-import { useDisclosure } from '@heroui/react';
+import { addToast, useDisclosure } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -79,6 +79,12 @@ export default function FixtureClient({
   function handleFixtureToResultCompletion(isSuccess: boolean) {
     if (isSuccess) {
       router.push(`/leagues/${league._id}/result/${fixture._id}`);
+    } else {
+      addToast({
+        title: 'Something went wrong',
+        description: 'Could not convert this fixture into a result',
+        color: 'warning',
+      });
     }
   }
 
