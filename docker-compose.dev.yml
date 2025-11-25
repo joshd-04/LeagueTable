@@ -1,0 +1,17 @@
+services:
+  api:
+    container_name: leaguemaster-dev-api
+    image: node:20-alpine # Use node directly, don't use build stage
+    working_dir: /app
+    volumes:
+      - ./server:/app # Your src code
+      - /app/node_modules # Keeps container node_modules isolated
+    ports:
+      - '8000:8000'
+    command: sh -c "npm install && npm run dev" # nodemon / ts-node
+    environment:
+      NODE_ENV: development
+    # Optionally override restart to avoid loops
+    restart: no
+    stdin_open: true # <-- optional but helps during debugging/logs
+    tty: true

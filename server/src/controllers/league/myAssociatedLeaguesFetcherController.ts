@@ -75,7 +75,6 @@ export async function myAssociatedLeaguesFetcherController(
     const filteredFavoriteLeagues = favoriteLeagues.map((league) => {
       // @ts-ignore
       const leagueOwner: IUserSchema = league.leagueOwner;
-      console.log(leagueOwner, 'xx');
       return {
         _id: league._id,
         name: league.name,

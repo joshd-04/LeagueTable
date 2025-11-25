@@ -69,9 +69,6 @@ export default function DashboardClient({
     following: leagues.following.map((l) => l._id),
   };
 
-  useEffect(() => {
-    console.log(leagues);
-  }, [leagues]);
 
   const [selectedLeagueTab, setSelectedLeagueTab] =
     useState<string>('favorites');

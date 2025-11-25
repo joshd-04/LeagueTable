@@ -2,7 +2,7 @@
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
@@ -13,6 +13,9 @@ import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
 import { useRouter } from 'next/navigation';
 import { useDisclosure } from '@heroui/react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
 
 export default function FixtureClient({
   league,
@@ -25,7 +28,39 @@ export default function FixtureClient({
   const { user } = context.account;
   const { isLoggedIn } = useAccount();
 
+  console.log(league.results.includes(fixture._id));
+
   const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
+
+  const { data: fixtureResultStatusData, isLoading } = useQuery({
+    queryFn: () => {
+      return fetchAPI(
+        `${API_URL}/leagues/${league._id}/fixture-result-status/${fixture._id}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
+    },
+    queryKey: ['fixture-result-status'],
+    refetchOnMount: true,
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (fixtureResultStatusData.status === 'success') {
+        const { isFixture, isResult } = fixtureResultStatusData.data;
+        if (isResult) {
+          router.push(`/leagues/${league._id}/result/${fixture._id}`);
+        } else if (isFixture) {
+          // do nothing
+        } else {
+          router.push(`/leagues/${league._id}`);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixtureResultStatusData]);
 
   const {
     isOpen: isFixtureToResultOpen,

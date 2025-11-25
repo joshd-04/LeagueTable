@@ -3,6 +3,7 @@ export { getHeadToHeadController } from './getHeadToHeadController';
 export { getAnnouncementController } from './getAnnouncementController';
 export { setAnnouncementController } from './setAnnouncementController';
 export { getFixtureByIdController } from './getFixtureByIdController';
+export { getFixtureResultStatusByIdController } from './getFixtureResultStatusByIdController';
 export { getResultsController } from './getResultsController';
 export { calculateSeasonSummaryController } from './calculateSeasonSummaryController';
 export { calculateSeasonStatsController } from './calculateSeasonStatsController';

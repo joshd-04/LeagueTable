@@ -17,6 +17,7 @@ import {
   calculateSeasonSummaryController,
   getAnnouncementController,
   getFixtureByIdController,
+  getFixtureResultStatusByIdController,
   getFixturesController,
   getHeadToHeadController,
   getResultsController,
@@ -82,10 +83,6 @@ app.options('*', cors());
 
 - If a route accepts JSON body data, enforce its required fields
 */
-// Basic route
-app.get('/', (req, res) => {
-  res.send('Hello, TypeScript with Express!');
-});
 
 // Auth
 app.post('/api/register', enforceRequiredFields, registrationController);
@@ -156,6 +153,11 @@ app.get(
 app.get('/api/leagues/:id/stats', calculateSeasonStatsController);
 app.get('/api/leagues/:id/teams', getTeamsController);
 app.get('/api/leagues/:id/headtohead/:teamA/:teamB', getHeadToHeadController);
+
+app.get(
+  '/api/leagues/:leagueId/fixture-result-status/:matchId',
+  getFixtureResultStatusByIdController
+);
 
 app.post(
   '/api/result',

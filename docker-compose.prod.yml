@@ -1,0 +1,7 @@
+services:
+  api:
+    container_name: leaguemaster-prod-api
+    command: ['node', 'dist/index.js']
+    environment:
+      NODE_ENV: production
+    volumes: [] # Ensure local code doesn’t override inside built image
