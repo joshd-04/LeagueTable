@@ -36,11 +36,17 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       title: `Home • ${WEBSITE_NAME}`,
       description: `Your home page where you can view your leagues and create new ones.`,
+      icons: {
+        icon: { url: '/favicon.ico', sizes: 'any' }, // classic,
+      },
     };
   } else {
     return {
       title: `${WEBSITE_NAME}`,
       description: `A simple to use, modern and sleek League/Table/Championship management website. Create & share your league with friends for free - ${WEBSITE_NAME}`,
+      icons: {
+        icon: { url: '/favicon.ico', sizes: 'any' }, // classic,
+      },
     };
   }
 }

@@ -2,8 +2,11 @@ import mongoose from 'mongoose';
 import { readDotenv } from './helpers';
 
 const database_password = readDotenv('DB_PASSWORD');
+const environment = readDotenv('ENVIRONMENT');
 
-const MONGO_URI = `mongodb+srv://leaguetableowner:${database_password}@cluster0.cea3t.mongodb.net/data`;
+const database_name = environment === 'PRODUCTION' ? 'app_prod' : 'app_dev';
+
+const MONGO_URI = `mongodb+srv://leaguetableowner:${database_password}@cluster0.cea3t.mongodb.net/${database_name}`;
 
 async function connectDB() {
   try {

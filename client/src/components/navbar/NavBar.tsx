@@ -15,7 +15,6 @@ import {
   NavbarItem,
   Switch,
 } from '@heroui/react';
-import Logo from '../logo/logo';
 import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '@/context/GlobalContextProvider';
@@ -29,6 +28,7 @@ import LightModeSVG from '@/assets/svg components/LightMode';
 import { useTheme } from 'next-themes';
 import ProChip from '../chips/ProChip';
 import ProPlusChip from '../chips/ProPlusChip';
+import LogoFull from '@/assets/svg components/LogoFull';
 
 export default function NavBar() {
   const { user, setUser } = useContext(GlobalContext).account;
@@ -56,12 +56,12 @@ export default function NavBar() {
 
   return (
     <Navbar>
-      <NavbarBrand>
+      <NavbarBrand className="h-full py-[22px]">
         <Link
           href="/"
-          className="text-inherit flex flex-row gap-1 items-center"
+          className="text-inherit h-full flex flex-row gap-1 items-center"
         >
-          <Logo />
+          <LogoFull className="fill-foreground h-full" />
           {user?.accountType === 'pro' && <ProChip />}
           {user?.accountType === 'pro+' && <ProPlusChip />}
         </Link>

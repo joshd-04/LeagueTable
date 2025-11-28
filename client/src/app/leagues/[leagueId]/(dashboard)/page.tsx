@@ -81,7 +81,7 @@ export async function generateMetadata({
     }
 
     return { title, description };
-  } catch (error) {
+  } catch {
     // Any unexpected crash → let error.tsx handle it
     return { title: 'Something went wrong' };
   }
