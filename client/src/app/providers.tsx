@@ -1,22 +1,13 @@
 'use client';
 import GlobalContextProvider from '@/context/GlobalContextProvider';
-import { NotificationContextProvider } from '@/context/NotificationContextProvider';
 import TanstackQueryContextProvider from '@/context/TanstackQueryContextProvider';
-import { User } from '@/util/definitions';
+
 import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
-export default function Providers({
-  initialUser,
-  initialError,
-  children,
-}: {
-  initialUser: User | null | undefined;
-  initialError: string;
-  children: ReactNode;
-}) {
+export default function Providers({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -33,14 +24,9 @@ export default function Providers({
     >
       <HeroUIProvider navigate={router.push}>
         <TanstackQueryContextProvider>
-          <GlobalContextProvider
-            initialUser={initialUser}
-            initialError={initialError}
-          >
-            <NotificationContextProvider>
-              <ToastProvider />
-              {children}
-            </NotificationContextProvider>
+          <GlobalContextProvider>
+            <ToastProvider />
+            {children}
           </GlobalContextProvider>
         </TanstackQueryContextProvider>
       </HeroUIProvider>

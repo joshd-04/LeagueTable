@@ -1,13 +1,8 @@
 'use client';
 import { createContext, useEffect, useState } from 'react';
-import { User } from '@/util/definitions';
 import { handleColorThemeToggle } from '@/util/helpers';
 
 interface GlobalContextInterface {
-  account: {
-    user: User | undefined | null;
-    setUser: (user: User | null) => void;
-  };
   colorTheme: {
     colorTheme: 'light' | 'dark';
     setColorTheme: (colorTheme: 'light' | 'dark') => void;
@@ -15,10 +10,6 @@ interface GlobalContextInterface {
 }
 
 const defaultGlobalContext: GlobalContextInterface = {
-  account: {
-    user: null,
-    setUser: () => {},
-  },
   colorTheme: {
     colorTheme: 'dark',
     setColorTheme: () => {},
@@ -29,14 +20,10 @@ export const GlobalContext =
   createContext<GlobalContextInterface>(defaultGlobalContext);
 
 export default function GlobalContextProvider({
-  initialUser,
   children,
 }: {
-  initialUser: User | undefined | null;
-  initialError: string;
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User | undefined | null>(initialUser);
   const [colorTheme, setColorTheme] = useState<'light' | 'dark'>('dark');
 
   // On mount, set the color theme to the user's sytem theme
@@ -56,10 +43,6 @@ export default function GlobalContextProvider({
   }, [colorTheme]);
 
   const context: GlobalContextInterface = {
-    account: {
-      user,
-      setUser,
-    },
     colorTheme: {
       colorTheme,
       setColorTheme,
