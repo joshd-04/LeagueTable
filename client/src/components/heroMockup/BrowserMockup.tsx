@@ -35,7 +35,8 @@ export default function BrowserMockup({ src, alt }: BrowserMockupProps) {
         max-w-[79rem] 
         rounded-xl 
         overflow-hidden 
-        drop-shadow-[-10px_10px_30px_rgba(255,255,255,0.05)]
+        drop-shadow-[-10px_10px_30px_rgba(0,0,0,0.95)]
+        dark:drop-shadow-[-10px_10px_30px_rgba(255,255,255,0.05)]
         border 
         border-white/10
         bg-linear-to-r from-[#1a1a1a] to-black

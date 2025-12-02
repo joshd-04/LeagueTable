@@ -4,10 +4,7 @@ import { Button } from '@heroui/react';
 import FadeInImage from './fadeInImage';
 import { FaArrowRight } from 'react-icons/fa';
 import BrowserMockup from '@/components/heroMockup/BrowserMockup';
-import LogoFull from '@/assets/svg components/LogoFull';
-import LogoSmall from '@/assets/svg components/LogoSmall';
 import { FaArrowDown } from 'react-icons/fa6';
-import PricingComponent from '@/components/landingPage/pricing/PricingComponent';
 
 export default function LandingPage() {
   return (
@@ -23,7 +20,7 @@ export default function LandingPage() {
             New onboarding experience
           </Button>
           <div className=" text-[clamp(40px,10vw,44px)] leading-[1.2] font-bold tracking-tighter sm:text-[64px]">
-            <div className="bg-hero-section-title bg-clip-text text-transparent">
+            <div className="bg-hero-section-title-light dark:bg-hero-section-title bg-clip-text text-transparent">
               Create and share modern
               <br /> leagues effortlessly
             </div>
@@ -73,6 +70,7 @@ export default function LandingPage() {
           preload
           alt="Hero image"
           src="/images/bg-gradient.png"
+          className="invert dark:invert-0"
         />
       </div>
     </div>

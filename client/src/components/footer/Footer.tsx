@@ -1,6 +1,6 @@
 'use client';
 import LogoFull from '@/assets/svg components/LogoFull';
-import { Button, Card, CardBody, Input, Link } from '@heroui/react';
+import { Button, Input, Link } from '@heroui/react';
 
 export default function Footer() {
   return (

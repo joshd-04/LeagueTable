@@ -18,6 +18,8 @@ const config = {
       backgroundImage: {
         'hero-section-title':
           'linear-gradient(91deg, #FFF 32.88%, rgba(255, 255, 255, 0.40) 99.12%)',
+        'hero-section-title-light':
+          'linear-gradient(91deg, #000 32.88%, rgba(0, 0, 0, 0.60) 99.12%)',
       },
       rotate: {
         'x-12': '12deg',
