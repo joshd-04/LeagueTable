@@ -1,14 +1,18 @@
 'use client';
-import { Button } from '@heroui/react';
+import { Button, Link } from '@heroui/react';
 
 import FadeInImage from './fadeInImage';
 import { FaArrowRight } from 'react-icons/fa';
 import BrowserMockup from '@/components/heroMockup/BrowserMockup';
 import { FaArrowDown } from 'react-icons/fa6';
+import { smoothScroll } from '@/util/helpers';
 
-export default function LandingPage() {
+export default function HeroSection() {
   return (
-    <div className="bg-background relative flex h-full w-full flex-col items-center">
+    <div
+      id="hero"
+      className="bg-background relative flex h-full w-full flex-col items-center"
+    >
       <main className="container  flex flex-1 flex-col items-start justify-start mt-15 ">
         <section className="z-20 flex flex-col items-start justify-center gap-[18px] sm:gap-6  mx-8 md:mx-16 xl:mx-72">
           <Button
@@ -20,7 +24,7 @@ export default function LandingPage() {
             New onboarding experience
           </Button>
           <div className=" text-[clamp(40px,10vw,44px)] leading-[1.2] font-bold tracking-tighter sm:text-[64px]">
-            <div className="bg-hero-section-title-light dark:bg-hero-section-title bg-clip-text text-transparent">
+            <div className="bg-gradient-title-light dark:bg-gradient-title bg-clip-text text-transparent">
               Create and share modern
               <br /> leagues effortlessly
             </div>
@@ -42,7 +46,7 @@ export default function LandingPage() {
               color="primary"
               variant="shadow"
             >
-              Join mailing list
+              Join waitlist
             </Button>
             <Button
               className="border-default-100 text-small h-10 w-[163px] border-1 px-[16px] py-[10px] leading-5 font-medium"
@@ -54,6 +58,9 @@ export default function LandingPage() {
               radius="full"
               variant="bordered"
               // color="secondary"
+              as={Link}
+              href="#features"
+              onClick={(e) => smoothScroll(e, 'features')}
             >
               See features
             </Button>

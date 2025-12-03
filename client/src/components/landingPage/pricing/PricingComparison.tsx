@@ -7,13 +7,13 @@ import {
   CardHeader,
   Chip,
   Divider,
-  Link,
   Tab,
   Tabs,
 } from '@heroui/react';
 import { useState } from 'react';
 import { FaCheck } from 'react-icons/fa6';
 import { RxCross1 } from 'react-icons/rx';
+import PricingTable from './PricingTable';
 
 interface PricingTierInterface {
   tierName: string;
@@ -30,58 +30,15 @@ interface PricingTierInterface {
   };
 }
 
-export default function PricingComponent() {
+export default function PricingComparison() {
   const yearlyDiscount = 30;
-  const pricingData: PricingTierInterface[] = [
-    {
-      tierName: 'Free',
-      tierCaption: 'For starters and hobbyists that want to try out.',
-      tierPriceMonthly: 0,
-      features: [
-        { text: 'Unlimited leagues' },
-        { text: 'Public shareable leagues' },
-        { text: 'Promotion and relegation' },
-        { text: 'Upto 2 seasons per league', isNegative: true },
-      ],
-      callToAction: { buttonText: 'Continue with Free' },
-    },
-    {
-      tierName: 'Pro',
-      tierCaption: 'For users who want longer leagues and more control.',
-      tierPriceMonthly: 3,
-      features: [
-        { text: 'Unlimited seasons' },
-        { text: 'Goal scorers, assists & more stats' },
-        { text: 'League announcements' },
-        { text: 'Season rewind' },
-      ],
-      callToAction: { buttonText: 'Get started' },
-      featured: {
-        color: 'hsl(var(--heroui-primary) / 1)',
-        title: 'Most Popular',
-        textColor: 'hsl(var(--heroui-primary-foreground) / 1)',
-      },
-    },
-    {
-      tierName: 'Pro+',
-      tierCaption: 'For those who want a premium experience',
-      tierPriceMonthly: 5,
-      features: [
-        { text: 'Team pages' },
-        { text: 'Graphs & data visuals' },
-        { text: 'Fixture categories & notifications' },
-        { text: 'Data PNG download' },
-      ],
-      callToAction: { buttonText: 'Coming soon' },
-    },
-  ];
 
   const [view, setView] = useState<'monthly' | 'yearly'>('monthly');
 
   return (
     <div
       id="pricing"
-      className="flex flex-col justify-center items-center gap-4 max-w-4xl p-4 text-center pt-20"
+      className="flex flex-col justify-center items-center gap-4 max-w-7xl py-4 text-center pt-20 "
     >
       <div className="flex flex-col items-center">
         <span className="text-primary text-base font-semibold">Pricing</span>
@@ -96,11 +53,7 @@ export default function PricingComponent() {
         onSelectionChange={(key) => setView(key as 'monthly' | 'yearly')}
       >
         <Tab key="monthly" title="Pay Monthly">
-          <PricingGrid
-            yearlyDiscount={yearlyDiscount}
-            view={view}
-            pricingData={pricingData}
-          />
+          <PricingTable />
         </Tab>
         <Tab
           key="yearly"
@@ -113,45 +66,17 @@ export default function PricingComponent() {
             </div>
           }
         >
-          <PricingGrid
-            yearlyDiscount={yearlyDiscount}
-            view={view}
-            pricingData={pricingData}
-          />
+          {/* <PricingGrid /> */}
+          <PricingTable />
         </Tab>
       </Tabs>
-      <Link
-        href="/pricing"
-        underline="hover"
-        color="foreground"
-        className="mt-2"
-      >
-        Compare all features
-      </Link>
     </div>
   );
 }
 
-function PricingGrid({
-  view,
-  yearlyDiscount,
-  pricingData,
-}: {
-  view: 'monthly' | 'yearly';
-  yearlyDiscount: number;
-  pricingData: PricingTierInterface[];
-}) {
+function PricingGrid() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {pricingData.map((p, i) => (
-        <PricingTile
-          yearlyDiscount={yearlyDiscount}
-          view={view}
-          pricingTier={p}
-          key={i}
-        />
-      ))}
-    </div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
   );
 }
 

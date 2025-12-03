@@ -16,9 +16,9 @@ const config = {
         muted: ['opacity-80 dark:opacity-70'],
       },
       backgroundImage: {
-        'hero-section-title':
+        'gradient-title':
           'linear-gradient(91deg, #FFF 32.88%, rgba(255, 255, 255, 0.40) 99.12%)',
-        'hero-section-title-light':
+        'gradient-title-light':
           'linear-gradient(91deg, #000 32.88%, rgba(0, 0, 0, 0.60) 99.12%)',
       },
       rotate: {

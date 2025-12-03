@@ -53,7 +53,7 @@ export default function FAQ() {
         'Yes. The entire platform is fully responsive, so users can check standings and results on phones, tablets, or desktops.',
     },
     {
-      question: 'Can I customise the look of my league?',
+      question: 'Can I customize the look of my league?',
       answer:
         'Yes. You can personalize colors, banners, and branding to match your team, club, organisation, or community identity.',
     },
@@ -64,10 +64,13 @@ export default function FAQ() {
     },
   ];
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 lg:flex-row lg:items-start lg:gap-12 px-8">
+    <div
+      className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 lg:flex-row lg:items-start lg:gap-12 px-8 pt-36 pb-16"
+      id="faq"
+    >
       <div className="px-2 text-3xl leading-7">
         {/* <span className="inline-block lg:hidden">FAQs</span> */}
-        <h2 className="from-foreground-800 to-foreground-500 dark:to-foreground-200 inline-block bg-linear-to-br bg-clip-text pt-4 text-5xl font-semibold tracking-tight text-transparent  text-start sm:text-center lg:text-start">
+        <h2 className="from-foreground-800 to-foreground-500 dark:to-foreground-200 inline-block bg-linear-to-br bg-clip-text pt-4 text-5xl font-semibold tracking-tight text-transparent text-start sm:text-center lg:text-start">
           Frequently
           <br />
           asked
@@ -81,7 +84,7 @@ export default function FAQ() {
 }
 
 function FAQComponent({ faq }: { faq: IQNA[] }) {
-  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set(['1']));
+  const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
 
   return (
     <Accordion
@@ -102,6 +105,7 @@ function FAQComponent({ faq }: { faq: IQNA[] }) {
             value={key}
             aria-label={element.question}
             title={element.question}
+            classNames={{ trigger: cn('cursor-pointer') }}
             startContent={
               <IoAddOutline
                 className={`h-7 w-7 p-0 text-default-400 transition-transform duration-200`}

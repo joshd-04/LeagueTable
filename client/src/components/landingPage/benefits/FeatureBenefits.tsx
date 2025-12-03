@@ -1,3 +1,5 @@
+import SmallBenefits from './SmallBenefits';
+
 interface IFeature {
   category: string;
   title: string;
@@ -27,13 +29,13 @@ export default function FeatureBenefits() {
       title:
         'Make your league truly yours with custom banners, colors & settings',
       descriptions: [
-        'Choose the level of detail you want in your league, go basic for a streamlined experience or go advanced for better engagement, stats and thrill.',
+        'Choose the level of detail you want in your league, go basic for a streamlined experience or go advanced for more stats and excitement.',
         'Represent your group, community or organisation with by customizing your leagues with custom banners, images, colors and more.',
         'Reward winning teams with more points, or punish losing teams with points deductions',
       ],
     },
     {
-      category: 'Announcements & notifications',
+      category: 'Notifications',
       title:
         'Keep league followers informed with custom announcements and notifications',
       descriptions: [
@@ -42,7 +44,7 @@ export default function FeatureBenefits() {
       ],
     },
     {
-      category: 'Sharing & exports',
+      category: 'Sharing',
       title: 'Let others enjoy your league with you',
       descriptions: [
         'Share the league link with others to let them explore the league, its history, fixtures and stats themselves',
@@ -52,7 +54,10 @@ export default function FeatureBenefits() {
   ];
 
   return (
-    <div className="flex flex-col gap-36 my-36 w-full items-center justify-center">
+    <div
+      className="flex flex-col gap-36 pt-36 mb-24  w-full items-center justify-center"
+      id="features"
+    >
       {featureData.map((feature, i) => (
         <FeatureBenefitSection
           feature={feature}
@@ -60,6 +65,7 @@ export default function FeatureBenefits() {
           reverse={i % 2 === 1}
         />
       ))}
+      <SmallBenefits />
     </div>
   );
 }

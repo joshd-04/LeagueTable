@@ -1,7 +1,10 @@
 'use client';
 import {
   Button,
-  cn,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Link,
   Navbar,
   NavbarBrand,
@@ -13,8 +16,14 @@ import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import LogoFull from '@/assets/svg components/LogoFull';
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
+import { FaChevronDown } from 'react-icons/fa6';
 
 export default function NavBar() {
+  type dropdownButtons = 'features' | 'use cases';
+  const [buttonHovering, setButtonHovering] = useState<dropdownButtons | null>(
+    null
+  );
+
   return (
     <Navbar className="bg-transparent sticky w-full h-15">
       <NavbarBrand className="h-full py-[22px]">
@@ -26,26 +35,129 @@ export default function NavBar() {
           <p className="xl:text-red-500 lg:text-blue-500 md:text-green-500 sm:text-pink-500  before:content-['--'] sm:before:content-['sm'] md:before:content-['md'] lg:before:content-['lg'] xl:before:content-['xl']"></p>
         </Link>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="#" className="font-semibold text-base">
-            Features
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link
-            aria-current="page"
-            href="#"
-            className="font-semibold text-base"
+      <NavbarContent className="hidden sm:flex gap-10 " justify="center">
+        <Dropdown isOpen={buttonHovering === 'features'} showArrow>
+          <NavbarItem>
+            <DropdownTrigger>
+              <Button
+                disableRipple
+                className="p-0 data-[hover=true]:bg-transparent font-medium text-base aria-expanded:scale-100"
+                endContent={<FaChevronDown className="-ml-1" />}
+                radius="sm"
+                variant="light"
+                onMouseEnter={() => setButtonHovering('features')}
+                onMouseLeave={() => setButtonHovering(null)}
+              >
+                Features
+              </Button>
+            </DropdownTrigger>
+          </NavbarItem>
+          <DropdownMenu
+            aria-label="ACME features"
+            onMouseEnter={() => setButtonHovering('features')}
+            onMouseLeave={() => setButtonHovering(null)}
+            itemClasses={{
+              base: 'gap-4',
+            }}
           >
-            Use cases
-          </Link>
-        </NavbarItem>
+            <DropdownItem
+              key="autoscaling"
+              description="ACME scales apps based on demand and load"
+            >
+              Autoscaling
+            </DropdownItem>
+            <DropdownItem
+              key="usage_metrics"
+              description="Real-time metrics to debug issues"
+            >
+              Usage Metrics
+            </DropdownItem>
+            <DropdownItem
+              key="production_ready"
+              description="ACME runs on ACME, join us at web scale"
+            >
+              Production Ready
+            </DropdownItem>
+            <DropdownItem
+              key="99_uptime"
+              description="High availability and uptime guarantees"
+            >
+              +99% Uptime
+            </DropdownItem>
+            <DropdownItem
+              key="supreme_support"
+              description="Support team ready to respond"
+            >
+              +Supreme Support
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
         <NavbarItem>
-          <Link color="foreground" href="#" className="font-semibold text-base">
-            FAQ
+          <Link
+            href="/pricing"
+            className="font-medium text-base"
+            color="foreground"
+            underline="hover"
+          >
+            Pricing
           </Link>
         </NavbarItem>
+        <Dropdown isOpen={buttonHovering === 'use cases'} showArrow>
+          <NavbarItem>
+            <DropdownTrigger>
+              <Button
+                disableRipple
+                className="p-0 data-[hover=true]:bg-transparent font-medium text-base aria-expanded:scale-100"
+                endContent={<FaChevronDown className="-ml-1" />}
+                radius="sm"
+                variant="light"
+                onMouseEnter={() => setButtonHovering('use cases')}
+                onMouseLeave={() => setButtonHovering(null)}
+              >
+                Use cases
+              </Button>
+            </DropdownTrigger>
+          </NavbarItem>
+          <DropdownMenu
+            aria-label="ACME features"
+            onMouseEnter={() => setButtonHovering('use cases')}
+            onMouseLeave={() => setButtonHovering(null)}
+            itemClasses={{
+              base: 'gap-4',
+            }}
+          >
+            <DropdownItem
+              key="autoscaling"
+              description="ACME scales apps based on demand and load"
+            >
+              Autoscaling
+            </DropdownItem>
+            <DropdownItem
+              key="usage_metrics"
+              description="Real-time metrics to debug issues"
+            >
+              Usage Metrics
+            </DropdownItem>
+            <DropdownItem
+              key="production_ready"
+              description="ACME runs on ACME, join us at web scale"
+            >
+              Production Ready
+            </DropdownItem>
+            <DropdownItem
+              key="99_uptime"
+              description="High availability and uptime guarantees"
+            >
+              +99% Uptime
+            </DropdownItem>
+            <DropdownItem
+              key="supreme_support"
+              description="Support team ready to respond"
+            >
+              +Supreme Support
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
