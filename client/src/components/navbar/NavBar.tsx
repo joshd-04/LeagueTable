@@ -23,6 +23,33 @@ export default function NavBar() {
   const [buttonHovering, setButtonHovering] = useState<dropdownButtons | null>(
     null
   );
+  const [clickedOpen, setClickedOpen] = useState<dropdownButtons | null>(null);
+
+  // Determine which dropdown should be open
+  const getIsOpen = (dropdown: dropdownButtons) => {
+    return clickedOpen === dropdown || buttonHovering === dropdown;
+  };
+
+  // Handle click on dropdown trigger
+  const handleDropdownClick = (dropdown: dropdownButtons) => {
+    if (clickedOpen === dropdown) {
+      setClickedOpen(null);
+    } else {
+      setClickedOpen(dropdown);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (clickedOpen) {
+        setClickedOpen(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [clickedOpen]);
 
   return (
     <Navbar className="bg-transparent sticky w-full h-15">
@@ -36,7 +63,7 @@ export default function NavBar() {
         </Link>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-10 " justify="center">
-        <Dropdown isOpen={buttonHovering === 'features'} showArrow>
+        <Dropdown isOpen={getIsOpen('features')} showArrow>
           <NavbarItem>
             <DropdownTrigger>
               <Button
@@ -47,6 +74,10 @@ export default function NavBar() {
                 variant="light"
                 onMouseEnter={() => setButtonHovering('features')}
                 onMouseLeave={() => setButtonHovering(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDropdownClick('features');
+                }}
               >
                 Features
               </Button>
@@ -102,7 +133,7 @@ export default function NavBar() {
             Pricing
           </Link>
         </NavbarItem>
-        <Dropdown isOpen={buttonHovering === 'use cases'} showArrow>
+        <Dropdown isOpen={getIsOpen('use cases')} showArrow>
           <NavbarItem>
             <DropdownTrigger>
               <Button
@@ -113,6 +144,10 @@ export default function NavBar() {
                 variant="light"
                 onMouseEnter={() => setButtonHovering('use cases')}
                 onMouseLeave={() => setButtonHovering(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDropdownClick('use cases');
+                }}
               >
                 Use cases
               </Button>
@@ -206,21 +241,9 @@ function ThemeSwitch() {
       isSelected={isLight}
       onValueChange={(isChecked) => setTheme(isChecked ? 'light' : 'dark')}
       color="success"
-      endContent={
-        // <DarkModeSVG
-        //   className="w-[16px] h-[16px] fill- inline"
-        //   style={{ width: '16px', fill: 'lightgrey' }}
-        // />
-        <MdDarkMode className="fill-black h-4 w-4 inline" />
-      }
+      endContent={<MdDarkMode className="fill-black h-4 w-4 inline" />}
       size="md"
-      startContent={
-        // <LightModeSVG
-        //   className="w-[16px] h-[16px] fill-black inline"
-        //   style={{ width: '16px' }}
-        // />
-        <MdLightMode className="fill-black h-4 w-4 inline" />
-      }
+      startContent={<MdLightMode className="fill-black h-4 w-4 inline" />}
     ></Switch>
   );
 }

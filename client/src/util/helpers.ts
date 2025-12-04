@@ -63,3 +63,16 @@ export function smoothScroll(event: React.MouseEvent, id: string) {
   // STILL update the hash in the URL
   history.pushState(null, '', `#${id}`);
 }
+
+export const yearlyDiscount = 30;
+
+export function calculatePrice(
+  monthlyPrice: number,
+  view: 'monthly' | 'yearly'
+) {
+  const price =
+    view === 'monthly'
+      ? monthlyPrice
+      : Math.round(monthlyPrice * (1 - yearlyDiscount / 100) * 12);
+  return price;
+}

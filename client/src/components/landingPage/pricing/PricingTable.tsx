@@ -7,19 +7,427 @@ import {
   CardBody,
   CardFooter,
   Divider,
+  Tooltip,
 } from '@heroui/react';
+import { calculatePrice } from '@/util/helpers';
 
-interface FeatureRowProps {
-  title: string;
-  free: React.ReactNode;
-  pro: React.ReactNode;
-  team: React.ReactNode;
+// Types
+type CellContentType = 'check' | 'cross' | 'text';
+
+interface CellContent {
+  type: CellContentType;
+  text?: string;
+  className?: string;
 }
 
-const CheckIcon = ({ forceWhite }: { forceWhite?: boolean }) => (
+interface Feature {
+  title: string;
+  description?: string;
+  free: CellContent;
+  pro: CellContent;
+  proplus: CellContent;
+}
+
+interface Category {
+  title: string;
+  features: Feature[];
+}
+
+interface PricingPlan {
+  id: string;
+  name: string;
+  description: string;
+  monthlyPrice: number;
+  priceUnit?: string;
+  mobileFeatures: { text: string; isNegative?: boolean }[];
+  buttonText: string;
+  buttonVariant?: 'flat' | 'solid' | 'shadow';
+  buttonColor?: 'default' | 'primary';
+  isPopular?: boolean;
+  mobileCardClassName?: string;
+  desktopColumnClassName?: string;
+  desktopHeaderClassName?: string;
+}
+
+interface PricingData {
+  plans: PricingPlan[];
+  categories: Category[];
+}
+
+// Helper function to create cell content
+export const createCellContent = {
+  check: (className?: string): CellContent => ({ type: 'check', className }),
+  cross: (className?: string): CellContent => ({ type: 'cross', className }),
+  text: (text: string, className?: string): CellContent => ({
+    type: 'text',
+    text,
+    className,
+  }),
+};
+
+// Default pricing data
+const defaultPricingData: PricingData = {
+  plans: [
+    {
+      id: 'free',
+      name: 'Free',
+      description: 'For starters and hobbyists that want to try out.',
+      monthlyPrice: 0,
+      mobileFeatures: [
+        { text: 'Unlimited leagues' },
+        { text: 'Public shareable leagues' },
+        { text: 'Promotion and relegation' },
+        { text: 'Upto 2 seasons per league', isNegative: true },
+      ],
+      buttonText: 'Continue with Free',
+      buttonVariant: 'flat',
+      buttonColor: 'default',
+      mobileCardClassName: 'border-medium! border-default-100 bg-transparent',
+      desktopColumnClassName: '',
+      desktopHeaderClassName: 'relative px-6 pt-6 xl:px-8 xl:pt-8',
+    },
+    {
+      id: 'pro',
+      name: 'Pro',
+      description: 'For users who want longer leagues and more control.',
+      monthlyPrice: 3,
+      priceUnit: '/per year',
+      mobileFeatures: [
+        { text: 'Unlimited seasons' },
+        { text: 'Goal scorers, assists & more stats' },
+        { text: 'League announcements' },
+        { text: 'Season rewind' },
+      ],
+      buttonText: 'Get started',
+      buttonVariant: 'shadow',
+      buttonColor: 'primary',
+      isPopular: true,
+      mobileCardClassName:
+        'border-primary shadow-primary/20 border-2 shadow-2xl bg-content1',
+      desktopColumnClassName:
+        'before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary',
+      desktopHeaderClassName:
+        'relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary before:rounded-t-medium',
+    },
+    {
+      id: 'proplus',
+      name: 'Pro+',
+      description:
+        'For organisers who want premium polish and zero limitations.',
+      monthlyPrice: 5,
+      priceUnit: '/per year',
+      mobileFeatures: [
+        { text: 'Team pages' },
+        { text: 'Graphs & data visuals' },
+        { text: 'Fixture categories & notifications' },
+        { text: 'Data PNG download' },
+      ],
+      buttonText: 'Contact us',
+      buttonVariant: 'flat',
+      buttonColor: 'default',
+      mobileCardClassName:
+        'border-medium! border-content3 bg-content2 dark:border-content2 dark:bg-content1',
+      desktopColumnClassName:
+        'before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1',
+      desktopHeaderClassName:
+        'relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1 before:rounded-t-medium',
+    },
+  ],
+  categories: [
+    {
+      title: 'League Management',
+      features: [
+        {
+          title: 'Number of leagues',
+          description:
+            'The maximum number of leagues a single account can create.',
+          free: createCellContent.text(
+            'Unlimited',
+            'text-medium text-default-500 text-center'
+          ),
+          pro: createCellContent.text(
+            'Unlimited',
+            'text-medium text-center text-primary-foreground/70'
+          ),
+          proplus: createCellContent.text(
+            'Unlimited',
+            'text-medium text-default-500 text-center'
+          ),
+        },
+        {
+          title: 'Seasons per league',
+          description: 'The maximum number of seasons any league can run for',
+          free: createCellContent.text(
+            '2 seasons',
+            'text-medium text-default-500 text-center'
+          ),
+          pro: createCellContent.text(
+            'Unlimited',
+            'text-medium text-center text-primary-foreground/70'
+          ),
+          proplus: createCellContent.text(
+            'Unlimited',
+            'text-medium text-default-500 text-center'
+          ),
+        },
+        {
+          title: 'Divisions per league',
+          description: 'The maximum number of divisions any league can have.',
+          free: createCellContent.text(
+            'Up to 5',
+            'text-medium text-default-500 text-center'
+          ),
+          pro: createCellContent.text(
+            'Up to 5',
+            'text-medium text-center text-primary-foreground/70'
+          ),
+          proplus: createCellContent.text(
+            'Up to 5',
+            'text-medium text-default-500 text-center'
+          ),
+        },
+        {
+          title: 'Teams per division',
+          description: 'The maximum number of teams any division can have',
+          free: createCellContent.text(
+            'Up to 24',
+            'text-medium text-default-500 text-center'
+          ),
+          pro: createCellContent.text(
+            'Up to 24',
+            'text-medium text-center text-primary-foreground/70'
+          ),
+          proplus: createCellContent.text(
+            'Up to 24',
+            'text-medium text-default-500 text-center'
+          ),
+        },
+        {
+          title: 'Custom promotion & relegation',
+          description:
+            'Choose how many teams should be promoted and relegated from each league every season',
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Basic leagues',
+          description: 'Faster leagues for a streamlined experience',
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Advanced leagues',
+          description: 'Detailed leagues with scorer & assist stats',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+      ],
+    },
+    {
+      title: 'Sharing',
+      features: [
+        {
+          title: 'Public league page',
+          description:
+            "Easily share your league with others by sending the league's URL.",
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Follower & visitor analytics',
+          description: 'See how many people like, follow or visit your league',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Announcements',
+          description: 'Broadcast messages to league viewers',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Big-match tags',
+          description:
+            'Mark specific fixtures as big games to build excitement',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Notifications',
+          description:
+            'Automatically send in-app and/or email notifications to league followers before and after big events',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.cross('text-primary-foreground/50'),
+          proplus: createCellContent.check('text-primary'),
+        },
+      ],
+    },
+    {
+      title: 'Fixtures & Results',
+      features: [
+        {
+          title: 'Enter match result',
+          description:
+            'Show league viewers how matches unfolded by inputting goals in the order they were scored',
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Edit/correct results',
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Head-to-head record',
+          description: 'Easily see the previous results of two teams',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Scorers & assists tracking',
+          description: 'Add goal scorers and assists in every result',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Match summary',
+          description:
+            'Manually add match summaries for league viewers to read and understand how the match panned out',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'AI fixture preview',
+          description:
+            'View AI generated fixture previews based off previous meetings. Available from season 2 onwards.',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.cross('text-primary-foreground/50'),
+          proplus: createCellContent.check('text-primary'),
+        },
+      ],
+    },
+    {
+      title: 'Stats',
+      features: [
+        {
+          title: 'Cleansheets',
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Season rewind',
+          description:
+            'Rewind through previous seasons and explore historic stats, results and more.',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Scorers & assists tracking',
+          description:
+            'Tracks goal scorers and assists with top scorers and most assists stat',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Sort tables',
+          description: 'Re-organise data in tables to quickly find information',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Team form',
+          description: 'Visual indicator showing every teams last 5 results',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Home/away stats',
+          description: 'Tables showing home and away data',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Deeper insights',
+          description:
+            'More in-depth analytics such as streaks, momentum and trends',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.cross('text-primary-foreground/50'),
+          proplus: createCellContent.check('text-primary'),
+        },
+      ],
+    },
+    {
+      title: 'Customization',
+      features: [
+        {
+          title: 'Promotion/relegation indicators',
+          description:
+            'Change the style of indicators that show teams in the promotion / relegation zone',
+          free: createCellContent.check('text-primary'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Banner/cover image',
+          description:
+            'Upload custom league banners that appear at the top of every league page',
+          free: createCellContent.text(
+            'Choose from presets',
+            'text-medium text-default-500 text-center'
+          ),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Custom color theme',
+          description: 'Change the accent color across the league',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.check('text-primary-foreground'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Team colors',
+          description: 'Give colors to represent each team',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.cross('text-primary-foreground/50'),
+          proplus: createCellContent.check('text-primary'),
+        },
+        {
+          title: 'Custom logo',
+          description:
+            'Replace the LeagueX logo in the top left corner with your own logo',
+          free: createCellContent.cross('text-default-400'),
+          pro: createCellContent.cross('text-primary-foreground/50'),
+          proplus: createCellContent.check('text-primary'),
+        },
+      ],
+    },
+  ],
+};
+
+// Icon Components
+const CheckIcon = ({ className = '' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className={`${forceWhite ? 'text-white' : 'text-primary'} mx-auto`}
+    className={` ${className}`}
     width="24"
     height="24"
     viewBox="0 0 24 24"
@@ -35,10 +443,10 @@ const CheckIcon = ({ forceWhite }: { forceWhite?: boolean }) => (
   </svg>
 );
 
-const CrossIcon = () => (
+const CrossIcon = ({ className = '' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="mx-auto"
+    className={` ${className}`}
     width="24"
     height="24"
     viewBox="0 0 24 24"
@@ -88,25 +496,171 @@ const InfoIcon = () => (
   </svg>
 );
 
-const FeatureRow: React.FC<FeatureRowProps> = ({ title, free, pro, team }) => (
+// Cell Content Renderer
+const CellContentRenderer: React.FC<{
+  content: CellContent;
+  planId: string;
+}> = ({ content, planId }) => {
+  const getPlanName = () => {
+    const names: { [key: string]: string } = {
+      free: 'Free',
+      pro: 'Pro',
+      team: 'Team',
+    };
+    return names[planId] || planId;
+  };
+
+  switch (content.type) {
+    case 'check':
+      return (
+        <>
+          <div className={content.className}>
+            <CheckIcon className="place-self-center" />
+          </div>
+          <span className="sr-only">Included in {getPlanName()}</span>
+        </>
+      );
+    case 'cross':
+      return (
+        <>
+          <div className={content.className}>
+            <CrossIcon className="place-self-center" />
+          </div>
+          <span className="sr-only">Not included in {getPlanName()}</span>
+        </>
+      );
+    case 'text':
+      return <div className={content.className}>{content.text}</div>;
+    default:
+      return null;
+  }
+};
+
+// Mobile Pricing Card
+interface PricingCardProps {
+  plan: PricingPlan;
+}
+
+const PricingCard: React.FC<PricingCardProps> = ({ plan }) => (
+  <Card
+    className={`relative p-3 ${plan.mobileCardClassName}`}
+    shadow={plan.isPopular ? 'lg' : 'none'}
+  >
+    {plan.isPopular && (
+      <Chip
+        color="primary"
+        variant="flat"
+        className="absolute top-4 right-4 bg-primary/20 text-primary-600"
+        classNames={{
+          content: 'font-medium text-primary-500 dark:text-primary-600',
+        }}
+      >
+        Most Popular
+      </Chip>
+    )}
+    <CardHeader className="flex flex-col items-start justify-start gap-2 pb-6">
+      <h2 className="text-large font-medium">{plan.name}</h2>
+      <p className="text-medium text-default-500 text-start">
+        {plan.description}
+      </p>
+    </CardHeader>
+    <Divider />
+    <CardBody className="gap-8">
+      <p className="flex items-baseline gap-1 pt-2">
+        <span className="from-foreground to-foreground-600 inline bg-linear-to-br bg-clip-text text-4xl leading-7 font-semibold tracking-tight text-transparent">
+          {plan.monthlyPrice === 0 ? 'Free' : `$${plan.monthlyPrice}`}
+        </span>
+        {plan.priceUnit && (
+          <span className="text-small text-default-400 font-medium">
+            {plan.priceUnit}
+          </span>
+        )}
+      </p>
+      <ul className="flex flex-col gap-2">
+        {plan.mobileFeatures.map((feature, index) => (
+          <li key={index} className="flex flex-row gap-2">
+            {feature.isNegative ? (
+              <CrossIcon className="text-default-400" />
+            ) : (
+              <CheckIcon className="text-primary" />
+            )}
+            <p className="text-default-500">{feature.text}</p>
+          </li>
+        ))}
+      </ul>
+    </CardBody>
+    <CardFooter>
+      <Button
+        className="w-full"
+        variant={plan.buttonVariant}
+        color={plan.buttonColor}
+        href="#"
+      >
+        {plan.buttonText}
+      </Button>
+    </CardFooter>
+  </Card>
+);
+
+// Desktop Feature Row
+interface FeatureRowProps {
+  feature: Feature;
+  plans: PricingPlan[];
+  isLastInCategory?: boolean;
+}
+
+const FeatureRow: React.FC<FeatureRowProps> = ({
+  feature,
+  plans,
+  isLastInCategory,
+}) => (
   <tr>
     <th className="text-medium text-default-700 py-4 font-normal" scope="row">
       <div className="flex items-center gap-1">
-        <span>{title}</span>
-        <InfoIcon />
+        <span>{feature.title}</span>
+        {feature.description && (
+          <Tooltip
+            content={feature.description}
+            isDisabled={!feature.description}
+            className="max-w-xs"
+          >
+            <div>
+              <InfoIcon />
+            </div>
+          </Tooltip>
+        )}
       </div>
     </th>
-    <td className="relative px-6 py-4 xl:px-8">{free}</td>
-    <td className="relative px-6 py-4 xl:px-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary">
-      {pro}
-    </td>
-    <td className="relative px-6 py-4 xl:px-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1">
-      {team}
-    </td>
+    {plans.map((plan) => {
+      const content = feature[plan.id as keyof Feature] as CellContent;
+      const baseClassName = 'relative px-6 py-4 xl:px-8';
+      const columnClassName = plan.desktopColumnClassName;
+      const roundedClass =
+        isLastInCategory && plan.id === 'pro'
+          ? 'before:rounded-b-medium'
+          : isLastInCategory && plan.id === 'team'
+          ? 'before:rounded-b-medium'
+          : '';
+
+      return (
+        <td
+          key={plan.id}
+          className={`${baseClassName} ${columnClassName} ${roundedClass}`}
+        >
+          <CellContentRenderer content={content} planId={plan.id} />
+        </td>
+      );
+    })}
   </tr>
 );
 
-const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
+// Desktop Section Header
+interface SectionHeaderProps {
+  title: string;
+  plans: PricingPlan[];
+}
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title, plans }) => (
   <tr>
     <th
       className="text-large text-foreground pb-4 font-semibold pt-16"
@@ -119,144 +673,34 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
         role="separator"
       />
     </th>
-    <td className="relative py-4" />
-    <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary" />
-    <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1" />
+    {plans.map((plan) => (
+      <td
+        key={plan.id}
+        className={`relative py-4 ${plan.desktopColumnClassName}`}
+      />
+    ))}
   </tr>
 );
 
-interface PricingCardProps {
-  title: string;
-  description: string;
-  price: string;
-  priceUnit?: string;
-  features: string[];
-  buttonText: string;
-  buttonVariant?: 'flat' | 'solid';
-  buttonColor?: 'default' | 'primary';
-  isPopular?: boolean;
-  cardClassName?: string;
+// Main Component
+interface PricingTableProps {
+  data?: PricingData;
+  timeframe: 'monthly' | 'yearly';
 }
 
-const PricingCard: React.FC<PricingCardProps> = ({
-  title,
-  description,
-  price,
-  priceUnit,
-  features,
-  buttonText,
-  buttonVariant = 'flat',
-  buttonColor = 'default',
-  isPopular = false,
-  cardClassName = '',
-}) => (
-  <Card
-    className={`relative p-3 ${cardClassName}`}
-    shadow={isPopular ? 'lg' : 'none'}
-  >
-    {isPopular && (
-      <Chip
-        color="primary"
-        variant="flat"
-        className="absolute top-4 right-4 bg-primary/20 text-primary-600"
-        classNames={{
-          content: 'font-medium text-primary-500 dark:text-primary-600',
-        }}
-      >
-        Most Popular
-      </Chip>
-    )}
-    <CardHeader className="flex flex-col items-start gap-2 pb-6">
-      <h2 className="text-large font-medium">{title}</h2>
-      <p className="text-medium text-default-500">{description}</p>
-    </CardHeader>
-    <Divider />
-    <CardBody className="gap-8">
-      <p className="flex items-baseline gap-1 pt-2">
-        <span className="from-foreground to-foreground-600 inline bg-linear-to-br bg-clip-text text-4xl leading-7 font-semibold tracking-tight text-transparent">
-          {price}
-        </span>
-        {priceUnit && (
-          <span className="text-small text-default-400 font-medium">
-            {priceUnit}
-          </span>
-        )}
-      </p>
-      <ul className="flex flex-col gap-2">
-        {features.map((feature, index) => (
-          <li key={index} className="flex items-center gap-2">
-            <CheckIcon />
-            <p className="text-default-500">{feature}</p>
-          </li>
-        ))}
-      </ul>
-    </CardBody>
-    <CardFooter>
-      <Button
-        className="w-full"
-        variant={buttonVariant}
-        color={buttonColor}
-        href="#"
-      >
-        {buttonText}
-      </Button>
-    </CardFooter>
-  </Card>
-);
+const PricingTable: React.FC<PricingTableProps> = ({
+  data = defaultPricingData,
+  timeframe,
+}) => {
+  const { plans, categories } = data;
 
-const PricingTable: React.FC = () => {
   return (
     <>
       {/* Mobile Layout */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:hidden">
-        <PricingCard
-          title="Free"
-          description="For starters and hobbyists that want to try out."
-          price="Free"
-          features={[
-            '10 users included',
-            '2 GB of storage',
-            'Help center access',
-            'Email support',
-          ]}
-          buttonText="Continue with Free"
-          buttonVariant="flat"
-          buttonColor="default"
-          cardClassName="border-medium! border-default-100 bg-transparent"
-        />
-        <PricingCard
-          title="Pro"
-          description="For small teams that have less that 10 members."
-          price="$72"
-          priceUnit="/per year"
-          features={[
-            '20 users included',
-            '10 GB of storage',
-            'Help center access',
-            'Priority email support',
-          ]}
-          buttonText="Get started"
-          buttonVariant="solid"
-          buttonColor="primary"
-          isPopular
-          cardClassName="border-primary shadow-primary/20 border-2 shadow-2xl bg-content1"
-        />
-        <PricingCard
-          title="Team"
-          description="For large teams that have more than 10 members."
-          price="$90"
-          priceUnit="/per year"
-          features={[
-            '50 users included',
-            '30 GB of storage',
-            'Help center access',
-            'Phone & email support',
-          ]}
-          buttonText="Contact us"
-          buttonVariant="flat"
-          buttonColor="default"
-          cardClassName="border-medium! border-content3 bg-content2 dark:border-content2 dark:bg-content1"
-        />
+        {plans.map((plan) => (
+          <PricingCard key={plan.id} plan={plan} />
+        ))}
       </div>
 
       {/* Desktop Table Layout */}
@@ -266,709 +710,117 @@ const PricingTable: React.FC = () => {
             <caption className="sr-only">Pricing plan comparison</caption>
             <colgroup>
               <col className="w-1/4" />
-              <col className="w-1/4" />
-              <col className="w-1/4" />
-              <col className="w-1/4" />
+              {plans.map((plan) => (
+                <col key={plan.id} className="w-1/4" />
+              ))}
             </colgroup>
             <thead>
               <tr>
                 <td />
-                <th className="relative px-6 pt-6 xl:px-8 xl:pt-8" scope="col">
-                  <div className="text-large text-foreground relative font-medium">
-                    Free
-                  </div>
-                </th>
-                <th
-                  className="relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary before:rounded-t-medium"
-                  scope="col"
-                >
-                  <Chip
-                    color="primary"
-                    variant="shadow"
-                    classNames={{
-                      base: 'absolute top-2 right-2 bg-primary-foreground shadow-large border-medium border-primary',
-                      content: 'text-primary font-medium',
-                    }}
+                {plans.map((plan) => (
+                  <th
+                    key={plan.id}
+                    className={plan.desktopHeaderClassName}
+                    scope="col"
                   >
-                    Most Popular
-                  </Chip>
-                  <div className="text-large relative font-medium text-primary-foreground">
-                    Pro
-                  </div>
-                </th>
-                <th
-                  className="relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1 before:rounded-t-medium"
-                  scope="col"
-                >
-                  <div className="text-large text-foreground relative font-medium">
-                    Team
-                  </div>
-                </th>
+                    {plan.isPopular && (
+                      <Chip
+                        color="primary"
+                        variant="shadow"
+                        classNames={{
+                          base: 'absolute top-2 right-2 bg-primary-foreground shadow-large border-medium border-primary',
+                          content: 'text-primary font-medium',
+                        }}
+                      >
+                        Most Popular
+                      </Chip>
+                    )}
+                    <div
+                      className={`text-large relative font-medium ${
+                        plan.id === 'pro'
+                          ? 'text-primary-foreground'
+                          : 'text-foreground'
+                      }`}
+                    >
+                      {plan.name}
+                    </div>
+                  </th>
+                ))}
               </tr>
               <tr>
                 <th scope="row">
                   <span className="sr-only">Price</span>
                 </th>
-                <td className="relative px-6 pt-4 xl:px-8">
-                  <div className="text-foreground flex items-baseline gap-1">
-                    <span className="from-foreground to-foreground-600 inline bg-linear-to-br bg-clip-text text-4xl leading-8 font-semibold tracking-tight text-transparent">
-                      Free
-                    </span>
-                    <span className="text-small! text-default-600 font-medium">
-                      /per year
-                    </span>
-                  </div>
-                  <Button
-                    className="w-full mt-6"
-                    variant="flat"
-                    color="default"
-                    href="#"
-                  >
-                    Continue with Free
-                  </Button>
-                </td>
-                <td className="relative px-6 pt-4 xl:px-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary">
-                  <div className="text-foreground flex items-baseline gap-1">
-                    <span className="from-foreground to-foreground-600 inline bg-linear-to-br bg-clip-text text-4xl leading-8 font-semibold tracking-tight text-primary-foreground">
-                      $72
-                    </span>
-                    <span className="text-small! font-medium text-primary-foreground/50">
-                      /per year
-                    </span>
-                  </div>
-                  <Button
-                    className="w-full mt-6 bg-primary-foreground text-primary shadow-default-500/50 font-medium shadow-xs"
-                    href="#"
-                  >
-                    Get started
-                  </Button>
-                </td>
-                <td className="relative px-6 pt-4 xl:px-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1">
-                  <div className="text-foreground flex items-baseline gap-1">
-                    <span className="from-foreground to-foreground-600 inline bg-linear-to-br bg-clip-text text-4xl leading-8 font-semibold tracking-tight text-transparent">
-                      $90
-                    </span>
-                    <span className="text-small! text-default-600 font-medium">
-                      /per user/per year
-                    </span>
-                  </div>
-                  <Button
-                    className="w-full mt-6"
-                    variant="flat"
-                    color="default"
-                    href="#"
-                  >
-                    Contact us
-                  </Button>
-                </td>
+                {plans.map((plan) => {
+                  const calculatedPrice = calculatePrice(
+                    plan.monthlyPrice,
+                    timeframe
+                  );
+                  return (
+                    <td
+                      key={plan.id}
+                      className={`relative px-6 pt-4 xl:px-8 ${plan.desktopColumnClassName}`}
+                    >
+                      <div className="text-foreground flex items-baseline gap-1">
+                        <span
+                          className={`from-foreground to-foreground-600 inline bg-linear-to-br bg-clip-text text-4xl leading-8 font-semibold tracking-tight ${
+                            plan.id === 'pro'
+                              ? 'text-primary-foreground'
+                              : 'text-transparent'
+                          }`}
+                        >
+                          {calculatedPrice === 0
+                            ? 'Free'
+                            : `$${calculatedPrice}`}
+                        </span>
+                        {calculatedPrice !== 0 && (
+                          <span
+                            className={`text-small! font-medium ${
+                              plan.id === 'pro'
+                                ? 'text-primary-foreground/50'
+                                : 'text-default-600'
+                            }`}
+                          >
+                            {timeframe === 'monthly'
+                              ? '/per month'
+                              : '/per year'}
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        className={`w-full mt-6 ${
+                          plan.id === 'pro'
+                            ? 'bg-primary-foreground text-primary font-medium shadow-white/30'
+                            : ''
+                        }`}
+                        variant={plan.buttonVariant}
+                        color={plan.buttonColor}
+                        href="#"
+                      >
+                        {plan.buttonText}
+                      </Button>
+                    </td>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
-              {/* Content Section */}
-              <SectionHeader title="Content" />
-
-              <FeatureRow
-                title="New apps & screens releases"
-                free={
-                  <div className="text-medium text-default-500 text-center">
-                    Latest 4 apps
-                  </div>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground">
-                      <CheckIcon forceWhite />
-                    </div>
-                    <span className="sr-only">Included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Access to latest versions"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground">
-                      <CheckIcon forceWhite />
-                    </div>
-                    <span className="sr-only">Included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Access to previous versions"
-                free={
-                  <div className="text-medium text-default-500 text-center">
-                    Limited to 3 rows
-                  </div>
-                }
-                pro={
-                  <div className="text-medium text-center text-primary-foreground/70">
-                    Unlimited
-                  </div>
-                }
-                team={
-                  <div className="text-medium text-default-500 text-center">
-                    Unlimited
-                  </div>
-                }
-              />
-
-              <FeatureRow
-                title="Access to flows of apps"
-                free={
-                  <div className="text-medium text-default-500 text-center">
-                    Limited to 3 rows
-                  </div>
-                }
-                pro={
-                  <div className="text-medium text-center text-primary-foreground/70">
-                    Unlimited
-                  </div>
-                }
-                team={
-                  <div className="text-medium text-default-500 text-center">
-                    Unlimited
-                  </div>
-                }
-              />
-
-              <FeatureRow
-                title="Filter & search results"
-                free={
-                  <div className="text-medium text-default-500 text-center">
-                    Limited to 3 rows
-                  </div>
-                }
-                pro={
-                  <div className="text-medium text-center text-primary-foreground/70">
-                    Unlimited
-                  </div>
-                }
-                team={
-                  <div className="text-medium text-default-500 text-center">
-                    Unlimited
-                  </div>
-                }
-              />
-
-              {/* Features Section */}
-              <tr>
-                <th
-                  className="text-large text-foreground pt-12 pb-4 font-semibold"
-                  colSpan={1}
-                  scope="colgroup"
-                >
-                  Features
-                  <hr
-                    className="shrink-0 border-none w-full h-divider bg-default-600/10 absolute -inset-x-4 mt-2"
-                    role="separator"
-                  />
-                </th>
-                <td className="relative py-4" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1" />
-              </tr>
-
-              <FeatureRow
-                title="Collections"
-                free={
-                  <div className="text-medium text-default-500 text-center">
-                    Up to 3 collections
-                  </div>
-                }
-                pro={
-                  <div className="text-medium text-center text-primary-foreground/70">
-                    Unlimited
-                  </div>
-                }
-                team={
-                  <div className="text-medium text-default-500 text-center">
-                    Unlimited
-                  </div>
-                }
-              />
-
-              <FeatureRow
-                title="Copy to clipboard"
-                free={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground">
-                      <CheckIcon forceWhite />
-                    </div>
-                    <span className="sr-only">Included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Screen download"
-                free={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground">
-                      <CheckIcon forceWhite />
-                    </div>
-                    <span className="sr-only">Included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Batch download"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground">
-                      <CheckIcon forceWhite />
-                    </div>
-                    <span className="sr-only">Included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              {/* Collaboration Section */}
-              <tr>
-                <th
-                  className="text-large text-foreground pt-12 pb-4 font-semibold"
-                  colSpan={1}
-                  scope="colgroup"
-                >
-                  Collaboration
-                  <hr
-                    className="shrink-0 border-none w-full h-divider bg-default-600/10 absolute -inset-x-4 mt-2"
-                    role="separator"
-                  />
-                </th>
-                <td className="relative py-4" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1" />
-              </tr>
-
-              <FeatureRow
-                title="Team members"
-                free={
-                  <div className="text-medium text-default-500 text-center">
-                    Just you
-                  </div>
-                }
-                pro={
-                  <div className="text-medium text-center text-primary-foreground/70">
-                    Just you
-                  </div>
-                }
-                team={
-                  <div className="text-medium text-default-500 text-center">
-                    Unlimited
-                  </div>
-                }
-              />
-
-              <FeatureRow
-                title="Team collections"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Team administration"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Flexible seat-based licensing"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              {/* Security & Access Section */}
-              <tr>
-                <th
-                  className="text-large text-foreground pt-12 pb-4 font-semibold"
-                  colSpan={1}
-                  scope="colgroup"
-                >
-                  Security & Access
-                  <hr
-                    className="shrink-0 border-none w-full h-divider bg-default-600/10 absolute -inset-x-4 mt-2"
-                    role="separator"
-                  />
-                </th>
-                <td className="relative py-4" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1" />
-              </tr>
-
-              <FeatureRow
-                title="SAML Single Sign-On (SSO)"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="SCIM user provisioning"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              {/* Billing Section */}
-              <tr>
-                <th
-                  className="text-large text-foreground pt-12 pb-4 font-semibold"
-                  colSpan={1}
-                  scope="colgroup"
-                >
-                  Billing
-                  <hr
-                    className="shrink-0 border-none w-full h-divider bg-default-600/10 absolute -inset-x-4 mt-2"
-                    role="separator"
-                  />
-                </th>
-                <td className="relative py-4" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1" />
-              </tr>
-
-              <FeatureRow
-                title="Flexible payment options"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Custom security assessment"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <FeatureRow
-                title="Custom agreement"
-                free={
-                  <>
-                    <div className="text-default-400">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground/50">
-                      <CrossIcon />
-                    </div>
-                    <span className="sr-only">Not included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              {/* Support Section */}
-              <tr>
-                <th
-                  className="text-large text-foreground pt-12 pb-4 font-semibold"
-                  colSpan={1}
-                  scope="colgroup"
-                >
-                  Support
-                  <hr
-                    className="shrink-0 border-none w-full h-divider bg-default-600/10 absolute -inset-x-4 mt-2"
-                    role="separator"
-                  />
-                </th>
-                <td className="relative py-4" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary" />
-                <td className="relative py-4 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1" />
-              </tr>
-
-              <FeatureRow
-                title="Help center"
-                free={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Free</span>
-                  </>
-                }
-                pro={
-                  <>
-                    <div className="text-primary-foreground">
-                      <CheckIcon forceWhite />
-                    </div>
-                    <span className="sr-only">Included in Pro</span>
-                  </>
-                }
-                team={
-                  <>
-                    <div className="text-primary">
-                      <CheckIcon />
-                    </div>
-                    <span className="sr-only">Included in Team</span>
-                  </>
-                }
-              />
-
-              <tr>
-                <th
-                  className="text-medium text-default-700 py-4 font-normal"
-                  scope="row"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Email support</span>
-                    <InfoIcon />
-                  </div>
-                </th>
-                <td className="relative px-6 py-4 xl:px-8">
-                  <div className="text-medium text-default-500 text-center">
-                    Best effort basis
-                  </div>
-                </td>
-                <td className="relative px-6 py-4 xl:px-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary before:rounded-b-medium">
-                  <div className="text-primary-foreground">
-                    <CheckIcon forceWhite />
-                  </div>
-                  <span className="sr-only">Included in Pro</span>
-                </td>
-                <td className="relative px-6 py-4 xl:px-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1 before:rounded-b-medium">
-                  <div className="text-primary">
-                    <CheckIcon />
-                  </div>
-                  <span className="sr-only">Included in Team</span>
-                </td>
-              </tr>
+              {categories.map((category, categoryIndex) => (
+                <React.Fragment key={categoryIndex}>
+                  <SectionHeader title={category.title} plans={plans} />
+                  {category.features.map((feature, featureIndex) => (
+                    <FeatureRow
+                      key={featureIndex}
+                      feature={feature}
+                      plans={plans}
+                      isLastInCategory={
+                        featureIndex === category.features.length - 1 &&
+                        categoryIndex === categories.length - 1
+                      }
+                    />
+                  ))}
+                </React.Fragment>
+              ))}
             </tbody>
           </table>
         </div>
@@ -978,3 +830,4 @@ const PricingTable: React.FC = () => {
 };
 
 export default PricingTable;
+export type { PricingData, PricingPlan, Category, Feature, CellContent };

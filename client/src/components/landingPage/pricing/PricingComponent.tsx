@@ -1,4 +1,5 @@
 'use client';
+import { calculatePrice, yearlyDiscount } from '@/util/helpers';
 import {
   Button,
   Card,
@@ -31,7 +32,6 @@ interface PricingTierInterface {
 }
 
 export default function PricingComponent() {
-  const yearlyDiscount = 30;
   const pricingData: PricingTierInterface[] = [
     {
       tierName: 'Free',
@@ -64,7 +64,8 @@ export default function PricingComponent() {
     },
     {
       tierName: 'Pro+',
-      tierCaption: 'For those who want a premium experience',
+      tierCaption:
+        'For organisers who want premium polish and zero limitations.',
       tierPriceMonthly: 5,
       features: [
         { text: 'Team pages' },
@@ -96,11 +97,7 @@ export default function PricingComponent() {
         onSelectionChange={(key) => setView(key as 'monthly' | 'yearly')}
       >
         <Tab key="monthly" title="Pay Monthly">
-          <PricingGrid
-            yearlyDiscount={yearlyDiscount}
-            view={view}
-            pricingData={pricingData}
-          />
+          <PricingGrid view={view} pricingData={pricingData} />
         </Tab>
         <Tab
           key="yearly"
@@ -113,11 +110,7 @@ export default function PricingComponent() {
             </div>
           }
         >
-          <PricingGrid
-            yearlyDiscount={yearlyDiscount}
-            view={view}
-            pricingData={pricingData}
-          />
+          <PricingGrid view={view} pricingData={pricingData} />
         </Tab>
       </Tabs>
       <Link
@@ -134,22 +127,15 @@ export default function PricingComponent() {
 
 function PricingGrid({
   view,
-  yearlyDiscount,
   pricingData,
 }: {
   view: 'monthly' | 'yearly';
-  yearlyDiscount: number;
   pricingData: PricingTierInterface[];
 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {pricingData.map((p, i) => (
-        <PricingTile
-          yearlyDiscount={yearlyDiscount}
-          view={view}
-          pricingTier={p}
-          key={i}
-        />
+        <PricingTile view={view} pricingTier={p} key={i} />
       ))}
     </div>
   );
@@ -157,19 +143,13 @@ function PricingGrid({
 
 function PricingTile({
   view,
-  yearlyDiscount,
+
   pricingTier,
 }: {
   view: 'monthly' | 'yearly';
-  yearlyDiscount: number;
   pricingTier: PricingTierInterface;
 }) {
-  const price =
-    view === 'monthly'
-      ? pricingTier.tierPriceMonthly
-      : Math.round(
-          pricingTier.tierPriceMonthly * (1 - yearlyDiscount / 100) * 12
-        );
+  const price = calculatePrice(pricingTier.tierPriceMonthly, view);
   return (
     <Card
       className={`p-3 overflow-visible text-start ${
