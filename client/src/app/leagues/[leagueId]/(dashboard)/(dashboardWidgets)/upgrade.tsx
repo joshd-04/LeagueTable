@@ -26,7 +26,7 @@ export default function Upgrade({ league }: { league: League }) {
       : 'This league is finished.';
   return (
     <Card className="p-[10px] h-full w-full">
-      <CardBody className="flex flex-col gap-2">
+      <CardBody className="flex flex-col gap-1">
         <p
           style={
             {

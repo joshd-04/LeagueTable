@@ -143,7 +143,7 @@ export default function AddTablesForm({
       <CardBody>
         <div>
           <h1 className="font-medium text-lg">Division Setup: {leagueName}</h1>
-          <p className="opacity-80 dark:opacity-70 text-sm">Part 2 of 3</p>
+          <p className="text-muted text-foreground text-sm">Part 2 of 3</p>
         </div>
         <Spacer y={4} />
         <Form onSubmit={handleSubmit}>

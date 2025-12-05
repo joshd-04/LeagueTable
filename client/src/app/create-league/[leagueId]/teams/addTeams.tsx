@@ -46,7 +46,7 @@ function ExtraInfo() {
             <InfoSVG className="w-[32px] h-[32px] fill-[var(--info)] inline align-middle  " />{' '}
             <p className="text-base align-middle inline">Team names</p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-sm">
+          <p className="text-muted text-sm">
             Make sure the different team names are unique
           </p>
         </div>

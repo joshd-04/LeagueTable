@@ -137,7 +137,7 @@ export default function RegistrationForm() {
       <CardHeader>
         <div>
           <h1 className="font-medium text-lg">Welcome!</h1>
-          <p className="opacity-80 dark:opacity-70 text-sm">
+          <p className="text-muted text-foreground text-sm">
             Create an account to get started
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function RegistrationForm() {
               isRequired
               onFocus={() => setIsError(false)}
               description={
-                <span className="opacity-80 dark:opacity-70">
+                <span className="text-muted text-foreground">
                   Visible to others
                 </span>
               }
@@ -180,7 +180,7 @@ export default function RegistrationForm() {
               isRequired
               onFocus={() => setIsError(false)}
               description={
-                <span className="opacity-80 dark:opacity-70">
+                <span className="text-muted text-foreground">
                   Only you can see this. We&apos;ll never share your email with
                   anyone.
                 </span>
@@ -284,7 +284,7 @@ export default function RegistrationForm() {
             {isRegisterSuccess ? 'Success' : 'Submit'}
           </Button>
           <Link
-            href="/register"
+            href="/login"
             className="text-sm font-medium cursor-pointer place-self-center"
           >
             Already have an account? Log in

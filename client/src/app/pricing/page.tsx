@@ -1,11 +1,11 @@
-import Dashboard from './(dashboard)/dashboard';
 import { cookies } from 'next/headers';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { User } from '@/util/definitions';
-import LandingPage from './(landingPage)/landingPage';
+import { redirect } from 'next/navigation';
+import PricingClient from './pricingClient';
 
-export default async function Home() {
+export default async function Page() {
   const cookieStore = await cookies();
   const response = await fetchAPI(`${API_URL}/me`, {
     method: 'GET',
@@ -16,7 +16,6 @@ export default async function Home() {
   });
 
   let user: User | null;
-  let error: string = '';
 
   if (response.status === 'success') {
     user = {
@@ -29,12 +28,14 @@ export default async function Home() {
     user = null;
   } else {
     user = null;
-    error = response.message;
   }
 
   const isLoggedIn = user !== undefined && user !== null;
 
-  if (isLoggedIn === false) {
-    return <LandingPage />;
-  } else return <Dashboard initialUser={user} initialError={error} />;
+  if (isLoggedIn) {
+    // router push
+    redirect('/');
+  } else {
+    return <PricingClient />;
+  }
 }

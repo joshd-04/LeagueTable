@@ -53,7 +53,7 @@ function ExtraInfo() {
               Table names
             </p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-sm">
+          <p className="text-muted text-sm">
             Make sure the different table names are unique
           </p>
         </div>
@@ -70,7 +70,7 @@ function ExtraInfo() {
               Promotion/relegation
             </p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-sm">
+          <p className="text-muted text-sm">
             Make sure the promotion and relegation numbers match between
             adjacent leagues.
             <br />

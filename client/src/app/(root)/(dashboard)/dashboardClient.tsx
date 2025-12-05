@@ -69,7 +69,6 @@ export default function DashboardClient({
     following: leagues.following.map((l) => l._id),
   };
 
-
   const [selectedLeagueTab, setSelectedLeagueTab] =
     useState<string>('favorites');
 
@@ -366,7 +365,7 @@ export default function DashboardClient({
                         size="sm"
                         className={
                           selectedLeagueTab === 'favorites'
-                            ? 'bg-foreground text-primary'
+                            ? 'bg-white text-primary'
                             : ''
                         }
                       >
@@ -400,7 +399,7 @@ export default function DashboardClient({
                         size="sm"
                         className={
                           selectedLeagueTab === 'yours'
-                            ? 'bg-foreground text-primary'
+                            ? 'bg-white text-primary'
                             : ''
                         }
                       >
@@ -445,7 +444,7 @@ export default function DashboardClient({
                         size="sm"
                         className={
                           selectedLeagueTab === 'following'
-                            ? 'bg-foreground text-primary'
+                            ? 'bg-white text-primary'
                             : ''
                         }
                       >

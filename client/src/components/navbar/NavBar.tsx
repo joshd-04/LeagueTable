@@ -15,22 +15,51 @@ import {
   NavbarItem,
   Switch,
 } from '@heroui/react';
-import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
+import LogoFull from '@/assets/svg components/LogoFull';
+import { MdDarkMode, MdLightMode } from 'react-icons/md';
+import { FaChevronDown } from 'react-icons/fa6';
 import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
+import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { API_URL } from '@/util/config';
 import { fetchAPI } from '@/util/api';
-import { useRouter } from 'next/navigation';
-import DarkModeSVG from '@/assets/svg components/DarkMode';
-import LightModeSVG from '@/assets/svg components/LightMode';
-import { useTheme } from 'next-themes';
-import ProChip from '../chips/ProChip';
-import ProPlusChip from '../chips/ProPlusChip';
-import LogoFull from '@/assets/svg components/LogoFull';
+import { API_URL } from '@/util/config';
 
 export default function NavBar() {
+  type dropdownButtons = 'features' | 'use cases';
+  const [buttonHovering, setButtonHovering] = useState<dropdownButtons | null>(
+    null
+  );
+  const [clickedOpen, setClickedOpen] = useState<dropdownButtons | null>(null);
+
+  // Determine which dropdown should be open
+  const getIsOpen = (dropdown: dropdownButtons) => {
+    return clickedOpen === dropdown || buttonHovering === dropdown;
+  };
+
+  // Handle click on dropdown trigger
+  const handleDropdownClick = (dropdown: dropdownButtons) => {
+    if (clickedOpen === dropdown) {
+      setClickedOpen(null);
+    } else {
+      setClickedOpen(dropdown);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (clickedOpen) {
+        setClickedOpen(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [clickedOpen]);
+
   const { user, setUser } = useContext(GlobalContext).account;
   const { isLoggedIn } = useAccount();
   const pathname = usePathname();
@@ -49,52 +78,156 @@ export default function NavBar() {
   });
 
   async function handleSignOut() {
-    await sendSignoutRequest();
-    setUser(null);
-    router.push('/login');
+    const response = await sendSignoutRequest();
+    if (response.data.status === 'success') {
+      setUser(null);
+      router.push('/login');
+    }
   }
 
   return (
-    <Navbar>
+    <Navbar className="bg-transparent sticky w-full h-15">
       <NavbarBrand className="h-full py-[22px]">
         <Link
           href="/"
-          className="text-inherit h-full flex flex-row gap-1 items-center"
+          className="text-inherit h-full flex flex-row gap-1 items-end"
         >
           <LogoFull className="fill-foreground h-full" />
-          {user?.accountType === 'pro' && <ProChip />}
-          {user?.accountType === 'pro+' && <ProPlusChip />}
+          <p className="xl:text-red-500 lg:text-blue-500 md:text-green-500 sm:text-pink-500  before:content-['--'] sm:before:content-['sm'] md:before:content-['md'] lg:before:content-['lg'] xl:before:content-['xl']"></p>
         </Link>
       </NavbarBrand>
-      {pathname === '/' && !isLoggedIn && (
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      {!isLoggedIn && pathname !== '/login' && (
+        <NavbarContent className="hidden sm:flex gap-10 " justify="center">
+          <Dropdown isOpen={getIsOpen('features')} showArrow>
+            <NavbarItem>
+              <DropdownTrigger>
+                <Button
+                  disableRipple
+                  className="p-0 data-[hover=true]:bg-transparent font-medium text-base aria-expanded:scale-100"
+                  endContent={<FaChevronDown className="-ml-1" />}
+                  radius="sm"
+                  variant="light"
+                  onMouseEnter={() => setButtonHovering('features')}
+                  onMouseLeave={() => setButtonHovering(null)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDropdownClick('features');
+                  }}
+                >
+                  Features
+                </Button>
+              </DropdownTrigger>
+            </NavbarItem>
+            <DropdownMenu
+              aria-label="ACME features"
+              onMouseEnter={() => setButtonHovering('features')}
+              onMouseLeave={() => setButtonHovering(null)}
+              itemClasses={{
+                base: 'gap-4',
+              }}
+            >
+              <DropdownItem
+                key="autoscaling"
+                description="ACME scales apps based on demand and load"
+              >
+                Autoscaling
+              </DropdownItem>
+              <DropdownItem
+                key="usage_metrics"
+                description="Real-time metrics to debug issues"
+              >
+                Usage Metrics
+              </DropdownItem>
+              <DropdownItem
+                key="production_ready"
+                description="ACME runs on ACME, join us at web scale"
+              >
+                Production Ready
+              </DropdownItem>
+              <DropdownItem
+                key="99_uptime"
+                description="High availability and uptime guarantees"
+              >
+                +99% Uptime
+              </DropdownItem>
+              <DropdownItem
+                key="supreme_support"
+                description="Support team ready to respond"
+              >
+                +Supreme Support
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
           <NavbarItem>
             <Link
+              href="/pricing"
+              className="font-medium text-base"
               color="foreground"
-              href="#"
-              className="font-semibold text-base"
+              underline="hover"
             >
-              Features
+              Pricing
             </Link>
           </NavbarItem>
-          <NavbarItem isActive>
-            <Link
-              aria-current="page"
-              href="#"
-              className="font-semibold text-base"
+          <Dropdown isOpen={getIsOpen('use cases')} showArrow>
+            <NavbarItem>
+              <DropdownTrigger>
+                <Button
+                  disableRipple
+                  className="p-0 data-[hover=true]:bg-transparent font-medium text-base aria-expanded:scale-100"
+                  endContent={<FaChevronDown className="-ml-1" />}
+                  radius="sm"
+                  variant="light"
+                  onMouseEnter={() => setButtonHovering('use cases')}
+                  onMouseLeave={() => setButtonHovering(null)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDropdownClick('use cases');
+                  }}
+                >
+                  Use cases
+                </Button>
+              </DropdownTrigger>
+            </NavbarItem>
+            <DropdownMenu
+              aria-label="ACME features"
+              onMouseEnter={() => setButtonHovering('use cases')}
+              onMouseLeave={() => setButtonHovering(null)}
+              itemClasses={{
+                base: 'gap-4',
+              }}
             >
-              Use cases
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link
-              color="foreground"
-              href="#"
-              className="font-semibold text-base"
-            >
-              FAQ
-            </Link>
-          </NavbarItem>
+              <DropdownItem
+                key="autoscaling"
+                description="ACME scales apps based on demand and load"
+              >
+                Autoscaling
+              </DropdownItem>
+              <DropdownItem
+                key="usage_metrics"
+                description="Real-time metrics to debug issues"
+              >
+                Usage Metrics
+              </DropdownItem>
+              <DropdownItem
+                key="production_ready"
+                description="ACME runs on ACME, join us at web scale"
+              >
+                Production Ready
+              </DropdownItem>
+              <DropdownItem
+                key="99_uptime"
+                description="High availability and uptime guarantees"
+              >
+                +99% Uptime
+              </DropdownItem>
+              <DropdownItem
+                key="supreme_support"
+                description="Support team ready to respond"
+              >
+                +Supreme Support
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarContent>
       )}
       {!isLoggedIn ? (
@@ -233,19 +366,9 @@ function ThemeSwitch() {
       isSelected={isLight}
       onValueChange={(isChecked) => setTheme(isChecked ? 'light' : 'dark')}
       color="success"
-      endContent={
-        <DarkModeSVG
-          className="w-[16px] h-[16px] fill- inline"
-          style={{ width: '16px', fill: 'lightgrey' }}
-        />
-      }
+      endContent={<MdDarkMode className="fill-black h-4 w-4 inline" />}
       size="md"
-      startContent={
-        <LightModeSVG
-          className="w-[16px] h-[16px] fill-black inline"
-          style={{ width: '16px' }}
-        />
-      }
+      startContent={<MdLightMode className="fill-black h-4 w-4 inline" />}
     ></Switch>
   );
 }

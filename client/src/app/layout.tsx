@@ -86,8 +86,10 @@ export default async function RootLayout({
         className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative  duration-250 overflow-x-clip overflow-y-auto`}
       >
         <Providers initialUser={user} initialError={error}>
-          <NavBar />
-          {children}
+          <div className="min-h-[100vh]">
+            <NavBar />
+            {children}
+          </div>
           <Footer />
         </Providers>
       </body>

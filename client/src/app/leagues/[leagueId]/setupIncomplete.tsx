@@ -85,7 +85,7 @@ function CardWhenOwner({
       <CardBody>
         <div className="flex flex-col gap-2 ">
           <p className="text-lg font-medium text-warning">Setup incomplete</p>
-          <p className="text-sm opacity-80 dark:opacity-70">
+          <p className="text-sm text-muted text-foreground">
             Finish setting up your league before you can start using it.
           </p>
           <Checkbox isDisabled defaultSelected>
@@ -139,7 +139,7 @@ function CardWhenNotOwner({ leagueName }: { leagueName: string }) {
           <p className="text-lg font-medium text-primary">
             Waiting for final touches
           </p>
-          <p className="text-sm opacity-80 dark:opacity-70">
+          <p className="text-sm text-muted text-foreground">
             <em>{leagueName}</em> still needs to be finished setting up by the
             league owner. Check back later.
           </p>
@@ -209,14 +209,14 @@ function CardWhenNotOwnerButtons({
           <p className="text-lg font-medium text-primary">
             Waiting for final touches
           </p>
-          <p className="text-sm opacity-80 dark:opacity-70">
+          <p className="text-sm text-muted text-foreground">
             <em>{leagueName}</em> still needs to be finished setting up by the
             league owner. Check back later.
           </p>
         </div>
       </CardBody>
       <CardFooter className="flex flex-col items-start justify-start gap-2">
-        <p className="text-sm opacity-80 dark:opacity-70">
+        <p className="text-sm text-muted text-foreground">
           While you&apos;re waiting...
         </p>
         <Button

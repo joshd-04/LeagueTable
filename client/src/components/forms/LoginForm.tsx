@@ -25,6 +25,7 @@ export default function LoginForm({
 }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
 
@@ -44,6 +45,7 @@ export default function LoginForm({
         username: username,
         email: null,
         password: password,
+        rememberMe: rememberMe,
       }),
       credentials: 'include',
     });
@@ -100,7 +102,7 @@ export default function LoginForm({
       <CardHeader>
         <div>
           <h1 className="font-medium text-lg">Welcome Back</h1>
-          <p className="opacity-80 dark:opacity-70 text-sm">
+          <p className="text-muted text-foreground text-sm">
             Log in to your account to continue
           </p>
         </div>
@@ -170,7 +172,11 @@ export default function LoginForm({
               }
             />
           </div>
-          <Checkbox className="text-sm">
+          <Checkbox
+            className="text-sm"
+            isSelected={rememberMe}
+            onValueChange={setRememberMe}
+          >
             <p className="text-sm">Remember me (does nothing)</p>
           </Checkbox>
           <Button

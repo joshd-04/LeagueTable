@@ -1,6 +1,7 @@
 import { heroui } from '@heroui/react';
 
 export default heroui({
+  addCommonColors: true,
   // layout tokens (sizes, radii, line-heights) tuned to your globals.css variables
   layout: {
     dividerWeight: '1px',
@@ -57,27 +58,27 @@ export default heroui({
         },
       },
       colors: {
-        background: 'hsl(0, 0%, 95%)', // --bg
-        foreground: 'hsl(0, 0%, 5%)', // --text
-        divider: 'hsl(0, 0%, 70%)', // --border
-        overlay: 'white', // used for modal, popover, etc.
-        focus: 'hsl(200, 95%, 0%)', // --accent
-        content1: 'hsl(0, 0%, 85%)', // --bg-light
-        content2: 'hsl(0, 0%, 80%)', // same as bg
-        content3: 'hsl(0, 0%, 75%)', // --bg-dark
+        //   // background: 'hsl(0, 0%, 95%)', // --bg
+        //   // foreground: 'hsl(0, 0%, 5%)', // --text
+        //   // divider: 'hsl(0, 0%, 70%)', // --border
+        //   // overlay: 'white', // used for modal, popover, etc.
+        //   // focus: 'hsl(200, 95%, 0%)', // --accent
+        //   // content1: 'hsl(0, 0%, 85%)', // --bg-light
+        //   // content2: 'hsl(0, 0%, 80%)', // same as bg
+        //   // content3: 'hsl(0, 0%, 75%)', // --bg-dark
         primary: {
-          DEFAULT: 'hsl(200, 100%, 50%)',
-          foreground: 'black',
-        },
-        success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'black' },
-        danger: {
-          DEFAULT: 'hsl(0, 70%, 50%)',
+          DEFAULT: 'hsl(212, 100%, 47%)',
           foreground: 'white',
         },
-        warning: {
-          DEFAULT: 'hsl(30, 70%, 50%)',
-          foreground: 'white',
-        },
+        //   success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'black' },
+        //   danger: {
+        //     DEFAULT: 'hsl(0, 70%, 50%)',
+        //     foreground: 'white',
+        //   },
+        //   warning: {
+        //     DEFAULT: 'hsl(30, 70%, 50%)',
+        //     foreground: 'white',
+        //   },
       },
     },
 
@@ -106,26 +107,26 @@ export default heroui({
         },
       },
       colors: {
-        background: 'hsl(0, 0%, 0%)',
-        foreground: 'hsl(0, 0%, 95%)',
-        divider: 'hsl(0, 0%, 30%)',
-        focus: 'hsl(200, 95%, 10%)',
-        content1: 'hsl(0, 0%, 5%)',
-        content2: 'hsl(0, 0%, 10%)',
-        content3: 'hsl(0, 0%, 15%)',
+        //   // background: 'hsl(0, 0%, 0%)',
+        //   // foreground: 'hsl(0, 0%, 95%)',
+        //   // divider: 'hsl(0, 0%, 30%)',
+        //   // focus: 'hsl(200, 95%, 10%)',
+        //   // content1: 'hsl(0, 0%, 5%)',
+        //   // content2: 'hsl(0, 0%, 10%)',
+        //   // content3: 'hsl(0, 0%, 15%)',
         primary: {
           DEFAULT: 'hsl(212, 100%, 47%)',
           foreground: 'white',
         },
-        success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'white' },
-        danger: {
-          DEFAULT: 'hsl(0, 60%, 60%)',
-          foreground: 'black',
-        },
-        warning: {
-          DEFAULT: 'hsl(60, 60%, 60%)',
-          foreground: 'black',
-        },
+        //   success: { DEFAULT: 'hsl(120, 60%, 60%)', foreground: 'white' },
+        //   danger: {
+        //     DEFAULT: 'hsl(0, 60%, 60%)',
+        //     foreground: 'black',
+        //   },
+        //   warning: {
+        //     DEFAULT: 'hsl(60, 60%, 60%)',
+        //     foreground: 'black',
+        //   },
       },
     },
   },

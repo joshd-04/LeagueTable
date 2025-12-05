@@ -2,12 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import User from '../../models/userModel';
 import { ErrorHandling } from '../../util/errorChecking';
 import bcrypt from 'bcrypt';
-import { generateJWTToken } from '../../util/helpers';
+import { generateJWTToken, readDotenv } from '../../util/helpers';
+import jwt from 'jsonwebtoken';
 
 interface LoginReqBody {
   username: string | null;
   email: string | null;
   password: string;
+  rememberMe?: boolean;
 }
 
 export async function loginController(
@@ -21,7 +23,12 @@ export async function loginController(
       Note: we don't want to send specific reasons why the login was rejected as this increases security risks
   */
   try {
-    const { username, email, password }: LoginReqBody = req.body;
+    const {
+      username,
+      email,
+      password,
+      rememberMe = false,
+    }: LoginReqBody = req.body;
     // Username should be given. Or email should be given. Not neither. Not both.
     if (
       (username === null && email === null) ||
@@ -51,13 +58,21 @@ export async function loginController(
     if (passwordsMatch) {
       const userId: any = user._id;
 
-      const token = generateJWTToken({ userId: userId }, next);
+      const jwtOptions: jwt.SignOptions = {
+        expiresIn: rememberMe ? '14d' : '30m',
+      };
+
+      const token = generateJWTToken(
+        { userId: userId, rememberMe: rememberMe },
+        jwtOptions,
+        next
+      );
       res.cookie('token', token, {
         path: '/',
         httpOnly: true,
-        // secure: true, // true in production (HTTPS)
+        secure: readDotenv('ENVIRONMENT') === 'PRODUCTION', // true in production (HTTPS)
         sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: rememberMe ? 14 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000, // 14 days or 30min
       });
       res.status(200).json({
         status: 'success',

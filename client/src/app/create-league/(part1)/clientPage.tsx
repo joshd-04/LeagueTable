@@ -23,7 +23,7 @@ export default function ClientPage() {
         {/* <Heading1>Create A League</Heading1>
         <Subtitle
           style={{ marginTop: '-10px' }}
-          className="opacity-80 dark:opacity-70"
+          className="text-muted text-foreground"
         >
           League Setup - Part 1 of 3
         </Subtitle> */}
@@ -56,12 +56,12 @@ function ExtraInfo() {
               League type
             </p>
           </span>
-          <p className="opacity-80 dark:opacity-70 text-sm">
+          <p className="text-muted text-sm">
             Basic leagues are simplified for a more streamlined experience.
             Advanced leagues contain more features & stats. <br /> Currently
             advanced leagues offer:
           </p>
-          <ul className="list-disc pl-[20px] opacity-80 dark:opacity-70 text-sm">
+          <ul className="list-disc pl-[20px] text-muted text-sm">
             <li className="">
               <p>Goal scorers</p>
             </li>

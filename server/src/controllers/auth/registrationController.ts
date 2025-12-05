@@ -4,6 +4,7 @@ import { ErrorHandling } from '../../util/errorChecking';
 import bcrypt from 'bcrypt';
 import { generateJWTToken } from '../../util/helpers';
 import validator from 'validator';
+import jwt from 'jsonwebtoken';
 
 interface RegisterReqBody {
   email: string;
@@ -128,13 +129,18 @@ export async function registrationController(
     });
 
     // Send success response and log user in
+    const jwtOptions: jwt.SignOptions = { expiresIn: '30m' };
 
-    const token = generateJWTToken({ userId: user._id }, next);
+    const token = generateJWTToken(
+      { userId: user._id, rememberMe: false },
+      jwtOptions,
+      next
+    );
     res.cookie('token', token, {
       httpOnly: true,
       // secure: true, // true in production (HTTPS)
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 30 * 60 * 1000, // 30min
     });
     res.status(201).json({
       status: 'success',

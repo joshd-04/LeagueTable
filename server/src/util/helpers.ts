@@ -93,6 +93,26 @@ export function protectedRoute(
         return;
       }
 
+      // Send re-newed token
+      const rememberMe = Boolean(payload.rememberMe) || false;
+      console.log(payload.userId, rememberMe);
+      const jwtOptions: jwt.SignOptions = {
+        expiresIn: rememberMe ? '14d' : '30m',
+      };
+
+      const newToken = generateJWTToken(
+        { userId: payload.userId },
+        jwtOptions,
+        next
+      );
+      res.cookie('token', newToken, {
+        path: '/',
+        httpOnly: true,
+        secure: readDotenv('ENVIRONMENT') === 'PRODUCTION', // true in production (HTTPS)
+        sameSite: 'lax',
+        maxAge: rememberMe ? 14 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000, // 14 days or 30min
+      });
+
       // Put user's id on the req.body for convenience for later use
       req.body.userId = payload.userId;
       next();
@@ -325,7 +345,11 @@ Array.prototype.rotateRight = function <T>(this: T[], n = 1): T[] {
   return this.slice(-n).concat(this.slice(0, -n));
 };
 
-export function generateJWTToken(payload: any, nextFn: NextFunction) {
+export function generateJWTToken(
+  payload: any,
+  options: jwt.SignOptions,
+  nextFn: NextFunction
+) {
   const SECRET_KEY = readDotenv('JWT_SECRET_KEY');
   if (!SECRET_KEY) {
     nextFn(
@@ -338,7 +362,7 @@ export function generateJWTToken(payload: any, nextFn: NextFunction) {
     return;
   }
 
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '7d' });
+  const token = jwt.sign(payload, SECRET_KEY, options);
   return token;
 }
 

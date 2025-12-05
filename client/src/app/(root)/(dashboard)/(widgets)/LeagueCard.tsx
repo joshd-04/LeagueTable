@@ -45,10 +45,16 @@ export default function LeagueCard({
 
   const doesUserOwnThisLeague = user?.username === league.owner.name;
 
+  const isSetupIncomplete = league.actions && league.actions.length > 0;
+
   return (
     <Card
-      className={`px-[12px] py-[8px]  hover:cursor-pointer hover:bg-content2 ${
+      className={`px-[12px] py-[8px]  hover:cursor-pointer ${
         !isHoveringOuterPanel ? 'data-[pressed=true]:scale-100' : ''
+      } ${
+        isSetupIncomplete && doesUserOwnThisLeague
+          ? 'outline-2 outline-warning dark:outline-transparent dark:outline-0'
+          : ''
       }`}
       onMouseEnter={() => setIsHoveringOuterPanel(true)}
       onMouseLeave={() => setIsHoveringOuterPanel(false)}
@@ -87,14 +93,16 @@ export default function LeagueCard({
           {league.leagueLevel === 'pro+' && <ProPlusChip />}
         </div>
       </CardHeader>
-      <CardBody className="flex flex-row justify-between items-end w-full transition-all duration-250">
+      <CardBody className="flex flex-row justify-between items-end w-full transition-all duration-150">
         <div className="flex flex-col w-full justify-start items-start text-sm">
-          {league.actions && league.actions.length > 0 ? (
+          {isSetupIncomplete ? (
             doesUserOwnThisLeague ? (
-              <span className="flex flex-row items-center gap-1">
-                <IoWarning className="w-5 h-5 text-warning" />
+              <span className="flex flex-row items-center gap-1 rounded-md">
+                <IoWarning className="w-5 h-5 dark:text-warning" />
 
-                <p className="text-warning">Action required</p>
+                <p className="dark:text-warning transition-none">
+                  Action required
+                </p>
               </span>
             ) : (
               <span className="text-muted">League not ready yet</span>

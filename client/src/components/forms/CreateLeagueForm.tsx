@@ -119,7 +119,7 @@ export default function CreateLeagueForm() {
             fullWidth
             onFocus={() => setIsError(false)}
             description={
-              <span className="opacity-80 dark:opacity-70">
+              <span className="text-muted text-foreground">
                 Visible to others
               </span>
             }
@@ -147,9 +147,13 @@ export default function CreateLeagueForm() {
             onValueChange={setLeagueType}
             size="sm"
             name="leagueType"
-            label={<span className="text-sm">League Type</span>}
+            label={
+              <span className="text-sm text-foreground text-muted">
+                League Type
+              </span>
+            }
             description={
-              <span className="opacity-80 dark:opacity-70">
+              <span className="text-foreground text-muted">
                 League type cannot be changed after creation.
               </span>
             }
@@ -158,7 +162,7 @@ export default function CreateLeagueForm() {
             <CustomRadio
               title={'Basic'}
               description={
-                <span className="opacity-80 dark:opacity-70 text-xs">
+                <span className="text-muted text-xs">
                   Simple, streamlined experience
                 </span>
               }
@@ -168,7 +172,7 @@ export default function CreateLeagueForm() {
             <CustomRadio
               title={'Advanced'}
               description={
-                <span className="opacity-80 dark:opacity-70 text-xs">
+                <span className="text-muted text-foreground text-xs">
                   Includes goals & assists tracking
                 </span>
               }
