@@ -39,7 +39,7 @@ export async function setAnnouncementController(
       );
     }
 
-    if (!league.leagueOwner._id.equals(req.body.userId)) {
+    if (!league.leagueOwner._id.equals(req.session.user?._id)) {
       return next(
         new ErrorHandling(403, {
           message: `You cannot edit this league`,

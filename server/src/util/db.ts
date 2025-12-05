@@ -1,10 +1,7 @@
 import mongoose from 'mongoose';
-import { readDotenv } from './helpers';
+import { database_name } from '../config';
 
-const database_password = readDotenv('DB_PASSWORD');
-const environment = readDotenv('ENVIRONMENT');
-
-const database_name = environment === 'PRODUCTION' ? 'app_prod' : 'app_dev';
+const database_password = process.env.DB_PASSWORD;
 
 const MONGO_URI = `mongodb+srv://leaguetableowner:${database_password}@cluster0.cea3t.mongodb.net/${database_name}`;
 

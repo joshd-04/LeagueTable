@@ -23,7 +23,7 @@ export async function startNextSeasonController(
     5. Generate fixtures
   */
   try {
-    const userId: string = req.body.userId;
+    const userId = req.session.user?._id;
     // 1. Ensure the league exists and the user is the owner
     // Make sure the user owns the specified league
     const leagueId = req.params.id;

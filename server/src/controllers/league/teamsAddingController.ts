@@ -16,7 +16,7 @@ export async function teamsAddingController(
 
   
   */
-  const userId: string = req.body.userId;
+  const userId = req.session.user?._id;
   // Make sure the user owns the specified league
   const leagueId = req.params.id;
   let league: ILeagueSchema | null;

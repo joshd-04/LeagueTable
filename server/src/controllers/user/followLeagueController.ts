@@ -9,7 +9,7 @@ export async function followLeagueController(
   res: Response,
   next: NextFunction
 ) {
-  const userId = req.body.userId;
+  const userId = req.session.user?._id;
   const { leagueId } = req.body;
   try {
     // Check if leagueId passed, is in valid format

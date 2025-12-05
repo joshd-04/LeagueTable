@@ -26,7 +26,7 @@ export async function turnFixtureIntoResult(
   
         Note: there is a separate endpoint to add teams to the league
     */
-  const userId = req.body.userId;
+  const userId = req.session.user?._id;
   try {
     const fixtureId = req.body.fixtureId;
     const basicOutcome: ('home' | 'away')[] = req.body.basicOutcome;

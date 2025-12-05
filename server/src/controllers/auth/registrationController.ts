@@ -2,9 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import User from '../../models/userModel';
 import { ErrorHandling } from '../../util/errorChecking';
 import bcrypt from 'bcrypt';
-import { generateJWTToken } from '../../util/helpers';
 import validator from 'validator';
-import jwt from 'jsonwebtoken';
 
 interface RegisterReqBody {
   email: string;
@@ -128,20 +126,29 @@ export async function registrationController(
       followedLeagues: [],
     });
 
-    // Send success response and log user in
-    const jwtOptions: jwt.SignOptions = { expiresIn: '30m' };
+    // Create session
+    const rememberMe = true;
+    req.session.user = {
+      _id: user._id as string,
+      username: user.username,
+      email: user.email,
+    };
 
-    const token = generateJWTToken(
-      { userId: user._id, rememberMe: false },
-      jwtOptions,
-      next
-    );
-    res.cookie('token', token, {
-      httpOnly: true,
-      // secure: true, // true in production (HTTPS)
-      sameSite: 'lax',
-      maxAge: 30 * 60 * 1000, // 30min
-    });
+    // Store timestamps for sliding + absolute expiration
+    const now = Date.now();
+    req.session.createdAt = now;
+    req.session.lastActivity = now;
+
+    req.session.absoluteSessionAgeLimit = rememberMe
+      ? 60 * 24 * 60 * 60 * 1000 // 60 days
+      : 8 * 60 * 60 * 1000; // 8 hours
+
+    // Set cookie maxAge accordingly
+    req.session.cookie.maxAge = rememberMe
+      ? 60 * 24 * 60 * 60 * 1000 // 60 days
+      : 8 * 60 * 60 * 1000; // 8 hours
+
+    req.session.save();
     res.status(201).json({
       status: 'success',
       data: { message: 'Successfully registered and logged in.' },

@@ -11,7 +11,7 @@ export async function myAssociatedLeaguesFetcherController(
   /* Args: none
     Returns: list of league ids and minimal league info
   */
-  const userId: string = req.body.userId;
+  const userId = req.session.user?._id;
   // For now, there is no favouriting or bookmarking functionality.
   // So just return the user's created leagues
 

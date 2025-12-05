@@ -7,18 +7,13 @@ export function signOutController(
   next: NextFunction
 ) {
   try {
-    res
-      .clearCookie('token', {
-        path: '/',
-        httpOnly: true,
-        // secure: true, // true in production (HTTPS)
-        sameSite: 'lax',
-      })
-      .status(200)
-      .json({
+    req.session.destroy(() => {
+      res.clearCookie('leaguex.sid');
+      res.json({
         status: 'success',
         data: { message: 'Successfully signed out' },
       });
+    });
   } catch (e: any) {
     next(new ErrorHandling(500, undefined, e.message));
   }

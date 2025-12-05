@@ -6,11 +6,7 @@ import {
   registrationController,
   signOutController,
 } from './controllers/auth';
-import {
-  enforceRequiredFields,
-  protectedRoute,
-  RequiredFields,
-} from './util/helpers';
+import { enforceRequiredFields, RequiredFields } from './util/helpers';
 import connectDB from './util/db';
 import {
   calculateSeasonStatsController,
@@ -43,6 +39,14 @@ import {
 import morgan from 'morgan';
 import { getResultByIdController } from './controllers/league/getResultByIdController';
 import { BACKEND_PORT, FRONTEND_URL } from './config';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
+import { sessionStore } from './util/sessionStore';
+import { requireAuth } from './middleware/authRequired';
+import dotenv from 'dotenv';
+import sessionAbsoluteExpirationMiddleware from './middleware/sessionAbsoluteExpirationMiddleware';
+
+dotenv.config();
 
 connectDB();
 
@@ -75,6 +79,27 @@ app.use(
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
+
+// Session authentication
+app.use(
+  session({
+    name: 'leaguex.sid',
+    secret: process.env.SESSION_SECRET!, // strong random string
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore as any,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 60 * 1000, // 30 minutes sliding window
+    },
+    rolling: true, // enables sliding expiration
+  })
+);
+
+app.use(sessionAbsoluteExpirationMiddleware);
+
 app.options('*', cors());
 
 // Routes
@@ -87,13 +112,13 @@ app.options('*', cors());
 // Auth
 app.post('/api/register', enforceRequiredFields, registrationController);
 app.post('/api/login', enforceRequiredFields, loginController);
-app.get('/api/signout', protectedRoute, signOutController);
-app.get('/api/me', protectedRoute, getMyAccountController);
+app.get('/api/signout', requireAuth, signOutController);
+app.get('/api/me', requireAuth, getMyAccountController);
 
 // League endpoints
 app.post(
   '/api/leagues',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   leagueCreationController
 );
@@ -101,13 +126,13 @@ app.post(
 // Gets all league id's with minimal info that are associated with you e.g. yours or favorites etc
 app.get(
   '/api/leagues/associated',
-  protectedRoute,
+  requireAuth,
   myAssociatedLeaguesFetcherController
 );
 app.get('/api/leagues/:id/announcement', getAnnouncementController);
 app.patch(
   '/api/leagues/:id/announcement',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   setAnnouncementController
 );
@@ -115,27 +140,27 @@ app.get('/api/leagues/:id', leagueFetcherController);
 
 app.post(
   '/api/leagues/:id/tables',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   tablesAddingController
 );
 
 app.post(
   '/api/leagues/:id/teams',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   teamsAddingController
 );
 
 app.post(
   '/api/leagues/:id/start-next-season',
-  protectedRoute,
+  requireAuth,
   startNextSeasonController
 );
 
 app.post(
   '/api/leagues/:id/start-next-matchweek',
-  protectedRoute,
+  requireAuth,
   startNextMatchweek
 );
 
@@ -161,7 +186,7 @@ app.get(
 
 app.post(
   '/api/result',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   turnFixtureIntoResult
 );
@@ -169,28 +194,28 @@ app.post(
 // User endpoints
 app.patch(
   '/api/users/favorites',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   favoriteLeagueController
 );
 
 app.delete(
   '/api/users/favorites',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   unfavoriteLeagueController
 );
 
 app.patch(
   '/api/users/following',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   followLeagueController
 );
 
 app.delete(
   '/api/users/following',
-  protectedRoute,
+  requireAuth,
   enforceRequiredFields,
   unfollowLeagueController
 );

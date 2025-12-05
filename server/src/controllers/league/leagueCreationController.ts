@@ -25,7 +25,7 @@ export async function leagueCreationController(
       Note: there is a separate endpoint to add tables (then teams) to the league
   */
   try {
-    const userId: string = req.body.userId;
+    const userId = req.session.user?._id;
 
     const user = await User.findById(userId);
     if (!user) {

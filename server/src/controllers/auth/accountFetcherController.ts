@@ -9,7 +9,7 @@ export async function getMyAccountController(
   next: NextFunction
 ) {
   try {
-    const userId = req.body.userId;
+    const userId = req.session.user?._id;
     const user: IUserSchema | null = await User.findById(userId);
 
     if (!user) {

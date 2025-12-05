@@ -1,5 +1,3 @@
-import { readDotenv } from './helpers';
-
 export class ErrorHandling extends Error {
   statusCode: number;
   status: 'fail' | 'error';
@@ -27,7 +25,8 @@ export class ErrorHandling extends Error {
     }
 
     // If in production and server side error occured, don't send error details in the message.
-    if (readDotenv('ENVIRONMENT') == 'PRODUCTION' && this.status === 'error') {
+    const environment = process.env.ENVIRONMENT;
+    if (environment == 'PRODUCTION' && this.status === 'error') {
       this.message =
         'An unexpected error occured on the server. Try again later.';
     }

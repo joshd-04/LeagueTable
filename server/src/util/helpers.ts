@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import dotenv from 'dotenv';
 import { ErrorHandling } from './errorChecking';
 import jwt from 'jsonwebtoken';
 import { requiredFields as rF } from '..';
@@ -12,7 +11,6 @@ import {
 } from './definitions';
 import { Types } from 'mongoose';
 import Fixture from '../models/fixtureModel';
-import { isDeepStrictEqual } from 'util';
 import League from '../models/leagueModel';
 
 export type RequiredFields = { [key: string]: string[] };
@@ -40,100 +38,6 @@ export function enforceRequiredFields(
 
     next(new ErrorHandling(400, Object.fromEntries(messages.entries())));
   } else next();
-}
-
-export function readDotenv(variableName: string) {
-  dotenv.config();
-
-  return process.env[variableName];
-}
-
-export function protectedRoute(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const token = req.cookies.token;
-
-    if (!token) {
-      next(
-        new ErrorHandling(401, { message: 'Not authenticated. Please log in.' })
-      );
-      return;
-    }
-    const SECRET_KEY = readDotenv('JWT_SECRET_KEY');
-    if (!SECRET_KEY) {
-      next(
-        new ErrorHandling(
-          500,
-          undefined,
-          'No JWT_SECRET_KEY environment variable found for JWT signature'
-        )
-      );
-      return;
-    }
-
-    try {
-      const payload = jwt.verify(token, SECRET_KEY);
-      if (typeof payload === 'string') throw new Error();
-      const iat = payload.iat;
-      const exp = payload.exp;
-
-      if (!iat || !exp) throw new Error();
-
-      const expiresIn = new Date(exp * 1000);
-
-      if (expiresIn < new Date()) {
-        next(
-          new ErrorHandling(401, {
-            message: 'Your session has expired. Please log in again.',
-          })
-        );
-        return;
-      }
-
-      // Send re-newed token
-      const rememberMe = Boolean(payload.rememberMe) || false;
-      console.log(payload.userId, rememberMe);
-      const jwtOptions: jwt.SignOptions = {
-        expiresIn: rememberMe ? '14d' : '30m',
-      };
-
-      const newToken = generateJWTToken(
-        { userId: payload.userId },
-        jwtOptions,
-        next
-      );
-      res.cookie('token', newToken, {
-        path: '/',
-        httpOnly: true,
-        secure: readDotenv('ENVIRONMENT') === 'PRODUCTION', // true in production (HTTPS)
-        sameSite: 'lax',
-        maxAge: rememberMe ? 14 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000, // 14 days or 30min
-      });
-
-      // Put user's id on the req.body for convenience for later use
-      req.body.userId = payload.userId;
-      next();
-    } catch {
-      next(
-        new ErrorHandling(401, {
-          message: 'Not authenticated. Please log in.',
-        })
-      );
-      return;
-    }
-  } catch (e: any) {
-    console.error(e);
-    return next(
-      new ErrorHandling(
-        500,
-        undefined,
-        'Unexpected error occured during the verification of your JWT Token.'
-      )
-    );
-  }
 }
 
 export function calculateTeamPoints(team: ITeamsSchema) {
@@ -344,27 +248,6 @@ declare global {
 Array.prototype.rotateRight = function <T>(this: T[], n = 1): T[] {
   return this.slice(-n).concat(this.slice(0, -n));
 };
-
-export function generateJWTToken(
-  payload: any,
-  options: jwt.SignOptions,
-  nextFn: NextFunction
-) {
-  const SECRET_KEY = readDotenv('JWT_SECRET_KEY');
-  if (!SECRET_KEY) {
-    nextFn(
-      new ErrorHandling(
-        500,
-        undefined,
-        'No JWT_SECRET_KEY environment variable found for JWT signature'
-      )
-    );
-    return;
-  }
-
-  const token = jwt.sign(payload, SECRET_KEY, options);
-  return token;
-}
 
 export async function findLeaguePosition(
   league: ILeagueSchema,

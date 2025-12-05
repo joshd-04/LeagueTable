@@ -9,7 +9,17 @@ import AddTeams from './addTeams';
 // @ts-expect-error idk
 export default async function Page({ params }) {
   const cookieStore = await cookies();
-  if (!cookieStore.has('token')) return redirect('/login');
+  const meResponse = await fetchAPI(`${API_URL}/me`, {
+    method: 'GET',
+    headers: {
+      Cookie: cookieStore.toString(), // pass request cookies
+    },
+    cache: 'no-store', // optional: prevent caching
+  });
+
+  if (meResponse.status !== 'success') {
+    return redirect('/login');
+  }
   const { leagueId }: { leagueId: string } = await params;
   const response = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {
     method: 'GET',
