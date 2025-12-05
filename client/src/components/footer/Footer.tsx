@@ -5,15 +5,14 @@ import { Button, Input, Link } from '@heroui/react';
 export default function Footer() {
   return (
     <footer className="w-full  bg-default/40 flex flex-col">
-      <div className="mx-auto max-w-7xl px-6 pt-16 pb-8 sm:pt-24 lg:px-8 lg:pt-32">
+      <div className="mx-auto max-w-7xl xl:w-7xl px-6 pt-16 pb-8 sm:pt-24 lg:px-8 lg:pt-32">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 md:pr-8">
             <div className="flex items-center justify-start">
               <LogoFull className="fill-foreground h-6" />
             </div>
             <p className="text-small text-default-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque
-              elit, tristique
+              Modern shareable leagues at your fingertips.
             </p>
             <div className="flex space-x-6">
               {/* Social media icons here */}
@@ -45,7 +44,7 @@ export default function Footer() {
         </div>
         <div className="flex flex-wrap justify-between gap-2 pt-8">
           <p className="text-small text-default-400">
-            © 2024 Acme Inc. All rights reserved.
+            © {new Date().getFullYear()} LeagueX. All rights reserved.
           </p>
         </div>
       </div>
@@ -107,7 +106,7 @@ function LinkGrid() {
               <li>
                 <Link
                   className="text-default-400 cursor-pointer text-small"
-                  href="#"
+                  href="/pricing"
                 >
                   Pricing Plans
                 </Link>

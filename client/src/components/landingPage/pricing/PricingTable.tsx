@@ -10,6 +10,8 @@ import {
   Tooltip,
 } from '@heroui/react';
 import { calculatePrice } from '@/util/helpers';
+import { FaCheck } from 'react-icons/fa6';
+import { RxCross1 } from 'react-icons/rx';
 
 // Types
 type CellContentType = 'check' | 'cross' | 'text';
@@ -425,41 +427,43 @@ const defaultPricingData: PricingData = {
 
 // Icon Components
 const CheckIcon = ({ className = '' }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={` ${className}`}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-  >
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="m6 12l4.243 4.243l8.484-8.486"
-    />
-  </svg>
+  // <svg
+  //   xmlns="http://www.w3.org/2000/svg"
+  //   className={` ${className}`}
+  //   width="24"
+  //   height="24"
+  //   viewBox="0 0 24 24"
+  // >
+  //   <path
+  //     fill="none"
+  //     stroke="currentColor"
+  //     strokeLinecap="round"
+  //     strokeLinejoin="round"
+  //     strokeWidth="2"
+  //     d="m6 12l4.243 4.243l8.484-8.486"
+  //   />
+  // </svg>
+  <FaCheck className={`h-6 w-4 ${className}`} />
 );
 
 const CrossIcon = ({ className = '' }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={` ${className}`}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-  >
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="m16 16l-4-4m0 0L8 8m4 4l4-4m-4 4l-4 4"
-    />
-  </svg>
+  // <svg
+  //   xmlns="http://www.w3.org/2000/svg"
+  //   className={` ${className}`}
+  //   width="24"
+  //   height="24"
+  //   viewBox="0 0 24 24"
+  // >
+  //   <path
+  //     fill="none"
+  //     stroke="currentColor"
+  //     strokeLinecap="round"
+  //     strokeLinejoin="round"
+  //     strokeWidth="2"
+  //     d="m16 16l-4-4m0 0L8 8m4 4l4-4m-4 4l-4 4"
+  //   />
+  // </svg>
+  <RxCross1 className={`stroke-1 h-6 w-4 ${className}`} />
 );
 
 const InfoIcon = () => (
@@ -638,7 +642,7 @@ const FeatureRow: React.FC<FeatureRowProps> = ({
       const roundedClass =
         isLastInCategory && plan.id === 'pro'
           ? 'before:rounded-b-medium'
-          : isLastInCategory && plan.id === 'team'
+          : isLastInCategory && plan.id === 'proplus'
           ? 'before:rounded-b-medium'
           : '';
 

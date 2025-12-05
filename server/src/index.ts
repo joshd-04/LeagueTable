@@ -1,48 +1,18 @@
 import { ErrorHandling } from './util/errorChecking';
 import express, { NextFunction, Request, Response } from 'express';
-import {
-  getMyAccountController,
-  loginController,
-  registrationController,
-  signOutController,
-} from './controllers/auth';
+
 import {
   enforceRequiredFields,
   protectedRoute,
   RequiredFields,
 } from './util/helpers';
 import connectDB from './util/db';
-import {
-  calculateSeasonStatsController,
-  calculateSeasonSummaryController,
-  getAnnouncementController,
-  getFixtureByIdController,
-  getFixtureResultStatusByIdController,
-  getFixturesController,
-  getHeadToHeadController,
-  getResultsController,
-  getTeamsController,
-  leagueCreationController,
-  leagueFetcherController,
-  myAssociatedLeaguesFetcherController,
-  setAnnouncementController,
-  startNextMatchweek,
-  startNextSeasonController,
-  tablesAddingController,
-  teamsAddingController,
-  turnFixtureIntoResult,
-} from './controllers/league';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import {
-  favoriteLeagueController,
-  followLeagueController,
-  unfavoriteLeagueController,
-  unfollowLeagueController,
-} from './controllers/user';
 import morgan from 'morgan';
-import { getResultByIdController } from './controllers/league/getResultByIdController';
 import { BACKEND_PORT, FRONTEND_URL } from './config';
+import { subscribeController } from './controllers/waitlist';
+import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 connectDB();
 
@@ -53,15 +23,7 @@ const port = BACKEND_PORT;
 // This object contains the REQUIRED fields to be sent by the client. If any required fields are absent, the request is rejected.
 
 export const requiredFields: RequiredFields = {
-  '/api/register': ['username', 'email', 'password'],
-  '/api/login': ['username', 'email', 'password'],
-  '/api/leagues': ['name', 'leagueType', 'divisionsCount'],
-  '/api/leagues/:id/tables': ['tables'],
-  '/api/leagues/:id/teams': ['teams'],
-  '/api/result': ['fixtureId', 'basicOutcome'],
-  '/api/users/favorites': ['leagueId'],
-  '/api/users/following': ['leagueId'],
-  '/api/leagues/:id/announcement': ['text'],
+  '/api/waitlist': ['email'],
 };
 
 // Middlewares
@@ -77,6 +39,29 @@ app.use(cookieParser());
 app.use(express.json());
 app.options('*', cors());
 
+const opts = {
+  points: 3, // 3 points
+  duration: 60, // Per 60 seconds
+};
+
+const rateLimiter = new RateLimiterMemory(opts);
+
+const rateLimit =
+  (limiter: RateLimiterMemory) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const rateLimiterRes = await limiter.consume(req.ip || 'unknown');
+      next();
+    } catch {
+      next(
+        new ErrorHandling(429, {
+          email: 'Too many requests.',
+        })
+      );
+      return;
+    }
+  };
+
 // Routes
 /* 
 - If a route requires a user to be signed in/requires a JWT, the first handler should be the protectedRoute middleware
@@ -84,115 +69,11 @@ app.options('*', cors());
 - If a route accepts JSON body data, enforce its required fields
 */
 
-// Auth
-app.post('/api/register', enforceRequiredFields, registrationController);
-app.post('/api/login', enforceRequiredFields, loginController);
-app.get('/api/signout', protectedRoute, signOutController);
-app.get('/api/me', protectedRoute, getMyAccountController);
-
-// League endpoints
 app.post(
-  '/api/leagues',
-  protectedRoute,
+  '/api/waitlist',
+  rateLimit(rateLimiter),
   enforceRequiredFields,
-  leagueCreationController
-);
-
-// Gets all league id's with minimal info that are associated with you e.g. yours or favorites etc
-app.get(
-  '/api/leagues/associated',
-  protectedRoute,
-  myAssociatedLeaguesFetcherController
-);
-app.get('/api/leagues/:id/announcement', getAnnouncementController);
-app.patch(
-  '/api/leagues/:id/announcement',
-  protectedRoute,
-  enforceRequiredFields,
-  setAnnouncementController
-);
-app.get('/api/leagues/:id', leagueFetcherController);
-
-app.post(
-  '/api/leagues/:id/tables',
-  protectedRoute,
-  enforceRequiredFields,
-  tablesAddingController
-);
-
-app.post(
-  '/api/leagues/:id/teams',
-  protectedRoute,
-  enforceRequiredFields,
-  teamsAddingController
-);
-
-app.post(
-  '/api/leagues/:id/start-next-season',
-  protectedRoute,
-  startNextSeasonController
-);
-
-app.post(
-  '/api/leagues/:id/start-next-matchweek',
-  protectedRoute,
-  startNextMatchweek
-);
-
-app.get('/api/leagues/:leagueId/fixtures/:fixtureId', getFixtureByIdController);
-app.get('/api/leagues/:id/fixtures', getFixturesController);
-
-app.get('/api/leagues/:leagueId/results/:resultId', getResultByIdController);
-app.get('/api/leagues/:id/results', getResultsController);
-
-app.get(
-  '/api/leagues/:id/season-summary-stats',
-  calculateSeasonSummaryController
-);
-
-app.get('/api/leagues/:id/stats', calculateSeasonStatsController);
-app.get('/api/leagues/:id/teams', getTeamsController);
-app.get('/api/leagues/:id/headtohead/:teamA/:teamB', getHeadToHeadController);
-
-app.get(
-  '/api/leagues/:leagueId/fixture-result-status/:matchId',
-  getFixtureResultStatusByIdController
-);
-
-app.post(
-  '/api/result',
-  protectedRoute,
-  enforceRequiredFields,
-  turnFixtureIntoResult
-);
-
-// User endpoints
-app.patch(
-  '/api/users/favorites',
-  protectedRoute,
-  enforceRequiredFields,
-  favoriteLeagueController
-);
-
-app.delete(
-  '/api/users/favorites',
-  protectedRoute,
-  enforceRequiredFields,
-  unfavoriteLeagueController
-);
-
-app.patch(
-  '/api/users/following',
-  protectedRoute,
-  enforceRequiredFields,
-  followLeagueController
-);
-
-app.delete(
-  '/api/users/following',
-  protectedRoute,
-  enforceRequiredFields,
-  unfollowLeagueController
+  subscribeController
 );
 
 /*

@@ -99,3 +99,12 @@ export interface IUserSchema extends Document {
   favoriteLeagues: [];
   followedLeagues: [];
 }
+
+export interface IWaitlistSchema extends Document {
+  email: string;
+  createdAt: Date;
+  status: 'subscribed' | 'unsubscribed';
+  updatedAt?: Date;
+  brevoContactId?: string;
+  unsubscribedAt?: Date;
+}

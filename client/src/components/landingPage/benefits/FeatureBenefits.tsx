@@ -25,6 +25,14 @@ export default function FeatureBenefits() {
       ],
     },
     {
+      category: 'Sharing',
+      title: 'Let others enjoy your league with you',
+      descriptions: [
+        'Share the league link with others to let them explore the league, its history, fixtures and stats themselves',
+        'Additionally you can download social media-ready formatted images to share various information',
+      ],
+    },
+    {
       category: 'Customization',
       title:
         'Make your league truly yours with custom banners, colors & settings',
@@ -41,14 +49,6 @@ export default function FeatureBenefits() {
       descriptions: [
         "Announce updates and messages to your league's followers.",
         "If you're following a league, you'll also recieve in-app notifications to keep updated with big events, such as rivalry results & league defining moments.",
-      ],
-    },
-    {
-      category: 'Sharing',
-      title: 'Let others enjoy your league with you',
-      descriptions: [
-        'Share the league link with others to let them explore the league, its history, fixtures and stats themselves',
-        'Additionally you can download social media-ready formatted images to share various information',
       ],
     },
   ];

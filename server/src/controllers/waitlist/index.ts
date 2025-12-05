@@ -1,0 +1,1 @@
+export { subscribeController } from './subscribeController';

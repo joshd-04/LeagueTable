@@ -1,13 +1,31 @@
 'use client';
-import { Button, Link } from '@heroui/react';
+import {
+  Button,
+  Form,
+  Input,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from '@heroui/react';
 
 import FadeInImage from './fadeInImage';
 import { FaArrowRight } from 'react-icons/fa';
 import BrowserMockup from '@/components/heroMockup/BrowserMockup';
-import { FaArrowDown } from 'react-icons/fa6';
+import { FaArrowDown, FaCheck } from 'react-icons/fa6';
 import { smoothScroll } from '@/util/helpers';
+import { useState } from 'react';
+import { isEmail } from 'validator';
+import { fetchAPI } from '@/util/api';
+import { API_URL } from '@/util/config';
+import { useMutation } from '@tanstack/react-query';
 
 export default function HeroSection() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   return (
     <div
       id="hero"
@@ -45,6 +63,7 @@ export default function HeroSection() {
               radius="full"
               color="primary"
               variant="shadow"
+              onPress={onOpen}
             >
               Join waitlist
             </Button>
@@ -80,6 +99,149 @@ export default function HeroSection() {
           className="invert dark:invert-0"
         />
       </div>
+      <WaitlistModal isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
+  );
+}
+
+function WaitlistModal({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+}) {
+  const [email, setEmail] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [serverErrors, setServerErrors] = useState<{ [key: string]: string }>(
+    {}
+  );
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: () =>
+      fetchAPI(`${API_URL}/waitlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      }),
+    onSuccess(response) {
+      if (response.status === 'fail') {
+        setServerErrors(response.data);
+      }
+    },
+    mutationKey: ['waitlist'],
+  });
+
+  async function handleSubmit(onClose: () => void) {
+    if (!email) return;
+    // If user hasnt responded to server errors:
+    if (Object.entries(serverErrors).length > 0) return;
+
+    const response = await mutateAsync();
+
+    if (response.status === 'success') {
+      setIsSuccess(true);
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+    }
+  }
+
+  function handleOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      setEmail('');
+      setServerErrors({});
+      setIsSuccess(false);
+    }
+    onOpenChange(isOpen);
+  }
+
+  return (
+    <Modal isOpen={isOpen} onOpenChange={handleOpenChange}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">
+              <h2>Be one of the first to join LeagueX</h2>
+              <p className="text-sm font-normal text-muted">
+                Get notified when we launch
+              </p>
+            </ModalHeader>
+            <ModalBody>
+              <Form
+                onSubmit={(e) => e.preventDefault()}
+                validationErrors={serverErrors}
+              >
+                <Input
+                  type="email"
+                  name="email"
+                  value={email}
+                  onValueChange={setEmail}
+                  labelPlacement="inside"
+                  label="Email"
+                  isRequired
+                  size="sm"
+                  errorMessage={(() => {
+                    if (email.length === 0) {
+                      return 'Please fill in this field.';
+                    } else if (!isEmail(email)) {
+                      return 'Please enter a valid email.';
+                    } else if (serverErrors.email) {
+                      return serverErrors.email;
+                    }
+                  })()}
+                  onChange={() => setServerErrors({})}
+                />
+              </Form>
+              <ul className="text-sm">
+                <li className="flex flex-row gap-2 items-center justify-start">
+                  <FaCheck
+                    className={`h-6 w-4 ${
+                      1 == 1 ? 'text-success' : 'text-primary'
+                    }`}
+                  />
+                  We won&apos;t spam your emails
+                </li>
+                <li className="flex flex-row gap-2 items-center justify-start">
+                  <FaCheck
+                    className={`h-6 w-4 ${
+                      1 == 1 ? 'text-success' : 'text-primary'
+                    }`}
+                  />
+                  We&apos;ll never share your email
+                </li>
+                <li className="flex flex-row gap-2 items-center justify-start">
+                  <FaCheck
+                    className={`h-6 w-4 ${
+                      1 == 1 ? 'text-success' : 'text-primary'
+                    }`}
+                  />
+                  Unsubscribe at anytime
+                </li>
+              </ul>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>
+                Close
+              </Button>
+              <Button
+                color={isSuccess ? 'success' : 'primary'}
+                onPress={() => handleSubmit(onClose)}
+                className="font-medium"
+                variant="shadow"
+                isLoading={isPending}
+                isDisabled={isSuccess}
+              >
+                {isSuccess ? 'Success' : 'Join waitlist'}
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 }
