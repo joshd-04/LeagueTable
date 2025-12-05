@@ -26,6 +26,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
+import ProChip from '../chips/ProChip';
+import ProPlusChip from '../chips/ProPlusChip';
 
 export default function NavBar() {
   type dropdownButtons = 'features' | 'use cases';
@@ -86,13 +88,15 @@ export default function NavBar() {
   }
 
   return (
-    <Navbar className="bg-transparent sticky w-full h-15">
+    <Navbar className={`bg-transparent sticky h-15`}>
       <NavbarBrand className="h-full py-[22px]">
         <Link
           href="/"
           className="text-inherit h-full flex flex-row gap-1 items-end"
         >
           <LogoFull className="fill-foreground h-full" />
+          {user?.accountType === 'pro' && <ProChip />}
+          {user?.accountType === 'pro+' && <ProPlusChip />}
           <p className="xl:text-red-500 lg:text-blue-500 md:text-green-500 sm:text-pink-500  before:content-['--'] sm:before:content-['sm'] md:before:content-['md'] lg:before:content-['lg'] xl:before:content-['xl']"></p>
         </Link>
       </NavbarBrand>

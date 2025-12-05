@@ -177,7 +177,7 @@ export default function LoginForm({
             isSelected={rememberMe}
             onValueChange={setRememberMe}
           >
-            <p className="text-sm">Remember me (does nothing)</p>
+            <p className="text-sm">Remember me</p>
           </Checkbox>
           <Button
             type="submit"

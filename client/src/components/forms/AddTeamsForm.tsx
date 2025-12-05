@@ -101,7 +101,7 @@ export default function AddTablesForm({
       } else {
         addToast({
           title: 'We ran into a problem',
-          description: 'Something went wrong on our end',
+          description: result.message,
           color: 'danger',
           shouldShowTimeoutProgress: true,
         });
