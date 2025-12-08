@@ -19,10 +19,12 @@ export async function getMyAccountController(
     res.status(200).json({
       status: 'success',
       data: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        accountType: user.accountType,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          accountType: user.accountType,
+        },
       },
     });
   } catch (e: any) {

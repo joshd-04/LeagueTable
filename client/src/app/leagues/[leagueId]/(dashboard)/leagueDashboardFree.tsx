@@ -1,8 +1,7 @@
 'use client';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { League } from '@/util/definitions';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Upgrade from './(dashboardWidgets)/upgrade';
 
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
@@ -18,23 +17,20 @@ import Controls from './(dashboardWidgets)/controls';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
 import Stats from './(dashboardWidgets)/stats';
+import { useParams } from 'next/navigation';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
-export default function LeagueDashboardFree({
-  initialLeague,
-}: {
-  initialLeague: League;
-}) {
-  const context = useContext(GlobalContext);
-  const { user } = context.account;
-  const { isLoggedIn } = useAccount();
+export default function LeagueDashboardFree() {
+  const { user, isLoggedIn } = useAccount();
+  const [league, setLeague] = useState<League | undefined>(undefined);
   const [divisionViewing, setDivisionViewing] = useState(1);
 
-  const [league, setLeague] = useState(initialLeague);
+  const { leagueId } = useParams();
+  const queryClient = useQueryClient();
 
   const { data: leagueQueryData, isLoading: leagueQueryIsLoading } = useQuery({
     queryFn: () =>
-      fetchAPI(`${API_URL}/leagues/${league._id}`, {
+      fetchAPI(`${API_URL}/leagues/${leagueId}`, {
         method: 'GET',
         credentials: 'include',
       }),
@@ -47,6 +43,26 @@ export default function LeagueDashboardFree({
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
 
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  function invalidateDashboardQueries() {
+    queryClient.invalidateQueries({ queryKey: ['league'] });
+    queryClient.invalidateQueries({ queryKey: ['fixtures'] });
+    queryClient.invalidateQueries({ queryKey: ['results'] });
+    queryClient.invalidateQueries({ queryKey: ['stats'] });
+    queryClient.invalidateQueries({ queryKey: ['seasonSummaryStats'] });
+    queryClient.invalidateQueries({ queryKey: ['table'] });
+  }
+  if (leagueQueryIsLoading) {
+    return <div>Loading... (x004)</div>;
+  }
+
+  if (league === undefined) {
+    return <div>League is undefined (x005)</div>;
+  }
+
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {
     if (user.id === league.leagueOwner._id) {
@@ -57,16 +73,6 @@ export default function LeagueDashboardFree({
   const teamsCount = league.tables.reduce((acc, cur) => {
     return acc + cur.numberOfTeams;
   }, 0);
-
-  const queryClient = useQueryClient();
-  function invalidateDashboardQueries() {
-    queryClient.invalidateQueries({ queryKey: ['league'] });
-    queryClient.invalidateQueries({ queryKey: ['fixtures'] });
-    queryClient.invalidateQueries({ queryKey: ['results'] });
-    queryClient.invalidateQueries({ queryKey: ['stats'] });
-    queryClient.invalidateQueries({ queryKey: ['seasonSummaryStats'] });
-    queryClient.invalidateQueries({ queryKey: ['table'] });
-  }
 
   return (
     <div className="flex flex-col gap-[20px]">

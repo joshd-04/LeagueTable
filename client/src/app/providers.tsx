@@ -7,6 +7,8 @@ import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import NavigationSync from '@/context/NavigationSync';
 
 export default function Providers({
   initialUser,
@@ -39,7 +41,9 @@ export default function Providers({
           >
             <NotificationContextProvider>
               <ToastProvider />
+              <NavigationSync />
               {children}
+              <ReactQueryDevtools initialIsOpen={false} />
             </NotificationContextProvider>
           </GlobalContextProvider>
         </TanstackQueryContextProvider>

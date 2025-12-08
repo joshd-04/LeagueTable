@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LuEye, LuEyeOff } from 'react-icons/lu';
 
 export default function LoginForm({
@@ -51,13 +51,16 @@ export default function LoginForm({
     });
   }
 
+  const queryClient = useQueryClient();
   const { mutateAsync: handleRequestMutation, isPending } = useMutation({
     mutationFn: handleSendRequest,
     onSuccess: (response) => {
       if (response.status === 'success') {
         setIsLoginSuccess(true);
+
         setTimeout(() => {
           router.push(callbackUrl);
+          queryClient.invalidateQueries({ queryKey: ['account-fetch'] });
         }, 300);
       } else if (response.status === 'fail') {
         setIsError(true);

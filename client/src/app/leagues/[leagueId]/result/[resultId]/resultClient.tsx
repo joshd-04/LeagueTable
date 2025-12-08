@@ -1,8 +1,6 @@
 'use client';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { League, Result } from '@/util/definitions';
-import { useContext } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
@@ -18,9 +16,7 @@ export default function ResultClient({
   league: League;
   result: Result;
 }) {
-  const context = useContext(GlobalContext);
-  const { user } = context.account;
-  const { isLoggedIn } = useAccount();
+  const { user, isLoggedIn } = useAccount();
 
   const homeGoals = result.basicOutcome.reduce(
     (acc, team) => (team === 'home' ? acc + 1 : acc),

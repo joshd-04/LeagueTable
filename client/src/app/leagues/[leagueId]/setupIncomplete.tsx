@@ -1,6 +1,5 @@
 'use client';
 
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -15,7 +14,6 @@ import {
   Link,
 } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
-import { useContext } from 'react';
 
 export default function SetupIncomplete({
   leagueId,
@@ -28,7 +26,8 @@ export default function SetupIncomplete({
   leagueOwner: string;
   property: 'teams' | 'tables';
 }) {
-  const { user } = useContext(GlobalContext).account;
+  // const { user } = useContext(GlobalContext).account;
+  const { user, isLoggedIn } = useAccount();
   const userOwnsThisLeague = user?.id === leagueOwner;
 
   /*
@@ -43,8 +42,6 @@ export default function SetupIncomplete({
   - do not show favorite buttons if not logged in
 
   */
-
-  const { isLoggedIn } = useAccount();
 
   if (userOwnsThisLeague) {
     return (

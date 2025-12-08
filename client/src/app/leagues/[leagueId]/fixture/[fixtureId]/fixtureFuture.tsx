@@ -1,6 +1,5 @@
 'use client';
 import { Fixture, League } from '@/util/definitions';
-import { useContext } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
@@ -8,7 +7,6 @@ import LinkButton from '@/components/text/LinkButton';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 
 export default function FixtureFuture({
@@ -18,9 +16,7 @@ export default function FixtureFuture({
   league: League;
   fixture: Fixture;
 }) {
-  const context = useContext(GlobalContext);
-  const { user } = context.account;
-  const { isLoggedIn } = useAccount();
+  const { user, isLoggedIn } = useAccount();
 
   let userOwnsThisLeague = false;
   if (isLoggedIn && user !== undefined && user !== null) {

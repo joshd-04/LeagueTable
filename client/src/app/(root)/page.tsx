@@ -1,40 +1,30 @@
-import Dashboard from './(dashboard)/dashboard';
 import { cookies } from 'next/headers';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { User } from '@/util/definitions';
-import LandingPage from './(landingPage)/landingPage';
+import ClientPageContent from './clientPageContent';
 
+/**
+ * Server Component - Handles routing decision ONLY.
+ *
+ * This does ONE /me check on initial page load to decide:
+ * - Should we render the authenticated app?
+ * - Or redirect/show landing page?
+ *
+ * After this, the CLIENT handles all auth state via TanStack Query.
+ */
 export default async function Home() {
   const cookieStore = await cookies();
   const response = await fetchAPI(`${API_URL}/me`, {
     method: 'GET',
     headers: {
-      Cookie: cookieStore.toString(), // pass request cookies
+      Cookie: cookieStore.toString(),
     },
-    cache: 'no-store', // optional: prevent caching
+    cache: 'no-store',
   });
 
-  let user: User | null;
-  let error: string = '';
+  const isLoggedIn = response.status === 'success' && response.data.user?._id;
 
-  if (response.status === 'success') {
-    user = {
-      id: response.data._id,
-      username: response.data.username,
-      email: response.data.email,
-      accountType: response.data.accountType,
-    };
-  } else if (response.status === 'fail') {
-    user = null;
-  } else {
-    user = null;
-    error = response.message;
-  }
-
-  const isLoggedIn = user !== undefined && user !== null;
-
-  if (isLoggedIn === false) {
-    return <LandingPage />;
-  } else return <Dashboard initialUser={user} initialError={error} />;
+  // Pass initial auth state to client
+  // Client will immediately sync this with TanStack Query
+  return <ClientPageContent initialIsLoggedIn={isLoggedIn} />;
 }

@@ -140,8 +140,8 @@ export default async function Page({
 
   // Render correct dashboard
   if (league.leagueLevel === 'pro' || league.leagueLevel === 'pro+') {
-    return <LeagueDashboardStandard initialLeague={league} />;
+    return <LeagueDashboardStandard />;
   }
 
-  return <LeagueDashboardFree initialLeague={league} />;
+  return <LeagueDashboardFree />;
 }

@@ -23,31 +23,35 @@ const roboto = Roboto({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const cookieStore = await cookies();
-  const response = await fetchAPI(`${API_URL}/me`, {
-    method: 'GET',
-    headers: {
-      Cookie: cookieStore.toString(), // pass request cookies
-    },
-    cache: 'no-store', // optional: prevent caching
-  });
+  try {
+    const cookieStore = await cookies();
+    const response = await fetchAPI(`${API_URL}/me`, {
+      method: 'GET',
+      headers: {
+        Cookie: cookieStore.toString(), // pass request cookies
+      },
+      cache: 'no-store', // optional: prevent caching
+    });
 
-  if (response.status === 'success') {
-    return {
-      title: `Home • ${WEBSITE_NAME}`,
-      description: `Your home page where you can view your leagues and create new ones.`,
-      icons: {
-        icon: { url: '/favicon.ico', sizes: 'any' }, // classic,
-      },
-    };
-  } else {
-    return {
-      title: `${WEBSITE_NAME}`,
-      description: `A simple to use, modern and sleek League/Table/Championship management website. Create & share your league with friends for free - ${WEBSITE_NAME}`,
-      icons: {
-        icon: { url: '/favicon.ico', sizes: 'any' }, // classic,
-      },
-    };
+    if (response.status === 'success') {
+      return {
+        title: `Home • ${WEBSITE_NAME}`,
+        description: `Your home page where you can view your leagues and create new ones.`,
+        icons: {
+          icon: { url: '/favicon.ico', sizes: 'any' }, // classic,
+        },
+      };
+    } else {
+      return {
+        title: `${WEBSITE_NAME} s`,
+        description: `A simple to use, modern and sleek League/Table/Championship management website. Create & share your league with friends for free - ${WEBSITE_NAME}`,
+        icons: {
+          icon: { url: '/favicon.ico', sizes: 'any' }, // classic,
+        },
+      };
+    }
+  } catch {
+    return { title: 'sa' };
   }
 }
 

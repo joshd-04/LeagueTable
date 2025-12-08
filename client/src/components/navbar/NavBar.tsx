@@ -15,15 +15,14 @@ import {
   NavbarItem,
   Switch,
 } from '@heroui/react';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import LogoFull from '@/assets/svg components/LogoFull';
 import { MdDarkMode, MdLightMode } from 'react-icons/md';
 import { FaChevronDown } from 'react-icons/fa6';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { usePathname, useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import ProChip from '../chips/ProChip';
@@ -62,8 +61,11 @@ export default function NavBar() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [clickedOpen]);
 
-  const { user, setUser } = useContext(GlobalContext).account;
-  const { isLoggedIn } = useAccount();
+  // const { user, setUser } = useContext(GlobalContext).account;
+  // const { isLoggedIn } = useAccount();
+
+  const { user, isUserFetchLoading, isLoggedIn, isSignedOut } = useAccount();
+
   const pathname = usePathname();
 
   const router = useRouter();
@@ -79,10 +81,11 @@ export default function NavBar() {
     enabled: false,
   });
 
+  const queryClient = useQueryClient();
   async function handleSignOut() {
     const response = await sendSignoutRequest();
     if (response.data.status === 'success') {
-      setUser(null);
+      queryClient.invalidateQueries({ queryKey: ['account-fetch'] });
       router.push('/login');
     }
   }
@@ -100,7 +103,7 @@ export default function NavBar() {
           <p className="xl:text-red-500 lg:text-blue-500 md:text-green-500 sm:text-pink-500  before:content-['--'] sm:before:content-['sm'] md:before:content-['md'] lg:before:content-['lg'] xl:before:content-['xl']"></p>
         </Link>
       </NavbarBrand>
-      {!isLoggedIn && pathname !== '/login' && (
+      {isSignedOut && pathname !== '/login' && (
         <NavbarContent className="hidden sm:flex gap-10 " justify="center">
           <Dropdown isOpen={getIsOpen('features')} showArrow>
             <NavbarItem>
@@ -234,7 +237,7 @@ export default function NavBar() {
           </Dropdown>
         </NavbarContent>
       )}
-      {!isLoggedIn ? (
+      {isSignedOut ? (
         // Signed out
         <NavbarContent justify="end">
           <NavbarItem>
@@ -264,90 +267,99 @@ export default function NavBar() {
           </NavbarItem>
         </NavbarContent>
       ) : (
-        // Signed in
-
-        <NavbarContent as="div" justify="end">
-          {pathname === '/' && (
+        isLoggedIn && (
+          // Signed in
+          <NavbarContent as="div" justify="end">
+            {pathname === '/' && (
+              <NavbarItem>
+                <Button
+                  as={Link}
+                  href="/create-league"
+                  color="primary"
+                  variant="shadow"
+                  className="font-semibold text-sm"
+                >
+                  <p>Create league</p>
+                </Button>
+              </NavbarItem>
+            )}
             <NavbarItem>
-              <Button
-                as={Link}
-                href="/create-league"
-                color="primary"
-                variant="shadow"
-                className="font-semibold text-sm"
-              >
-                <p>Create league</p>
-              </Button>
+              <ThemeSwitch />
             </NavbarItem>
-          )}
-          <NavbarItem>
-            <ThemeSwitch />
-          </NavbarItem>
-          <Dropdown placement="bottom-end" shouldBlockScroll={false}>
-            <DropdownTrigger>
-              <Avatar
-                isBordered
-                as="button"
-                className="transition-transform cursor-pointer"
-                color="primary"
-                name="Jason Hughes"
-                size="sm"
-                src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-              />
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Profile Actions"
-              variant="flat"
-              disabledKeys={['currentaccounttype']}
-            >
-              <DropdownSection showDivider>
-                <DropdownItem
-                  key="profile"
-                  className="h-14 gap-2"
-                  textValue="Profile"
-                >
-                  <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold">{user?.email}</p>
-                </DropdownItem>
-                <DropdownItem key="currentaccounttype" textValue="Account type">
-                  Account type: {user?.accountType}
-                </DropdownItem>
-                <DropdownItem
-                  key="upgradetopro"
-                  textValue="Upgrade to pro"
-                  onPress={() => {
-                    addToast({
-                      title: 'Functionality not added yet',
-                      description:
-                        'This button is for testing/debugging purposes.',
-                    });
-                  }}
-                >
-                  Upgrade to PRO
-                </DropdownItem>
-              </DropdownSection>
-              <DropdownSection showDivider>
-                <DropdownItem key="reportbug" textValue="Report a bug">
-                  Report a bug
-                </DropdownItem>
-              </DropdownSection>
-              <DropdownSection>
-                <DropdownItem key="settings" textValue="Settings">
-                  Settings
-                </DropdownItem>
+            <Dropdown placement="bottom-end" shouldBlockScroll={false}>
+              <DropdownTrigger>
+                <Avatar
+                  isBordered
+                  as="button"
+                  className="transition-transform cursor-pointer"
+                  color="primary"
+                  name="Jason Hughes"
+                  size="sm"
+                  src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                />
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Profile Actions"
+                variant="flat"
+                disabledKeys={['currentaccounttype']}
+              >
+                <DropdownSection showDivider>
+                  <DropdownItem
+                    key="profile"
+                    className="h-14 gap-2"
+                    textValue="Profile"
+                  >
+                    <p className="font-semibold">Signed in as</p>
+                    <p className="font-semibold">{user?.email}</p>
+                  </DropdownItem>
+                  <DropdownItem
+                    key="currentaccounttype"
+                    textValue="Account type"
+                  >
+                    Account type: {user?.accountType}
+                  </DropdownItem>
+                  <DropdownItem
+                    key="upgradetopro"
+                    textValue="Upgrade to pro"
+                    onPress={() => {
+                      addToast({
+                        title: 'Functionality not added yet',
+                        description:
+                          'This button is for testing/debugging purposes.',
+                      });
+                    }}
+                  >
+                    Upgrade to PRO
+                  </DropdownItem>
+                </DropdownSection>
+                <DropdownSection showDivider>
+                  <DropdownItem key="reportbug" textValue="Report a bug">
+                    Report a bug
+                  </DropdownItem>
+                </DropdownSection>
+                <DropdownSection>
+                  <DropdownItem key="settings" textValue="Settings">
+                    Settings
+                  </DropdownItem>
 
-                <DropdownItem
-                  key="logout"
-                  color="danger"
-                  textValue="Log Out"
-                  onPress={handleSignOut}
-                  className="text-danger"
-                >
-                  Log Out
-                </DropdownItem>
-              </DropdownSection>
-            </DropdownMenu>
-          </Dropdown>
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    textValue="Log Out"
+                    onPress={handleSignOut}
+                    className="text-danger"
+                  >
+                    Log Out
+                  </DropdownItem>
+                </DropdownSection>
+              </DropdownMenu>
+            </Dropdown>
+          </NavbarContent>
+        )
+      )}
+      {isUserFetchLoading && (
+        <NavbarContent>
+          <NavbarItem>Loading...</NavbarItem>
         </NavbarContent>
       )}
     </Navbar>

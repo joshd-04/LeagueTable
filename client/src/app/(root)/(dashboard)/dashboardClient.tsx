@@ -1,17 +1,9 @@
 'use client';
 import Heading3 from '@/components/text/Heading3';
 
-import { GlobalContext } from '@/context/GlobalContextProvider';
-import React, {
-  ReactNode,
-  Suspense,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { ReactNode, Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LeagueInterface } from './dashboard';
-import { User } from '@/util/definitions';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useQuery } from '@tanstack/react-query';
@@ -20,12 +12,16 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Chip,
   Link,
   Tab,
   Tabs,
 } from '@heroui/react';
 import LeagueCard from './(widgets)/LeagueCard';
+import useAccount from '@/hooks/useAccount';
+import { IoPersonSharp } from 'react-icons/io5';
+import DashboardSkeleton from './(widgets)/DashboardSkeleton';
 
 interface LeaguesInterface {
   created: LeagueInterface[];
@@ -34,23 +30,13 @@ interface LeaguesInterface {
 }
 
 export default function DashboardClient({
-  initialUser,
   initialError,
-  initialLeagues,
 }: {
-  initialUser: User | null;
   initialError: string;
-  initialLeagues: {
-    created: LeagueInterface[];
-    favorites: LeagueInterface[];
-    following: LeagueInterface[];
-  };
 }) {
-  const context = useContext(GlobalContext);
-  const { user, setUser } = context.account;
+  const { user } = useAccount();
 
   useEffect(() => {
-    setUser(initialUser);
     if (initialError) {
       addToast({
         title: 'We ran into a problem',
@@ -59,10 +45,13 @@ export default function DashboardClient({
         shouldShowTimeoutProgress: true,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialUser, initialError]);
+  }, [initialError]);
 
-  const [leagues, setLeagues] = useState<LeaguesInterface>(initialLeagues);
+  const [leagues, setLeagues] = useState<LeaguesInterface>({
+    created: [],
+    favorites: [],
+    following: [],
+  });
   const simplifiedLeagues = {
     created: leagues.created.map((l) => l._id),
     favorites: leagues.favorites.map((l) => l._id),
@@ -341,9 +330,7 @@ export default function DashboardClient({
         <div>
           {associatedLeaguesIsLoading ? (
             <>
-              <LeagueSectionSkeleton title="Favorite Leagues" />
-              <LeagueSectionSkeleton title="Your Leagues" />
-              <LeagueSectionSkeleton title="Bookmarked Leagues" />
+              <DashboardSkeleton />
             </>
           ) : (
             <>
@@ -471,19 +458,6 @@ export default function DashboardClient({
             </>
           )}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function LeagueSectionSkeleton({ title }: { title: string }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="text-base">{title}</p>
-      <div className=" animate-pulse">
-        <NoLeaguesFound>
-          <i>Loading...</i>
-        </NoLeaguesFound>
       </div>
     </div>
   );

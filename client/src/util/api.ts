@@ -20,7 +20,9 @@ export async function fetchAPI(
       ...options,
       signal: AbortSignal.timeout(8000),
     });
+
     const data = await response.json();
+
     return data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {

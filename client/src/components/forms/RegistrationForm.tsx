@@ -11,13 +11,11 @@ import {
   Link,
   Tooltip,
 } from '@heroui/react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
-import { GlobalContext } from '@/context/GlobalContextProvider';
-import { User } from '@/util/definitions';
 
 import { LuEye, LuEyeOff } from 'react-icons/lu';
 
@@ -35,9 +33,6 @@ export default function RegistrationForm() {
   const [serverErrors, setServerErrors] = useState<{ [key: string]: string }>(
     {}
   );
-
-  const globalContext = useContext(GlobalContext);
-  const setUser = globalContext.account.setUser;
 
   const router = useRouter();
 
@@ -68,13 +63,7 @@ export default function RegistrationForm() {
     onSuccess: (response) => {
       if (response.status === 'success') {
         setIsRegisterSuccess(true);
-        const user: User = {
-          id: response.data.userId,
-          username: response.data.username,
-          email: response.data.email,
-          accountType: response.data.accountType,
-        };
-        setUser(user);
+
         setTimeout(() => {
           router.push('/');
         }, 300);

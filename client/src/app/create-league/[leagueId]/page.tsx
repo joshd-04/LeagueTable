@@ -18,7 +18,7 @@ export default async function Page({ params }) {
   });
 
   if (meResponse.status !== 'success') {
-    return redirect('/login?');
+    return redirect('/login');
   }
   const { leagueId }: { leagueId: string } = await params;
   const response = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {

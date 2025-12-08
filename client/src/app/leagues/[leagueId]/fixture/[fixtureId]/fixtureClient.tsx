@@ -1,8 +1,7 @@
 'use client';
-import { GlobalContext } from '@/context/GlobalContextProvider';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
-import { useContext, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
@@ -24,9 +23,7 @@ export default function FixtureClient({
   league: League;
   fixture: Fixture;
 }) {
-  const context = useContext(GlobalContext);
-  const { user } = context.account;
-  const { isLoggedIn } = useAccount();
+  const { user, isLoggedIn } = useAccount();
 
   console.log(league.results.includes(fixture._id));
 

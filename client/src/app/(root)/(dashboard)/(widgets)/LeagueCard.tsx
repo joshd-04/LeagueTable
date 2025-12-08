@@ -1,6 +1,5 @@
 'use client';
-import { GlobalContext } from '@/context/GlobalContextProvider';
-import { Dispatch, SetStateAction, useContext, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { LeagueInterface } from '../dashboard';
 import { Card, CardBody, CardHeader, Chip } from '@heroui/react';
 import { IoPersonSharp, IoWarning } from 'react-icons/io5';
@@ -13,6 +12,7 @@ import {
   MdFavoriteBorder,
 } from 'react-icons/md';
 import { motion } from 'motion/react';
+import useAccount from '@/hooks/useAccount';
 
 interface LeagueCardProps {
   simplifiedLeagues: {
@@ -41,7 +41,7 @@ export default function LeagueCard({
   const isFavorited = simplifiedLeagues.favorites.includes(league._id);
   const isFollowing = simplifiedLeagues.following.includes(league._id);
 
-  const { user } = useContext(GlobalContext).account;
+  const { user } = useAccount();
 
   const doesUserOwnThisLeague = user?.username === league.owner.name;
 
