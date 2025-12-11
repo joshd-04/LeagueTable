@@ -37,7 +37,7 @@ export default function ResultClient({
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <LeagueBanner league={league}>
+      <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%] w-max">
           <div
             className={`w-full ${

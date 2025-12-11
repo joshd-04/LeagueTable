@@ -80,7 +80,7 @@ export default function FixturesClient({
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <LeagueBanner league={league}>
+      <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <Heading1>Fixtures</Heading1>
         </div>

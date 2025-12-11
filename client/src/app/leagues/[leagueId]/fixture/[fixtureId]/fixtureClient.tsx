@@ -1,7 +1,7 @@
 'use client';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
@@ -87,7 +87,7 @@ export default function FixtureClient({
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <LeagueBanner league={league}>
+      <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <div
             className={`w-full ${
