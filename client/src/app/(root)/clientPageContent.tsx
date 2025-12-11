@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import useAccount from '@/hooks/useAccount';
 import LandingPage from './(landingPage)/landingPage';
 import DashboardClient from './(dashboard)/dashboardClient';
+import { Spinner } from '@heroui/react';
 /**
  * Client component that renders based on CURRENT auth state.
  *
@@ -42,8 +43,8 @@ export default function ClientPageContent({
   // Show loading only on very first load if needed
   if (isUserFetchLoading && isLoggedIn === false && isSignedOut === false) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div>Loading...</div>
+      <div className="flex items-center justify-center min-h-[90vh]">
+        <Spinner variant="wave" />
       </div>
     );
   }

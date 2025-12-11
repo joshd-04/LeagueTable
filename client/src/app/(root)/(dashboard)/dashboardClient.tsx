@@ -12,7 +12,6 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Chip,
   Link,
   Tab,
@@ -20,7 +19,6 @@ import {
 } from '@heroui/react';
 import LeagueCard from './(widgets)/LeagueCard';
 import useAccount from '@/hooks/useAccount';
-import { IoPersonSharp } from 'react-icons/io5';
 import DashboardSkeleton from './(widgets)/DashboardSkeleton';
 
 interface LeaguesInterface {

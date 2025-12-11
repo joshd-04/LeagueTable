@@ -358,8 +358,12 @@ export default function NavBar() {
         )
       )}
       {isUserFetchLoading && (
-        <NavbarContent>
-          <NavbarItem>Loading...</NavbarItem>
+        <NavbarContent justify="end">
+          <NavbarItem className="flex flex-row gap-1 animate-pulse">
+            <div className="bg-content1 w-14 h-8 rounded-md"></div>
+            <div className="bg-content1 w-18 h-8 rounded-md"></div>
+            <div className="bg-content1 w-18 h-8 rounded-md"></div>
+          </NavbarItem>
         </NavbarContent>
       )}
     </Navbar>

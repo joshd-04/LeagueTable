@@ -12,12 +12,13 @@ import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
-import { IoPersonSharp } from 'react-icons/io5';
 import Controls from './(dashboardWidgets)/controls';
 import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
 import Stats from './(dashboardWidgets)/stats';
 import { useParams } from 'next/navigation';
+import LeagueDashboardSkeleton from './(dashboardWidgets)/dashboardSkeleton';
+import LeagueDetailsRibbon from './(dashboardWidgets)/leagueDetailsRibbon';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardFree() {
@@ -56,7 +57,7 @@ export default function LeagueDashboardFree() {
     queryClient.invalidateQueries({ queryKey: ['table'] });
   }
   if (leagueQueryIsLoading) {
-    return <div>Loading... (x004)</div>;
+    return <LeagueDashboardSkeleton />;
   }
 
   if (league === undefined) {
@@ -70,13 +71,9 @@ export default function LeagueDashboardFree() {
     }
   }
 
-  const teamsCount = league.tables.reduce((acc, cur) => {
-    return acc + cur.numberOfTeams;
-  }, 0);
-
   return (
-    <div className="flex flex-col gap-[20px]">
-      <LeagueBanner league={league}>
+    <div className="flex flex-col gap-5">
+      <LeagueBanner leagueLevel={league.leagueLevel}>
         <Heading1
           style={{
             position: 'absolute',
@@ -89,29 +86,9 @@ export default function LeagueDashboardFree() {
         </Heading1>
       </LeagueBanner>
 
-      <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="flex flex-row justify-center items-center gap-[50px] text-base">
-          <span className="flex flex-row items-center gap-1">
-            <IoPersonSharp className="w-5 h-5" />
-            <p>
-              {league.leagueOwner.username === user?.username
-                ? 'You'
-                : league.leagueOwner.username}
-            </p>
-          </span>
-          <p>
-            {league.divisionsCount} division
-            {league.divisionsCount === 1 ? '' : 's'}
-          </p>
-          <p>
-            {teamsCount} team
-            {teamsCount === 1 ? '' : 's'}
-          </p>
-          <p>
-            Season {league.currentSeason} Matchweek {league.currentMatchweek}
-          </p>
-        </div>
-        <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-[20px]">
+      <div className="flex flex-col gap-5 mx-[20px]">
+        <LeagueDetailsRibbon league={league} />
+        <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-5">
           <Upgrade league={league} />
           <LatestResults league={league} />
           <NextFixtures

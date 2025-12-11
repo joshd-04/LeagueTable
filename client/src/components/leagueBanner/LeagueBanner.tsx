@@ -1,20 +1,24 @@
 'use client';
 import Image from 'next/image';
-import { League } from '@/util/definitions';
 import Particles from '@/assets/reactbits/backgrounds/Particles';
 
 export default function LeagueBanner({
-  league,
+  leagueLevel,
+  displayNothing,
   children,
 }: {
-  league: League;
+  leagueLevel: 'free' | 'pro' | 'pro+';
+  displayNothing?: boolean;
   children: React.ReactNode;
 }) {
-  if (league.leagueLevel === 'free')
+  if (displayNothing) {
+    return <LeagueBannerEmpty>{children}</LeagueBannerEmpty>;
+  }
+  if (leagueLevel === 'free')
     return <LeagueBannerFree>{children}</LeagueBannerFree>;
-  else if (league.leagueLevel === 'pro')
+  else if (leagueLevel === 'pro')
     return <LeagueBannerStandard>{children}</LeagueBannerStandard>;
-  else if (league.leagueLevel === 'pro+')
+  else if (leagueLevel === 'pro+')
     return <LeagueBannerStandard>{children}</LeagueBannerStandard>;
   else {
     return <div>Invalid leagueLevel</div>;
@@ -75,6 +79,16 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
           disableRotation={false}
         />
 
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function LeagueBannerEmpty({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative">
+      <div className="w-full max-w-full aspect-[2560/338] border-b-1 border-[var(--border)]">
         {children}
       </div>
     </div>
