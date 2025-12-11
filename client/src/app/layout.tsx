@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
 import { Instrument_Sans, Inter, Roboto } from 'next/font/google';
 import './globals.css';
-import Footer from '@/components/footer/Footer';
 import { cookies } from 'next/headers';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { fetchAPI } from '@/util/api';
 import { User } from '@/util/definitions';
 import Providers from './providers';
-import NavBar from '@/components/navbar/NavBar';
+import LayoutClientContent from './layoutClientContent';
 
 const instrumentSans = Instrument_Sans({
   variable: '--font-instrument-sans',
@@ -90,11 +89,7 @@ export default async function RootLayout({
         className={`${instrumentSans.variable} ${inter.variable} ${roboto.variable} antialiased w-[100vw] relative  duration-250 overflow-x-clip overflow-y-auto`}
       >
         <Providers initialUser={user} initialError={error}>
-          <div className="min-h-[100vh]">
-            <NavBar />
-            {children}
-          </div>
-          <Footer />
+          <LayoutClientContent>{children}</LayoutClientContent>
         </Providers>
       </body>
     </html>

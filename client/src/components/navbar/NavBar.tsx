@@ -91,7 +91,8 @@ export default function NavBar() {
   }
 
   return (
-    <Navbar className={`bg-transparent sticky h-15`}>
+    // Max height due to loading page being 90vh
+    <Navbar className={`bg-transparent sticky h-15 max-h-[10vh]`}>
       <NavbarBrand className="h-full py-[22px]">
         <Link
           href="/"

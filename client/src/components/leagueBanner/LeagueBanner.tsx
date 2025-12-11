@@ -67,7 +67,7 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative">
-      <div className="bg-[var(--bg-dark)] w-full max-w-full aspect-[2560/338] border-b-1 border-[var(--border)]">
+      <div className="bg-transparent w-full max-w-full aspect-[2560/338] border-b-1 border-[var(--border)]">
         <Particles
           particleColors={['#00aaff', '#808080']}
           particleCount={800}

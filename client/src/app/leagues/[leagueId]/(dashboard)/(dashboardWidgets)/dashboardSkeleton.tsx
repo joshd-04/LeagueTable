@@ -1,6 +1,5 @@
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import Heading1 from '@/components/text/Heading1';
-import { Card, Spinner } from '@heroui/react';
 
 export default function LeagueDashboardSkeleton() {
   return (
@@ -18,7 +17,7 @@ export default function LeagueDashboardSkeleton() {
           Loading
         </Heading1>
       </LeagueBanner>
-      <div className="flex flex-col gap-5 mx-[20px] animate-pulse">
+      <div className="flex flex-col gap-5 mx-[20px] animate-pulse mb-5">
         <div className="flex flex-row justify-center items-center gap-5">
           <div className="w-16 h-6 bg-content2 rounded-md"></div>
           <div className="w-14 h-6 bg-content2 rounded-md"></div>
@@ -34,9 +33,6 @@ export default function LeagueDashboardSkeleton() {
           <div className="h-[440px] w-full bg-content1 rounded-xl row-span-2"></div>
           <div className="h-[440px] w-full bg-content1 rounded-xl col-span-2 row-span-2"></div>
           <div className="h-[440px] w-full bg-content1 rounded-xl row-span-2"></div>
-          <div></div>
-          <div></div>
-          <div></div>
         </div>
       </div>
     </div>
