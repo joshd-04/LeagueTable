@@ -46,18 +46,20 @@ export async function loginController(
     req.session.createdAt = now;
     req.session.lastActivity = now;
 
-    // req.session.absoluteSessionAgeLimit = rememberMe
-    //   ? 60 * 24 * 60 * 60 * 1000 // 60 days
-    //   : 8 * 60 * 60 * 1000; // 8 hours
-
-    // // Set cookie maxAge accordingly
-    // req.session.cookie.maxAge = rememberMe
-    //   ? 60 * 24 * 60 * 60 * 1000 // 60 days
-    //   : 8 * 60 * 60 * 1000; // 8 hours
-    req.session.absoluteSessionAgeLimit = 5 * 60 * 1000; // 2 mins
+    req.session.absoluteSessionAgeLimit = rememberMe
+      ? 60 * 24 * 60 * 60 * 1000 // 60 days
+      : 8 * 60 * 60 * 1000; // 8 hours
 
     // Set cookie maxAge accordingly
-    req.session.cookie.maxAge = 2 * 60 * 1000; // 30 sec
+    req.session.cookie.maxAge = rememberMe
+      ? 14 * 24 * 60 * 60 * 1000 // 14 days
+      : 1 * 60 * 60 * 1000; // 1 hour
+
+    // Temporary limits for testing:
+    // req.session.absoluteSessionAgeLimit = 5 * 60 * 1000; // 2 mins
+
+    // Set cookie maxAge accordingly
+    // req.session.cookie.maxAge = 2 * 60 * 1000; // 30 sec
 
     req.session.save();
 
