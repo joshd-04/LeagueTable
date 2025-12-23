@@ -3,7 +3,7 @@ import { Fixture, League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
 
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
@@ -13,6 +13,7 @@ import FixtureRowFuture from './widgets/fixtureRowFuture';
 import FixtureRow from './widgets/fixtureRow';
 import { Button, cn, Select, SelectItem, Spinner } from '@heroui/react';
 import Link from 'next/link';
+import NoFixtures from './widgets/noFixtures';
 
 export default function FixturesClient({
   league,
@@ -22,12 +23,19 @@ export default function FixturesClient({
   fixtures: Fixture[];
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const matchweek = Number(searchParams.get('matchweek')) ?? null;
+
   // 0 means all divsions, other numbers mean that specific division only
   const [divisionFilter, setDivisionFilter] = useState(0);
   // const [filteredFixtures, setFilteredFixtures]
 
+  const specifiedPage =
+    matchweek >= 1 && matchweek <= league.finalMatchweek ? matchweek : null;
+
   const [matchweekViewing, setMatchweekViewing] = useState(
-    league.currentMatchweek
+    specifiedPage || league.currentMatchweek
   );
 
   function handleClick(id: string) {
@@ -77,6 +85,10 @@ export default function FixturesClient({
       }
     };
     fetchData();
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('matchweek', String(matchweekViewing));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchweekViewing]);
 
@@ -107,17 +119,21 @@ export default function FixturesClient({
               </div>
             ) : (
               <div className="flex flex-col gap-[10px]">
-                {filteredFixtures.map((fixture, i) =>
-                  +matchweekViewing > league.currentMatchweek ? (
-                    <FixtureRowFuture fixture={fixture} key={i} />
-                  ) : (
-                    <FixtureRow
-                      league={league}
-                      fixture={fixture}
-                      key={i}
-                      handleClick={handleClick}
-                    />
+                {filteredFixtures.length > 0 ? (
+                  filteredFixtures.map((fixture, i) =>
+                    +matchweekViewing > league.currentMatchweek ? (
+                      <FixtureRowFuture fixture={fixture} key={i} />
+                    ) : (
+                      <FixtureRow
+                        league={league}
+                        fixture={fixture}
+                        key={i}
+                        handleClick={handleClick}
+                      />
+                    )
                   )
+                ) : (
+                  <NoFixtures matchweek={+matchweekViewing} league={league} />
                 )}
               </div>
             )}
@@ -154,51 +170,27 @@ function DetailsRibbon({
   ];
   return (
     <div className="flex flex-col gap-[20px] mx-[20px] items-center">
-      <div className="grid grid-rows-1 grid-cols-3 place-items-center w-max">
-        <p className="text-base justify-self-end">
+      <div className="grid grid-rows-1 grid-cols-3 place-items-center w-max text-base">
+        <p className="justify-self-end">
           Season {league.currentSeason} Matchweek {league.currentMatchweek}
         </p>
-        {/* <LinkButton
-          color="var(--text)"
-          bgHoverColor="var(--bg)"
-          borderlessButton={true}
-          underlineEffect={false}
-          href={`/leagues/${league._id}`}
-        >
-          {league.name}
-        </LinkButton> */}
+
         <Button as={Link} href={`/leagues/${league._id}`} variant="flat">
           {league.name}
         </Button>
-        <p className="text-base justify-self-start">
-          {/* <select
-            className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
-            value={divisionFilter}
-            onChange={(e) => setDivisionFilter(+e.target.value)}
-          >
-            <option value={0}>All fixtures</option>
-            {league.tables
-              .filter((table) => table.season === league.currentSeason)
-              .map((table, i) => (
-                <option value={table.division} key={i}>
-                  {table.name}
-                </option>
-              ))}
-          </select> */}
-          <Select
-            items={items}
-            selectedKeys={[String(divisionFilter)]}
-            className="min-w-50"
-            classNames={{ base: cn('w-full') }}
-            onSelectionChange={(keys) => {
-              const value = Number([...keys][0]);
-              setDivisionFilter(value);
-            }}
-            disallowEmptySelection={true}
-          >
-            {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
-          </Select>
-        </p>
+        <Select
+          items={items}
+          selectedKeys={[String(divisionFilter)]}
+          className="min-w-50"
+          classNames={{ base: cn('w-full') }}
+          onSelectionChange={(keys) => {
+            const value = Number([...keys][0]);
+            setDivisionFilter(value);
+          }}
+          disallowEmptySelection={true}
+        >
+          {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+        </Select>
       </div>
     </div>
   );

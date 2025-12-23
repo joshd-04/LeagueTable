@@ -39,7 +39,7 @@ export default function NextFixtures({
           method: 'GET',
         }
       ),
-    queryKey: ['fixtures', seasonViewing],
+    queryKey: ['fixtures', league._id, seasonViewing],
   });
 
   const fixtures:

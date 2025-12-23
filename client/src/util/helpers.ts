@@ -1,3 +1,5 @@
+import { AccountTypeInterface } from './definitions';
+
 export function handleColorThemeToggle(newColorTheme: 'light' | 'dark') {
   if (newColorTheme === 'light') {
     document.documentElement.style.setProperty('--bg-dark', 'hsl(0, 0%, 90%)');
@@ -74,4 +76,31 @@ export function calculatePrice(
       ? monthlyPrice
       : Math.round(monthlyPrice * (1 - yearlyDiscount / 100) * 12);
   return price;
+}
+
+export function meetsMinimumTierLevel(
+  requiredLevel: AccountTypeInterface,
+  level: AccountTypeInterface
+) {
+  if (requiredLevel === 'free') return true;
+  if (requiredLevel === 'pro') {
+    if (level === 'pro' || level === 'pro+') return true;
+    return false;
+  }
+  if (requiredLevel === 'pro+') {
+    if (level === 'pro+') return true;
+    return false;
+  }
+  return false;
+}
+
+export function shouldGrantAccessToFeature(
+  featureLevel: AccountTypeInterface,
+  leagueLevel: AccountTypeInterface,
+  accountType: AccountTypeInterface
+) {
+  return (
+    meetsMinimumTierLevel(featureLevel, accountType) &&
+    meetsMinimumTierLevel(featureLevel, leagueLevel)
+  );
 }

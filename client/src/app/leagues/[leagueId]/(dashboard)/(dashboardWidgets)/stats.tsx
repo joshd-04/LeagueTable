@@ -75,7 +75,7 @@ export default function Stats({
         `${API_URL}/leagues/${league._id}/stats?season=${seasonViewing}`,
         { method: 'GET' }
       ),
-    queryKey: ['stats', seasonViewing],
+    queryKey: ['stats', league._id, seasonViewing],
   });
 
   const stats: SeasonStats | undefined = data?.data.stats;

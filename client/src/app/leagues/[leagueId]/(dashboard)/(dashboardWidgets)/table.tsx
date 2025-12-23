@@ -3,6 +3,7 @@ import TeamForm from '@/components/teamForm/TeamForm';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
+import { shouldGrantAccessToFeature } from '@/util/helpers';
 import {
   Card,
   CardBody,
@@ -29,7 +30,7 @@ import {
 } from 'react';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import { FaLock } from 'react-icons/fa';
-import { RxExclamationTriangle, RxQuestionMarkCircled } from 'react-icons/rx';
+import { RxQuestionMarkCircled } from 'react-icons/rx';
 
 export default function TableWidget({
   league,
@@ -52,17 +53,25 @@ export default function TableWidget({
           method: 'GET',
         }
       ),
-    queryKey: ['table', divisionViewing, seasonViewing],
+    queryKey: ['table', league._id, divisionViewing, seasonViewing],
   });
   const teams: Team[] | undefined = data?.data.teams;
 
   const [displayAsProLeague, setDisplayAsProLeague] = useState(
-    league.leagueLevel !== 'free' && league.leagueOwner.accountType !== 'free'
+    shouldGrantAccessToFeature(
+      'pro',
+      league.leagueLevel,
+      league.leagueOwner.accountType
+    )
   );
 
   useEffect(() => {
     setDisplayAsProLeague(
-      league.leagueLevel !== 'free' && league.leagueOwner.accountType !== 'free'
+      shouldGrantAccessToFeature(
+        'pro',
+        league.leagueLevel,
+        league.leagueOwner.accountType
+      )
     );
   }, [league]);
 

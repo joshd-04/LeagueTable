@@ -1,17 +1,24 @@
 'use client';
 import { Result, League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
-
-import LinkButton from '@/components/text/LinkButton';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
-import Subtitle from '@/components/text/Subtitle';
-import { motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import PaginationComponent from '@/components/pagination/Pagination';
 import { fetchAPI } from '@/util/api';
 import { useQuery } from '@tanstack/react-query';
 import { API_URL } from '@/util/config';
+import {
+  Button,
+  Card,
+  CardBody,
+  Link,
+  Select,
+  SelectItem,
+  Spinner,
+} from '@heroui/react';
+import TruncatedText from '@/components/formattedText/truncatedText';
+import NoResults from './widgets/noResults';
 
 export default function ResultsClient({
   league,
@@ -28,51 +35,13 @@ export default function ResultsClient({
   }
 
   return (
-    <div className="flex flex-col gap-[20px]">
+    <div className="flex flex-col gap-[20px] w-screen mb-20">
       <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <Heading1>Results</Heading1>
         </div>
       </LeagueBanner>
-      <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="justify-self-end text-base">
-            Season {league.currentSeason} Matchweek {league.currentMatchweek}
-          </p>
-          <LinkButton
-            color="var(--text)"
-            bgHoverColor="var(--bg)"
-            borderlessButton={true}
-            underlineEffect={false}
-            href={`/leagues/${league._id}`}
-          >
-            {league.name}
-          </LinkButton>
-          <p
-            style={{ justifySelf: 'start' }}
-            className="justify-self-start text-base"
-          >
-            <select
-              className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
-              value={sort}
-              onChange={(e) => {
-                if (
-                  !['matchweek', 'most recent'].some(
-                    (x) => e.target.value === x
-                  )
-                ) {
-                  return;
-                }
-
-                setSort(e.target.value as 'matchweek' | 'most recent');
-              }}
-            >
-              <option value="matchweek">Matchweek</option>
-              <option value="most recent">Most recent</option>
-            </select>
-          </p>
-        </div>
-      </div>
+      <DetailsRibbon league={league} sort={sort} setSort={setSort} />
       <div className="w-[50%] place-self-center">
         {sort === 'matchweek' ? (
           <ResultsByMatchweek
@@ -88,11 +57,57 @@ export default function ResultsClient({
   );
 }
 
+function DetailsRibbon({
+  league,
+  sort,
+  setSort,
+}: {
+  league: League;
+  sort: 'matchweek' | 'most recent';
+  setSort: Dispatch<SetStateAction<'matchweek' | 'most recent'>>;
+}) {
+  const items = [
+    { key: 'matchweek', label: 'Matchweek' },
+    { key: 'most recent', label: 'Most recent' },
+  ];
+
+  return (
+    <div className="flex flex-col gap-[20px] mx-[20px] items-center">
+      <div className="grid grid-rows-1 grid-cols-3 place-items-center w-max">
+        <p className="text-base justify-self-end">
+          Season {league.currentSeason} Matchweek {league.currentMatchweek}
+        </p>
+
+        <Button as={Link} href={`/leagues/${league._id}`} variant="flat">
+          {league.name}
+        </Button>
+
+        <div className="justify-self-start">
+          <Select
+            items={items}
+            selectedKeys={[sort]}
+            className="min-w-50"
+            onSelectionChange={(keys) => {
+              const value = [...keys][0] as 'matchweek' | 'most recent';
+              setSort(value);
+            }}
+            disallowEmptySelection={true}
+          >
+            {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResultRow({
   result,
+  league,
   handleClick,
 }: {
   result: Result;
+  league: League;
   handleClick: (id: string) => void;
 }) {
   const homeGoals = result.basicOutcome.reduce(
@@ -103,25 +118,59 @@ function ResultRow({
     (acc, goal) => (goal === 'away' ? acc + 1 : acc),
     0
   );
-  return (
-    <motion.div
-      className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[6px] items-center hover:bg-[var(--bg-light)] hover:cursor-pointer hover:border-transparent"
-      whileTap={{ scale: 0.98 }}
-      onClick={() => handleClick(result._id)}
-    >
-      <div className="grid grid-rows-1 grid-cols-[1fr_3ch] gap-[20px] items-baseline justify-items-end">
-        <Subtitle>{result.homeTeamDetails.name}</Subtitle>
-        <Subtitle>{homeGoals}</Subtitle>
-      </div>
-      <p className="font-bold text-center items-baseline align-middle text-sm">
-        -
-      </p>
 
-      <div className="grid grid-rows-1 grid-cols-[3ch_1fr] gap-[20px] items-baseline">
-        <Subtitle>{awayGoals}</Subtitle>
-        <Subtitle>{result.awayTeamDetails.name}</Subtitle>
-      </div>
-    </motion.div>
+  return (
+    <Card
+      isPressable
+      onPress={() => handleClick(result._id)}
+      as={Link}
+      href={`/leagues/${league._id}/result/${result._id}`}
+    >
+      <CardBody className="@container">
+        <div className="flex items-center gap-2">
+          {/* Home side */}
+          <div className="flex-1 min-w-0 flex items-center justify-end gap-2">
+            {/* Name - always visible, truncates */}
+            <div className="min-w-0 max-w-50 flex-shrink flex-grow">
+              <TruncatedText
+                content={result.homeTeamDetails.name}
+                placement="top-end"
+                textClassName="text-right whitespace-nowrap overflow-hidden text-ellipsis w-full text-lg"
+              >
+                {result.homeTeamDetails.name}
+              </TruncatedText>
+            </div>
+
+            {/* Goals */}
+            <p className="flex-shrink-0 text-lg font-medium w-[3ch] text-right">
+              {homeGoals}
+            </p>
+          </div>
+
+          {/* Center - never shrinks */}
+          <p className="font-bold text-sm flex-shrink-0 flex-grow-0">-</p>
+
+          {/* Away side */}
+          <div className="flex-1 min-w-0 flex items-center justify-start gap-2">
+            {/* Goals */}
+            <p className="flex-shrink-0 text-lg font-medium w-[3ch]">
+              {awayGoals}
+            </p>
+
+            {/* Name - always visible, truncates */}
+            <div className="min-w-0 max-w-50 flex-shrink flex-grow">
+              <TruncatedText
+                content={result.awayTeamDetails.name}
+                placement="top-start"
+                textClassName="text-left whitespace-nowrap overflow-hidden text-ellipsis w-full text-lg"
+              >
+                {result.awayTeamDetails.name}
+              </TruncatedText>
+            </div>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 
@@ -139,7 +188,7 @@ function ResultsByMostRecent({
       fetchAPI(`${API_URL}/leagues/${league._id}/results`, {
         method: 'GET',
       }),
-    queryKey: ['resultsRecent'],
+    queryKey: ['resultsRecent', league._id],
     staleTime: 1000 * 60 * 1,
     gcTime: 1000 * 60 * 10,
   });
@@ -166,11 +215,8 @@ function ResultsByMostRecent({
   if (resultsAreLoading) {
     return (
       <div className="flex flex-col gap-[20px]">
-        <div>
-          <p className="font-bold mb-[10px] place-self-center text-sm">
-            Results loading...
-          </p>
-          <div className="flex flex-col gap-[10px]"></div>
+        <div className="flex flex-col justify-center items-center mb-4">
+          <Spinner />
         </div>
       </div>
     );
@@ -186,7 +232,12 @@ function ResultsByMostRecent({
           </p>
           <div className="flex flex-col gap-[10px]">
             {data.results.map((result, i) => (
-              <ResultRow result={result} key={i} handleClick={handleClick} />
+              <ResultRow
+                result={result}
+                league={league}
+                key={i}
+                handleClick={handleClick}
+              />
             ))}
           </div>
         </div>
@@ -194,6 +245,7 @@ function ResultsByMostRecent({
     </div>
   );
 }
+
 function ResultsByMatchweek({
   league,
   results,
@@ -203,13 +255,20 @@ function ResultsByMatchweek({
   results: Result[];
   handleClick: (id: string) => void;
 }) {
-  const [displayedResults, setDisplayedResults] = useState(results);
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const matchweek = Number(searchParams.get('matchweek')) ?? null;
 
+  const specifiedPage =
+    matchweek >= 1 && matchweek <= league.finalMatchweek ? matchweek : null;
+
+  const [displayedResults, setDisplayedResults] = useState([]);
   const [matchweekViewing, setMatchweekViewing] = useState(
-    league.currentMatchweek
+    specifiedPage || league.currentMatchweek
   );
 
-  const { refetch: refetchResults } = useQuery({
+  const { refetch: refetchResults, isFetching: isFetchingResults } = useQuery({
     queryFn: () =>
       fetchAPI(
         `${API_URL}/leagues/${league._id}/results?matchweek=${matchweekViewing}`,
@@ -217,10 +276,9 @@ function ResultsByMatchweek({
           method: 'GET',
         }
       ),
-    queryKey: ['resultsMatchweek'],
+    queryKey: ['resultsMatchweek', league._id, matchweekViewing],
     staleTime: 1000 * 60 * 1,
     gcTime: 1000 * 60 * 10,
-
     enabled: false,
   });
 
@@ -229,6 +287,7 @@ function ResultsByMatchweek({
       return;
     const fetchData = async () => {
       const { data } = await refetchResults();
+      console.log(data);
       if (data.status === 'success') {
         setDisplayedResults(data.data.results);
         window.scrollTo({
@@ -237,7 +296,12 @@ function ResultsByMatchweek({
         });
       }
     };
+
     fetchData();
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('matchweek', String(matchweekViewing));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchweekViewing]);
 
@@ -249,11 +313,27 @@ function ResultsByMatchweek({
           {+matchweekViewing > league.currentMatchweek && '(future)'}
         </p>
 
-        <div className="flex flex-col gap-[10px]">
-          {displayedResults.map((result, i) => (
-            <ResultRow result={result} key={i} handleClick={handleClick} />
-          ))}
-        </div>
+        {isFetchingResults ? (
+          <div className="flex flex-col justify-center items-center mb-4">
+            <Spinner />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-[10px]">
+            {displayedResults.length > 0 ? (
+              displayedResults.map((result, i) => (
+                <ResultRow
+                  result={result}
+                  league={league}
+                  key={i}
+                  handleClick={handleClick}
+                />
+              ))
+            ) : (
+              <NoResults league={league} matchweek={+matchweekViewing} />
+            )}
+          </div>
+        )}
+
         <PaginationComponent
           page={matchweekViewing}
           setPage={setMatchweekViewing}

@@ -31,12 +31,16 @@ export default function LeagueDashboardFree() {
 
   const { data: leagueQueryData, isLoading: leagueQueryIsLoading } = useQuery({
     queryFn: () =>
-      fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+      fetchAPI(`${API_URL}/leagues/${leagueId}?x=67`, {
         method: 'GET',
         credentials: 'include',
       }),
-    queryKey: ['league'],
+    queryKey: ['league', leagueId],
   });
+
+  useEffect(() => {
+    console.log('MASON MOUNT');
+  }, []);
 
   useEffect(() => {
     if (leagueQueryData !== undefined && !leagueQueryIsLoading) {
@@ -44,16 +48,14 @@ export default function LeagueDashboardFree() {
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-
   function invalidateDashboardQueries() {
-    queryClient.invalidateQueries({ queryKey: ['league'] });
+    queryClient.invalidateQueries({ queryKey: ['league', leagueId] });
     queryClient.invalidateQueries({ queryKey: ['fixtures'] });
     queryClient.invalidateQueries({ queryKey: ['results'] });
     queryClient.invalidateQueries({ queryKey: ['stats'] });
-    queryClient.invalidateQueries({ queryKey: ['seasonSummaryStats'] });
+    queryClient.invalidateQueries({
+      queryKey: ['seasonSummaryStats'],
+    });
     queryClient.invalidateQueries({ queryKey: ['table'] });
   }
   if (leagueQueryIsLoading) {

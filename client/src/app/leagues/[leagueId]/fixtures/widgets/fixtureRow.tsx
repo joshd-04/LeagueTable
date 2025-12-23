@@ -1,6 +1,7 @@
 import TruncatedText from '@/components/formattedText/truncatedText';
 import TeamForm from '@/components/teamForm/TeamForm';
 import { Fixture, League } from '@/util/definitions';
+import { shouldGrantAccessToFeature } from '@/util/helpers';
 import { Card, CardBody, Link } from '@heroui/react';
 
 export default function FixtureRow({
@@ -17,6 +18,12 @@ export default function FixtureRow({
   const awayPoints =
     fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
 
+  const shouldShowTeamForm = shouldGrantAccessToFeature(
+    'pro',
+    league.leagueLevel,
+    league.leagueOwner.accountType
+  );
+
   return (
     <Card
       isPressable
@@ -29,12 +36,14 @@ export default function FixtureRow({
           {/* Home side - exactly 50% minus half the gap */}
           <div className="flex-1 min-w-0 flex items-center justify-end gap-3">
             {/* Form - disappears first */}
-            <div className="@[800px]:block hidden flex-shrink-0">
-              <TeamForm form={fixture.homeTeamDetails.form} />
-            </div>
+            {shouldShowTeamForm && (
+              <div className="@[800px]:block hidden flex-shrink-0">
+                <TeamForm form={fixture.homeTeamDetails.form} />
+              </div>
+            )}
 
             {/* Points - disappears second */}
-            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch] text-right">
+            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch] text-right text-nowrap">
               {homePoints} pt{homePoints === 1 ? '' : 's'}
             </p>
 
@@ -67,14 +76,16 @@ export default function FixtureRow({
             </div>
 
             {/* Points - disappears second */}
-            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch]">
+            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch] text-nowrap">
               {awayPoints} pt{awayPoints === 1 ? '' : 's'}
             </p>
 
             {/* Form - disappears first */}
-            <div className="@[800px]:block hidden flex-shrink-0">
-              <TeamForm form={fixture.awayTeamDetails.form} />
-            </div>
+            {shouldShowTeamForm && (
+              <div className="@[800px]:block hidden flex-shrink-0">
+                <TeamForm form={fixture.awayTeamDetails.form} />
+              </div>
+            )}
           </div>
         </div>
       </CardBody>

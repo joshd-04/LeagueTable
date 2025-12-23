@@ -19,7 +19,6 @@ import SeasonRewind from './(dashboardWidgets)/seasonRewind';
 import Stats from './(dashboardWidgets)/stats';
 import { useParams } from 'next/navigation';
 import LeagueDetailsRibbon from './(dashboardWidgets)/leagueDetailsRibbon';
-import LoadingPage from '@/components/loadingPage/LoadingPage';
 import LeagueDashboardSkeleton from './(dashboardWidgets)/dashboardSkeleton';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
@@ -38,7 +37,7 @@ export default function LeagueDashboardStandard() {
         method: 'GET',
         credentials: 'include',
       }),
-    queryKey: ['league'],
+    queryKey: ['league', leagueId],
   });
 
   useEffect(() => {
@@ -55,11 +54,13 @@ export default function LeagueDashboardStandard() {
   }, [league, leagueQueryIsLoading]);
 
   function invalidateDashboardQueries() {
-    queryClient.invalidateQueries({ queryKey: ['league'] });
+    queryClient.invalidateQueries({ queryKey: ['league', leagueId] });
     queryClient.invalidateQueries({ queryKey: ['fixtures'] });
     queryClient.invalidateQueries({ queryKey: ['results'] });
     queryClient.invalidateQueries({ queryKey: ['stats'] });
-    queryClient.invalidateQueries({ queryKey: ['seasonSummaryStats'] });
+    queryClient.invalidateQueries({
+      queryKey: ['seasonSummaryStats'],
+    });
     queryClient.invalidateQueries({ queryKey: ['table'] });
   }
 

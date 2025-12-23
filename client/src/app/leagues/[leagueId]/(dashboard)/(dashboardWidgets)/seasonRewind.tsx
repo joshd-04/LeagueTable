@@ -1,5 +1,6 @@
 import ProChip from '@/components/chips/ProChip';
 import { League } from '@/util/definitions';
+import { shouldGrantAccessToFeature } from '@/util/helpers';
 import {
   Button,
   ButtonGroup,
@@ -23,7 +24,9 @@ export default function SeasonRewind({
 }) {
   const isViewingCurrentSeason = league.currentSeason === seasonViewing;
 
-  const disableOverride = !['pro', 'pro+'].includes(
+  const shouldDisable = !shouldGrantAccessToFeature(
+    'pro',
+    league.leagueLevel,
     league.leagueOwner.accountType
   );
 
@@ -47,7 +50,7 @@ export default function SeasonRewind({
     <Card
       className="h-full w-full px-[10px] py-[6px]"
       fullWidth
-      isDisabled={disableOverride}
+      isDisabled={shouldDisable}
     >
       <CardHeader className="flex flex-col items-start">
         <div className="flex flex-row justify-between items-start w-full">
@@ -90,14 +93,14 @@ export default function SeasonRewind({
             <ButtonGroup color="primary" variant="flat">
               <Button
                 onPress={decrementSeason}
-                isDisabled={disableOverride || seasonViewing <= 1}
+                isDisabled={shouldDisable || seasonViewing <= 1}
               >
                 <FaBackward /> Back
               </Button>
               <Button
                 onPress={resetSeason}
                 isDisabled={
-                  disableOverride || seasonViewing === league.currentSeason
+                  shouldDisable || seasonViewing === league.currentSeason
                 }
               >
                 Reset
@@ -106,7 +109,7 @@ export default function SeasonRewind({
               <Button
                 onPress={incrementSeason}
                 isDisabled={
-                  disableOverride || seasonViewing === league.currentSeason
+                  shouldDisable || seasonViewing === league.currentSeason
                 }
               >
                 Next

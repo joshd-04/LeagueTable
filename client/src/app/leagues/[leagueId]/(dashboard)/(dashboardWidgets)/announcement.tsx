@@ -2,6 +2,7 @@ import ProChip from '@/components/chips/ProChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League } from '@/util/definitions';
+import { shouldGrantAccessToFeature } from '@/util/helpers';
 import {
   addToast,
   Button,
@@ -40,7 +41,9 @@ export default function Announcement({
     league.announcement || { text: '', date: new Date() }
   );
 
-  const disableOverride = !['pro', 'pro+'].includes(
+  const shouldDisable = !shouldGrantAccessToFeature(
+    'pro',
+    league.leagueLevel,
     league.leagueOwner.accountType
   );
 
@@ -70,7 +73,7 @@ export default function Announcement({
     <>
       <Card
         className="h-full w-full px-[10px] py-[6px]"
-        isDisabled={disableOverride}
+        isDisabled={shouldDisable}
       >
         <CardBody className="flex flex-col gap-2">
           <div className="flex flex-row justify-between items-center">
@@ -85,7 +88,7 @@ export default function Announcement({
                 variant="flat"
                 onPress={onOpen}
                 isIconOnly
-                isDisabled={disableOverride}
+                isDisabled={shouldDisable}
               >
                 <FaRegEdit className="w-4 h-4" />
               </Button>

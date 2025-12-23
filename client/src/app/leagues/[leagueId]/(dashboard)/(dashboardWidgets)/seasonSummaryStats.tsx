@@ -19,7 +19,7 @@ export default function SeasonSummaryStats({
           method: 'GET',
         }
       ),
-    queryKey: ['seasonSummaryStats', seasonViewing],
+    queryKey: ['seasonSummaryStats', league._id, seasonViewing],
   });
   const stats: SeasonSummaryStatsInterface | undefined =
     data?.data.seasonSummaryStats;

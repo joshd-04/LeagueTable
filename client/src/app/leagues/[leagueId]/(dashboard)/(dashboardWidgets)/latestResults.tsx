@@ -25,7 +25,7 @@ export default function LatestResults({
           method: 'GET',
         }
       ),
-    queryKey: ['results', seasonViewing],
+    queryKey: ['results', league._id, seasonViewing],
   });
 
   const mostRecentResults: Result[] = data?.data.results.slice(0, 3);

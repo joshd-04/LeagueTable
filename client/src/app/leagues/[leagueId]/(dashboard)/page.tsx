@@ -100,7 +100,7 @@ export default async function Page({
   let leagueResponse;
   try {
     const cookieStore = await cookies();
-    leagueResponse = await fetchAPI(`${API_URL}/leagues/${leagueId}`, {
+    leagueResponse = await fetchAPI(`${API_URL}/leagues/${leagueId}?x=2`, {
       method: 'GET',
       headers: { Cookie: cookieStore.toString() },
       cache: 'no-store',
