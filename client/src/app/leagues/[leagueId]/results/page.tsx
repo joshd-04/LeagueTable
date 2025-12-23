@@ -3,7 +3,7 @@ import ResultsClient from './resultsClient';
 import { fetchAPI } from '@/util/api';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { redirect } from 'next/navigation';
-import { Result, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import SetupIncomplete from '../setupIncomplete';
 import { Metadata } from 'next';
 
@@ -71,6 +71,5 @@ export default async function Page({ params }) {
     return redirect('/');
   }
   const l = league.data.league as League;
-  const f = results.data.results as Result[];
-  return <ResultsClient league={l} results={f} />;
+  return <ResultsClient league={l} />;
 }

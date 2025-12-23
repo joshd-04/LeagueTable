@@ -21,7 +21,7 @@ export default function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
             </div>
 
             {/* Points - disappears second */}
-            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch] text-right">
+            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch] text-right text-nowrap">
               {homePoints} pt{homePoints === 1 ? '' : 's'}
             </p>
 
@@ -54,7 +54,7 @@ export default function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
             </div>
 
             {/* Points - disappears second */}
-            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch]">
+            <p className="@[500px]:block hidden flex-shrink-0 text-sm text-default-600 w-[4ch] text-nowrap">
               {awayPoints} pt{awayPoints === 1 ? '' : 's'}
             </p>
 
