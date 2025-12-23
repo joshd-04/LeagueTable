@@ -10,6 +10,7 @@ import { API_URL } from '@/util/config';
 import { Card, CardBody, useDisclosure } from '@heroui/react';
 import { FaRegEdit } from 'react-icons/fa';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
+import TruncatedText from '@/components/formattedText/truncatedText';
 
 export default function NextFixtures({
   league,
@@ -171,14 +172,29 @@ function FixtureRow({
         MD {fixtureObj.matchweek}
       </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_40px_1fr] flex-grow place-items-end">
-        <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        {/* <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.homeTeamDetails.name}
-        </p>
+        </p> */}
+        <TruncatedText
+          content={fixtureObj.homeTeamDetails.name}
+          placement="top-end"
+          textClassName="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
+        >
+          {fixtureObj.homeTeamDetails.name}
+        </TruncatedText>
+
         <p className="w-full text-center text-sm text-muted">vs</p>
 
-        <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        {/* <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.awayTeamDetails.name}
-        </p>
+        </p> */}
+        <TruncatedText
+          content={fixtureObj.awayTeamDetails.name}
+          placement="top-start"
+          textClassName="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
+        >
+          {fixtureObj.awayTeamDetails.name}
+        </TruncatedText>
       </div>
       {userOwnsThisLeague && (
         <div

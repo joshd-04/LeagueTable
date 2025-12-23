@@ -19,6 +19,8 @@ import SeasonRewind from './(dashboardWidgets)/seasonRewind';
 import Stats from './(dashboardWidgets)/stats';
 import { useParams } from 'next/navigation';
 import LeagueDetailsRibbon from './(dashboardWidgets)/leagueDetailsRibbon';
+import LoadingPage from '@/components/loadingPage/LoadingPage';
+import LeagueDashboardSkeleton from './(dashboardWidgets)/dashboardSkeleton';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard() {
@@ -62,7 +64,7 @@ export default function LeagueDashboardStandard() {
   }
 
   if (leagueQueryIsLoading) {
-    return <div>Loading... (x002)</div>;
+    return <LeagueDashboardSkeleton />;
   }
 
   if (league === undefined) {

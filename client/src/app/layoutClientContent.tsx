@@ -14,7 +14,7 @@ export default function LayoutClientContent({
 
   return (
     <>
-      <div className="min-h-[100vh]">
+      <div className="min-h-[100vh]  ">
         <NavBar />
         {isUserFetchLoading ? <LoadingPage /> : children}
       </div>

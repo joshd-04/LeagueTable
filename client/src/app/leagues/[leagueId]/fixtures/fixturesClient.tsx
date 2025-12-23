@@ -2,17 +2,17 @@
 import { Fixture, League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
 
-import LinkButton from '@/components/text/LinkButton';
-import TeamForm from '@/components/teamForm/TeamForm';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
-import Subtitle from '@/components/text/Subtitle';
-import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import Pagination from '@/components/pagination/Pagination';
+import PaginationComponent from '@/components/pagination/Pagination';
+import FixtureRowFuture from './widgets/fixtureRowFuture';
+import FixtureRow from './widgets/fixtureRow';
+import { Button, cn, Select, SelectItem, Spinner } from '@heroui/react';
+import Link from 'next/link';
 
 export default function FixturesClient({
   league,
@@ -46,20 +46,22 @@ export default function FixturesClient({
     );
   }
 
-  const { refetch: refetchFixtures } = useQuery({
-    queryFn: () =>
-      fetchAPI(
-        `${API_URL}/leagues/${league._id}/fixtures?matchweek=${matchweekViewing}`,
-        {
-          method: 'GET',
-        }
-      ),
-    queryKey: ['fixtures'],
-    staleTime: 1000 * 60 * 1,
-    gcTime: 1000 * 60 * 10,
+  const { refetch: refetchFixtures, isFetching: isFetchingFixtures } = useQuery(
+    {
+      queryFn: () =>
+        fetchAPI(
+          `${API_URL}/leagues/${league._id}/fixtures?matchweek=${matchweekViewing}`,
+          {
+            method: 'GET',
+          }
+        ),
+      queryKey: ['fixtures'],
+      staleTime: 1000 * 60 * 1,
+      gcTime: 1000 * 60 * 10,
 
-    enabled: false,
-  });
+      enabled: false,
+    }
+  );
 
   useEffect(() => {
     if (matchweekViewing < 1 || matchweekViewing > league.finalMatchweek)
@@ -79,44 +81,18 @@ export default function FixturesClient({
   }, [matchweekViewing]);
 
   return (
-    <div className="flex flex-col gap-[20px]">
+    <div className="flex flex-col gap-[20px] w-screen mb-20">
       <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <Heading1>Fixtures</Heading1>
         </div>
       </LeagueBanner>
-      <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="text-base justify-self-end">
-            Season {league.currentSeason} Matchweek {league.currentMatchweek}
-          </p>
-          <LinkButton
-            color="var(--text)"
-            bgHoverColor="var(--bg)"
-            borderlessButton={true}
-            underlineEffect={false}
-            href={`/leagues/${league._id}`}
-          >
-            {league.name}
-          </LinkButton>
-          <p className="text-base justify-self-start">
-            <select
-              className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
-              value={divisionFilter}
-              onChange={(e) => setDivisionFilter(+e.target.value)}
-            >
-              <option value={0}>All fixtures</option>
-              {league.tables
-                .filter((table) => table.season === league.currentSeason)
-                .map((table, i) => (
-                  <option value={table.division} key={i}>
-                    {table.name}
-                  </option>
-                ))}
-            </select>
-          </p>
-        </div>
-      </div>
+      <DetailsRibbon
+        league={league}
+        divisionFilter={divisionFilter}
+        setDivisionFilter={setDivisionFilter}
+      />
+
       <div className="w-[50%] place-self-center">
         <div className="flex flex-col gap-[20px]">
           <div>
@@ -125,23 +101,30 @@ export default function FixturesClient({
               {+matchweekViewing > league.currentMatchweek && '(future)'}
             </p>
 
-            <div className="flex flex-col gap-[10px]">
-              {filteredFixtures.map((fixture, i) =>
-                +matchweekViewing > league.currentMatchweek ? (
-                  <FixtureRowFuture fixture={fixture} key={i} />
-                ) : (
-                  <FixtureRow
-                    fixture={fixture}
-                    key={i}
-                    handleClick={handleClick}
-                  />
-                )
-              )}
-            </div>
+            {isFetchingFixtures ? (
+              <div className="flex flex-col justify-center items-center mb-4">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-[10px]">
+                {filteredFixtures.map((fixture, i) =>
+                  +matchweekViewing > league.currentMatchweek ? (
+                    <FixtureRowFuture fixture={fixture} key={i} />
+                  ) : (
+                    <FixtureRow
+                      league={league}
+                      fixture={fixture}
+                      key={i}
+                      handleClick={handleClick}
+                    />
+                  )
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        <Pagination
+        <PaginationComponent
           page={matchweekViewing}
           setPage={setMatchweekViewing}
           lastPage={league.finalMatchweek}
@@ -151,107 +134,71 @@ export default function FixturesClient({
   );
 }
 
-function FixtureRow({
-  fixture,
-  handleClick,
+function DetailsRibbon({
+  league,
+  divisionFilter,
+  setDivisionFilter,
 }: {
-  fixture: Fixture;
-  handleClick: (id: string) => void;
+  league: League;
+  divisionFilter: number;
+  setDivisionFilter: Dispatch<SetStateAction<number>>;
 }) {
-  const homePoints =
-    fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws;
-  const awayPoints =
-    fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
+  const items = [
+    { key: '0', label: 'All fixtures' },
+    ...league.tables
+      .filter((t) => t.season === league.currentSeason)
+      .map((t) => ({
+        key: String(t.division),
+        label: t.name,
+      })),
+  ];
   return (
-    <motion.div
-      className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline hover:bg-[var(--bg-light)] hover:cursor-pointer hover:border-transparent"
-      whileTap={{ scale: 0.98 }}
-      onClick={() => handleClick(fixture._id)}
-    >
-      <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
-        <TeamForm form={fixture.homeTeamDetails.form} />
-        <p className="inline text-base text-muted">
-          {homePoints} pt{homePoints === 1 ? '' : 's'}
+    <div className="flex flex-col gap-[20px] mx-[20px] items-center">
+      <div className="grid grid-rows-1 grid-cols-3 place-items-center w-max">
+        <p className="text-base justify-self-end">
+          Season {league.currentSeason} Matchweek {league.currentMatchweek}
         </p>
-        <Subtitle
-          style={{
-            textAlign: 'right',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            width: '100%',
-          }}
+        {/* <LinkButton
+          color="var(--text)"
+          bgHoverColor="var(--bg)"
+          borderlessButton={true}
+          underlineEffect={false}
+          href={`/leagues/${league._id}`}
         >
-          {fixture.homeTeamDetails.name}
-        </Subtitle>
-      </div>
-      <p className="font-bold text-center text-sm">vs</p>
-
-      <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
-        <Subtitle
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-        >
-          {fixture.awayTeamDetails.name}
-        </Subtitle>
-        <p className="inline text-base text-muted">
-          {awayPoints} pt{awayPoints === 1 ? '' : 's'}
+          {league.name}
+        </LinkButton> */}
+        <Button as={Link} href={`/leagues/${league._id}`} variant="flat">
+          {league.name}
+        </Button>
+        <p className="text-base justify-self-start">
+          {/* <select
+            className="bg-[var(--bg)] hover:bg-[var(--bg-light)] p-2 rounded-[10px] outline-none cursor-pointer"
+            value={divisionFilter}
+            onChange={(e) => setDivisionFilter(+e.target.value)}
+          >
+            <option value={0}>All fixtures</option>
+            {league.tables
+              .filter((table) => table.season === league.currentSeason)
+              .map((table, i) => (
+                <option value={table.division} key={i}>
+                  {table.name}
+                </option>
+              ))}
+          </select> */}
+          <Select
+            items={items}
+            selectedKeys={[String(divisionFilter)]}
+            className="min-w-50"
+            classNames={{ base: cn('w-full') }}
+            onSelectionChange={(keys) => {
+              const value = Number([...keys][0]);
+              setDivisionFilter(value);
+            }}
+            disallowEmptySelection={true}
+          >
+            {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+          </Select>
         </p>
-        <TeamForm form={fixture.awayTeamDetails.form} />
-      </div>
-    </motion.div>
-  );
-}
-
-function FixtureRowFuture({ fixture }: { fixture: Fixture }) {
-  const homePoints =
-    fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws;
-  const awayPoints =
-    fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
-  return (
-    <div className="bg-[var(--bg)] w-full border-1 border-[var(--border)] rounded-[10px] p-[10px] grid grid-rows-1 grid-cols-[1fr_auto_1fr] gap-[20px] items-baseline brightness-80">
-      <div className="grid grid-rows-1 grid-cols-[1fr_6ch_160px] gap-[20px] items-baseline justify-items-end">
-        <TeamForm form={fixture.homeTeamDetails.form} />
-        <p className="text-base inline text-muted">
-          {homePoints} pt{homePoints === 1 ? '' : 's'}
-        </p>
-        <Subtitle
-          style={{
-            textAlign: 'right',
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            width: '100%',
-          }}
-          className=" text-muted"
-        >
-          {fixture.homeTeamDetails.name}
-        </Subtitle>
-      </div>
-      <p className="font-bold text-center text-sm">vs</p>
-
-      <div className="grid grid-rows-1 grid-cols-[160px_6ch_1fr] gap-[20px] items-baseline">
-        <Subtitle
-          style={{
-            textWrap: 'nowrap',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}
-          className=" text-muted"
-        >
-          {fixture.awayTeamDetails.name}
-        </Subtitle>
-        <p className="inline text-base text-muted">
-          {awayPoints} pt{awayPoints === 1 ? '' : 's'}
-        </p>
-        <TeamForm form={fixture.awayTeamDetails.form} />
       </div>
     </div>
   );

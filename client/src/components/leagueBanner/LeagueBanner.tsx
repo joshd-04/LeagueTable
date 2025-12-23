@@ -66,7 +66,7 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
   // );
 
   return (
-    <div className="relative">
+    <div className="relative place-items-center">
       <div className="bg-transparent w-full max-w-full aspect-[2560/338] border-b-1 border-[var(--border)]">
         <Particles
           particleColors={['#00aaff', '#808080']}
@@ -87,7 +87,7 @@ function LeagueBannerFree({ children }: { children: React.ReactNode }) {
 
 function LeagueBannerEmpty({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative">
+    <div className="relative place-items-center">
       <div className="w-full max-w-full aspect-[2560/338] border-b-1 border-[var(--border)]">
         {children}
       </div>
@@ -98,7 +98,7 @@ function LeagueBannerEmpty({ children }: { children: React.ReactNode }) {
 function LeagueBannerStandard({ children }: { children: React.ReactNode }) {
   // Brightness values can be adjustable in league settings
   return (
-    <div className="relative">
+    <div className="relative place-items-center">
       <Image
         src="/banners/anfield.png"
         alt={'Banner'}

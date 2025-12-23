@@ -8,7 +8,7 @@ import Subtitle from '@/components/text/Subtitle';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Pagination from '@/components/pagination/Pagination';
+import PaginationComponent from '@/components/pagination/Pagination';
 import { fetchAPI } from '@/util/api';
 import { useQuery } from '@tanstack/react-query';
 import { API_URL } from '@/util/config';
@@ -254,7 +254,7 @@ function ResultsByMatchweek({
             <ResultRow result={result} key={i} handleClick={handleClick} />
           ))}
         </div>
-        <Pagination
+        <PaginationComponent
           page={matchweekViewing}
           setPage={setMatchweekViewing}
           lastPage={league.currentMatchweek}
