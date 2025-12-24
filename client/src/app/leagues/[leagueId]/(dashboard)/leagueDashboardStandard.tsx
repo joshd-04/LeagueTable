@@ -20,6 +20,7 @@ import Stats from './(dashboardWidgets)/stats';
 import { useParams } from 'next/navigation';
 import LeagueDetailsRibbon from './(dashboardWidgets)/leagueDetailsRibbon';
 import LeagueDashboardSkeleton from './(dashboardWidgets)/dashboardSkeleton';
+import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
 export default function LeagueDashboardStandard() {
@@ -64,6 +65,7 @@ export default function LeagueDashboardStandard() {
     queryClient.invalidateQueries({ queryKey: ['table'] });
   }
 
+  const mr = useScrollbarMargin(20);
   if (leagueQueryIsLoading) {
     return <LeagueDashboardSkeleton />;
   }
@@ -96,7 +98,10 @@ export default function LeagueDashboardStandard() {
           {league.name}
         </Heading1>
       </LeagueBanner>
-      <div className="flex flex-col gap-5 mx-[20px] mb-5">
+      <div
+        className="flex flex-col gap-5 mx-[20px] mb-5"
+        style={{ marginRight: `${mr}px` }}
+      >
         <LeagueDetailsRibbon league={league} />
         <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-5 ">
           <Announcement

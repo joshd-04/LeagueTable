@@ -93,7 +93,7 @@ export default function FixturesClient({
   }, [matchweekViewing]);
 
   return (
-    <div className="flex flex-col gap-[20px] w-screen mb-20">
+    <div className="flex flex-col gap-[20px] mb-20">
       <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <Heading1>Fixtures</Heading1>
@@ -181,7 +181,7 @@ function DetailsRibbon({
         <Select
           items={items}
           selectedKeys={[String(divisionFilter)]}
-          className="min-w-50"
+          className="min-w-50 justify-self-start"
           classNames={{ base: cn('w-full') }}
           onSelectionChange={(keys) => {
             const value = Number([...keys][0]);

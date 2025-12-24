@@ -60,20 +60,18 @@ function DetailsRibbon({
           {league.name}
         </Button>
 
-        <div className="justify-self-start">
-          <Select
-            items={items}
-            selectedKeys={[sort]}
-            className="min-w-50"
-            onSelectionChange={(keys) => {
-              const value = [...keys][0] as 'matchweek' | 'most recent';
-              setSort(value);
-            }}
-            disallowEmptySelection={true}
-          >
-            {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
-          </Select>
-        </div>
+        <Select
+          items={items}
+          selectedKeys={[sort]}
+          className="min-w-50 justify-self-start"
+          onSelectionChange={(keys) => {
+            const value = [...keys][0] as 'matchweek' | 'most recent';
+            setSort(value);
+          }}
+          disallowEmptySelection={true}
+        >
+          {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+        </Select>
       </div>
     </div>
   );

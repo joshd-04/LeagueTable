@@ -27,50 +27,16 @@ export default function PaginationComponent({
   const THRESHOLD = 20;
 
   useLayoutEffect(() => {
-    // Find the actual scrolling element
-    const findScrollParent = (
-      element: HTMLElement | null
-    ): HTMLElement | Window => {
-      if (!element) return window;
-
-      const { overflow, overflowY } = window.getComputedStyle(element);
-      const isScrollable = /(auto|scroll)/.test(overflow + overflowY);
-
-      if (isScrollable && element.scrollHeight > element.clientHeight) {
-        console.log('Found scroll parent:', element);
-        return element;
-      }
-
-      return element.parentElement
-        ? findScrollParent(element.parentElement)
-        : window;
-    };
-
-    const scrollParent = inFlowRef.current
-      ? findScrollParent(inFlowRef.current.parentElement)
-      : window;
-
     const checkStickyState = () => {
       const inFlowEl = inFlowRef.current;
       if (!inFlowEl) return;
 
       const rect = inFlowEl.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const stickyTop = viewportHeight - FIXED_BOTTOM_PX;
+      const stickyTop = window.innerHeight - FIXED_BOTTOM_PX;
 
       const shouldBeSticky = rect.top > stickyTop + THRESHOLD;
 
       if (isStickyRef.current !== shouldBeSticky) {
-        console.log(
-          'Sticky state changing:',
-          isStickyRef.current,
-          '->',
-          shouldBeSticky,
-          'rect.top:',
-          rect.top,
-          'stickyTop:',
-          stickyTop
-        );
         isStickyRef.current = shouldBeSticky;
         setIsSticky(shouldBeSticky);
       }
@@ -78,40 +44,16 @@ export default function PaginationComponent({
 
     checkStickyState();
 
-    let rafId: number | null = null;
     const handleScroll = () => {
-      console.log('Scroll event detected!');
-      if (rafId !== null) return;
-      rafId = requestAnimationFrame(() => {
-        checkStickyState();
-        rafId = null;
-      });
+      requestAnimationFrame(checkStickyState);
     };
 
-    console.log('Setting up scroll listeners on:', scrollParent);
-
-    if (scrollParent === window) {
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      window.addEventListener('resize', handleScroll);
-    } else {
-      scrollParent.addEventListener('scroll', handleScroll, {
-        passive: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
-      window.addEventListener('resize', handleScroll);
-    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
 
     return () => {
-      console.log('Cleaning up scroll listeners');
-      if (scrollParent === window) {
-        window.removeEventListener('scroll', handleScroll);
-      } else {
-        scrollParent.removeEventListener('scroll', handleScroll);
-      }
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
     };
   }, []);
 

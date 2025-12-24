@@ -1,17 +1,16 @@
 'use client';
 import useAccount from '@/hooks/useAccount';
 import { Fixture, League } from '@/util/definitions';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
-import Button from '@/components/text/Button';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
 import { useRouter } from 'next/navigation';
-import { addToast, useDisclosure } from '@heroui/react';
+import { addToast, Button, Link, useDisclosure } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -24,8 +23,6 @@ export default function FixtureClient({
   fixture: Fixture;
 }) {
   const { user, isLoggedIn } = useAccount();
-
-  console.log(league.results.includes(fixture._id));
 
   const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
 
@@ -124,62 +121,66 @@ export default function FixtureClient({
           </div>
         </div>
       </LeagueBanner>
-      <div className="flex flex-col items-center gap-[20px] mx-[20px]">
-        <div className="grid grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="justify-self-end text-base">
-            Season {fixture.season} Matchweek {fixture.matchweek}
-          </p>
-          <LinkButton
-            color="var(--text)"
-            bgHoverColor="var(--bg)"
-            borderlessButton={true}
-            underlineEffect={false}
-            href={`/leagues/${league._id}`}
-          >
-            {league.name}
-          </LinkButton>
-          <div className="flex flex-row items-center justify-start gap-12 text-base">
-            <p>
-              {league.tables[fixture.division - 1].name} (div {fixture.division}
-              )
-            </p>
-            {fixture.neutralGround && <p>Neutral Ground</p>}
-            {userOwnsThisLeague && (
-              <Button
-                color="var(--primary)"
-                bgHoverColor="var(--accent)"
-                borderlessButton={true}
-                underlineEffect={false}
-                onClick={() => {
-                  setSelectedFixture(fixture);
-                  onFixtureToResultOpen();
-                }}
-              >
-                Upload result
-              </Button>
-            )}
-          </div>
+      <DetailsRibbon
+        league={league}
+        fixture={fixture}
+        setSelectedFixture={setSelectedFixture}
+        onFixtureToResultOpen={onFixtureToResultOpen}
+      />
+      <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
+        <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
+          <p className="text-base">AI insights</p>
         </div>
-        <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
-          <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <p className="text-base">AI insights</p>
-          </div>
-          <MatchPreview fixture={fixture} />
-          <HeadToHead
-            fixture={fixture}
-            league={league}
-            userOwnsThisLeague={userOwnsThisLeague}
-          />
-        </div>
-        <FixtureToResult
-          leagueType={league.leagueType}
-          fixtureObj={selectedFixture}
-          isModalOpen={isFixtureToResultOpen}
-          onModalClose={onFixtureToResultClose}
-          setSelectedFixture={setSelectedFixture}
-          onResolution={handleFixtureToResultCompletion}
+        <MatchPreview fixture={fixture} />
+        <HeadToHead
+          fixture={fixture}
+          league={league}
+          userOwnsThisLeague={userOwnsThisLeague}
         />
       </div>
+      <FixtureToResult
+        leagueType={league.leagueType}
+        fixtureObj={selectedFixture}
+        isModalOpen={isFixtureToResultOpen}
+        onModalClose={onFixtureToResultClose}
+        setSelectedFixture={setSelectedFixture}
+        onResolution={handleFixtureToResultCompletion}
+      />
+    </div>
+  );
+}
+
+function DetailsRibbon({
+  league,
+  fixture,
+  setSelectedFixture,
+  onFixtureToResultOpen,
+}: {
+  league: League;
+  fixture: Fixture;
+  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  onFixtureToResultOpen: () => void;
+}) {
+  return (
+    <div className="grid grid-rows-1 grid-cols-3 place-self-center place-items-center text-base">
+      <p className="justify-self-end">
+        Season {league.currentSeason} Matchweek {league.currentMatchweek}
+      </p>
+
+      <Button as={Link} href={`/leagues/${league._id}`} variant="flat">
+        {league.name}
+      </Button>
+      <Button
+        // variant="bordered"
+        color="primary"
+        className="font-semibold justify-self-start"
+        onPress={() => {
+          setSelectedFixture(fixture);
+          onFixtureToResultOpen();
+        }}
+      >
+        Upload result
+      </Button>
     </div>
   );
 }

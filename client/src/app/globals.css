@@ -53,16 +53,15 @@
 html {
   height: 100%;
   /* width: 98vw; */
-  overflow: hidden; /* Block <html> from scrolling */
+  overflow-x: hidden;
+  /* scrollbar-gutter: stable; Prevent layout shift */
 }
 
 body {
   height: 100%;
   /* width: 98vw; */
-  overflow-y: auto; /* Enable scroll on <body> */
-  overflow-x: hidden;
-  scrollbar-gutter: stable; /* Prevent layout shift */
   font-family: 'Instrument Sans';
+  /* overflow: hidden; */
 }
 
 /* 2. Ensure sticky works */
