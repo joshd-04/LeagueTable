@@ -25,6 +25,23 @@ export default function PaginationComponent({
 
   const FIXED_BOTTOM_PX = 60;
   const THRESHOLD = 20;
+  const [centerOffset, setCenterOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    const updateCenterOffset = () => {
+      // Calculate the center of the content area (excluding scrollbar)
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
+      setCenterOffset(-scrollbarWidth / 2);
+    };
+
+    updateCenterOffset();
+    window.addEventListener('resize', updateCenterOffset);
+
+    return () => {
+      window.removeEventListener('resize', updateCenterOffset);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const checkStickyState = () => {
@@ -89,12 +106,14 @@ export default function PaginationComponent({
       {/* Sticky position - fixed to bottom of viewport */}
       <div
         ref={fixedRef}
-        className={`fixed left-1/2 -translate-x-1/2 transition-all duration-200 ${
+        className={`fixed transition-all duration-200 ${
           isSticky
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 translate-y-2 pointer-events-none'
         }`}
         style={{
+          left: '50%',
+          transform: `translateX(calc(-50% - ${centerOffset}px))`,
           bottom: `${FIXED_BOTTOM_PX}px`,
           zIndex: 60,
         }}

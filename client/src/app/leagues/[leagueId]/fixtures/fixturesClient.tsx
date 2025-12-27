@@ -93,7 +93,7 @@ export default function FixturesClient({
   }, [matchweekViewing]);
 
   return (
-    <div className="flex flex-col gap-[20px] mb-20">
+    <div className="flex flex-col w-screen gap-[20px] mb-20">
       <LeagueBanner leagueLevel={league.leagueLevel}>
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <Heading1>Fixtures</Heading1>

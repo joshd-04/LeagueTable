@@ -201,6 +201,7 @@ function FixtureRow({
           onMouseEnter={() => setEditHover(true)}
           onMouseLeave={() => setEditHover(false)}
           className="px-[10px] hover:bg-content3 h-full flex flex-col justify-center items-center rounded-[10px] ml-1"
+          tabIndex={0}
           onClick={(e) => {
             e.stopPropagation();
             setSelectedFixture(fixtureObj);
