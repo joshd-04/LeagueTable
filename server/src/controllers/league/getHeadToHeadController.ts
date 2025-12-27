@@ -5,9 +5,10 @@ import {
   ILeagueSchema,
   IResultSchema,
   ITeamsSchema,
+  IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { sortTeams } from '../../util/helpers';
+import { meetsMinimumTierLevel, sortTeams } from '../../util/helpers';
 
 interface statsInterface {
   goalsScored: number;
@@ -30,10 +31,13 @@ export async function getHeadToHeadController(
 
     // Check if league exists
     try {
-      league = await League.findById(leagueId).populate({
-        path: 'results',
-        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
-      });
+      league = await League.findById(leagueId).populate([
+        {
+          path: 'results',
+          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+        },
+        { path: 'leagueOwner' },
+      ]);
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -50,10 +54,12 @@ export async function getHeadToHeadController(
       );
     }
 
-    if (league.leagueLevel === 'free') {
+    const accountType = (league.leagueOwner as unknown as IUserSchema)
+      .accountType;
+    if (!meetsMinimumTierLevel('pro', accountType)) {
       return next(
         new ErrorHandling(403, {
-          message: `Upgrade to standard level to unlock head-to-head history`,
+          message: `Upgrade to account to pro to unlock head-to-head history`,
         })
       );
     }
@@ -81,7 +87,7 @@ export async function getHeadToHeadController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error calculating the season summary statistics. ${e.message}`
+        `There was an error getting the head to head. ${e.message}`
       )
     );
   }

@@ -14,6 +14,7 @@ import { addToast, Button, Link, useDisclosure } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
+import AiInsights from './(widgets)/aiInsights';
 
 export default function FixtureClient({
   league,
@@ -128,14 +129,13 @@ export default function FixtureClient({
         onFixtureToResultOpen={onFixtureToResultOpen}
       />
       <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
-        <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-          <p className="text-base">AI insights</p>
-        </div>
+        <AiInsights league={league} fixture={fixture} />
         <MatchPreview fixture={fixture} />
         <HeadToHead
           fixture={fixture}
           league={league}
           userOwnsThisLeague={userOwnsThisLeague}
+          
         />
       </div>
       <FixtureToResult

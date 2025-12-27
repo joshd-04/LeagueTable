@@ -229,11 +229,7 @@ function EditAnnouncementModal({
                 variant="flat"
                 value={announcementText}
                 onValueChange={setAnnouncementText}
-                description={
-                  <p className="text-muted">
-                    Do not enter harmful or sensitive content
-                  </p>
-                }
+                description={<p>Do not enter harmful or sensitive content</p>}
               />
             </ModalBody>
             <ModalFooter>

@@ -1,8 +1,10 @@
 import { Document, Types } from 'mongoose';
 
+export type AccountTypeInterface = 'free' | 'pro' | 'pro+';
+
 export interface ILeagueSchema extends Document {
   name: string;
-  leagueLevel: 'free' | 'pro' | 'pro+';
+  leagueLevel: AccountTypeInterface;
   announcement?: {
     date: Date;
     text: string;
@@ -94,7 +96,7 @@ export interface IUserSchema extends Document {
   username: string;
   email: string;
   passwordHash: string;
-  accountType: 'free' | 'pro' | 'pro+';
+  accountType: AccountTypeInterface;
   leaguesCreated: [];
   favoriteLeagues: [];
   followedLeagues: [];

@@ -5,7 +5,6 @@ import { API_URL, WEBSITE_NAME } from '@/util/config';
 import SetupIncomplete from '../../setupIncomplete';
 import { redirect } from 'next/navigation';
 import { Fixture, League } from '@/util/definitions';
-import FixtureFuture from './fixtureFuture';
 import { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -84,11 +83,6 @@ export default async function Page({ params }) {
   }
   const l = league.data.league as League;
   const f = fixture.data.fixture as Fixture;
-  const isFutureFixture =
-    f.matchweek > l.currentMatchweek && f.season === l.currentSeason;
-  if (isFutureFixture) {
-    return <FixtureFuture league={l} fixture={fixture.data.fixture} />;
-  }
 
-  return <FixtureClient league={l} fixture={fixture.data.fixture} />;
+  return <FixtureClient league={l} fixture={f} />;
 }

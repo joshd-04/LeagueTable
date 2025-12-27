@@ -1,3 +1,5 @@
+export type AccountTypeInterface = 'free' | 'pro' | 'pro+';
+
 export interface User {
   id: string;
   username: string;
@@ -156,5 +158,3 @@ export interface NotificationInterface {
   description?: string | (() => string);
   duration: number;
 }
-
-export type AccountTypeInterface = 'free' | 'pro' | 'pro+';

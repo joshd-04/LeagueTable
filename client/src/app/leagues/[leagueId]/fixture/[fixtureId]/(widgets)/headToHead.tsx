@@ -1,8 +1,11 @@
 'use client';
 
+import ProChip from '@/components/chips/ProChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { Fixture, League, Result } from '@/util/definitions';
+import { meetsMinimumTierLevel } from '@/util/helpers';
+import { Card, CardBody } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
@@ -17,15 +20,27 @@ export default function HeadToHead({
   league: League;
   userOwnsThisLeague: boolean;
 }) {
+  const shouldShowHeadToHead = meetsMinimumTierLevel(
+    'pro',
+    league.leagueOwner.accountType
+  );
+  // const shouldShowHeadToHead = true;
+
   return (
-    <div className="p-[20px]  h-full w-full  bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-      <p className="text-base">Head-to-head record</p>
-      {league.leagueLevel === 'free' ? (
-        <HeadToHeadLocked userOwnsThisLeague={userOwnsThisLeague} />
-      ) : (
-        <HeadToHeadBody fixture={fixture} league={league} />
-      )}
-    </div>
+    <Card className="h-full w-full px-[10px] py-[6px]">
+      <CardBody className="flex flex-col gap-2">
+        {/* <p className="text-base">Head-to-head record</p> */}
+        <span className="flex flex-row gap-2 items-center">
+          <ProChip />
+          <p className="align-middle inline text-base">Head-to-head record</p>
+        </span>
+        {shouldShowHeadToHead ? (
+          <HeadToHeadBody fixture={fixture} league={league} />
+        ) : (
+          <HeadToHeadLocked userOwnsThisLeague={userOwnsThisLeague} />
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -38,9 +53,12 @@ function HeadToHeadLocked({
     return (
       <div className="text-sm">
         <p className="text-warning">
-          Head-to-head is not available for free leagues.
+          Head-to-head is currently disabled for your league.
         </p>
-        <p>Upgrade to standard level to unlock.</p>
+        <p>
+          Upgrade your account to pro level to unlock H2H for this league
+          instantly. Only you can see this message.
+        </p>
       </div>
     );
   }
@@ -51,7 +69,11 @@ function HeadToHeadLocked({
     </div>
   );
 }
-
+/**
+ *
+ * Note: Only render this component when you are sure the league is atleast pro level & league owner is atleast pro.
+ *
+ */
 function HeadToHeadBody({
   league,
   fixture,

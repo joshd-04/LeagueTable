@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
       };
     } else {
       return {
-        title: `${WEBSITE_NAME} s`,
+        title: `${WEBSITE_NAME}`,
         description: `A simple to use, modern and sleek League/Table/Championship management website. Create & share your league with friends for free - ${WEBSITE_NAME}`,
         icons: {
           icon: { url: '/favicon.ico', sizes: 'any' }, // classic,

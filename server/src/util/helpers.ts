@@ -3,6 +3,7 @@ import { ErrorHandling } from './errorChecking';
 import jwt from 'jsonwebtoken';
 import { requiredFields as rF } from '..';
 import {
+  AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
@@ -273,4 +274,20 @@ export async function findLeaguePosition(
  */
 export function isTeam(doc: any): doc is ITeamsSchema {
   return doc && typeof doc === 'object' && 'name' in doc && 'division' in doc;
+}
+
+export function meetsMinimumTierLevel(
+  requiredLevel: AccountTypeInterface,
+  level: AccountTypeInterface
+) {
+  if (requiredLevel === 'free') return true;
+  if (requiredLevel === 'pro') {
+    if (level === 'pro' || level === 'pro+') return true;
+    return false;
+  }
+  if (requiredLevel === 'pro+') {
+    if (level === 'pro+') return true;
+    return false;
+  }
+  return false;
 }
