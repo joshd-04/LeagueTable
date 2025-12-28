@@ -4,10 +4,10 @@ import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import SetupIncomplete from '../setupIncomplete';
-import LeagueDashboardFree from './leagueDashboardFree';
-import LeagueDashboardStandard from './leagueDashboardStandard';
+
 import { League } from '@/util/definitions';
 import { Metadata } from 'next';
+import LeagueDashboard from './leagueDashboard';
 
 // Helper to reduce duplication
 async function fetchLeagueAndUser(leagueId: string) {
@@ -136,12 +136,5 @@ export default async function Page({
     redirect('/');
   }
 
-  const league: League = leagueResponse.data.league;
-
-  // Render correct dashboard
-  if (league.leagueLevel === 'pro' || league.leagueLevel === 'pro+') {
-    return <LeagueDashboardStandard />;
-  }
-
-  return <LeagueDashboardFree />;
+  return <LeagueDashboard />;
 }

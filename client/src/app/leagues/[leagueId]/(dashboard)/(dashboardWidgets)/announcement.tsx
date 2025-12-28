@@ -38,8 +38,11 @@ export default function Announcement({
   userOwnsThisLeague: boolean;
 }) {
   const [announcement, setAnnouncement] = useState(
-    league.announcement || { text: '', date: new Date() }
+    league.announcement ?? { text: '', date: new Date() }
   );
+
+  // console.log(league.announcement);
+  // console.log(announcement);
 
   const shouldDisable = !shouldGrantAccessToFeature(
     'pro',
@@ -59,7 +62,7 @@ export default function Announcement({
       fetchAPI(`${API_URL}/leagues/${league._id}/announcement`, {
         method: 'GET',
       }),
-    queryKey: ['announcement'],
+    queryKey: ['announcement', league._id],
   });
 
   useEffect(() => {
@@ -68,6 +71,10 @@ export default function Announcement({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  useEffect(() => {
+    console.log(announcement);
+  }, [announcement]);
 
   return (
     <>
@@ -147,7 +154,7 @@ function EditAnnouncementModal({
     if (isOpen) {
       setAnnouncementText(initialAnnouncement.text || '');
     }
-  }, [isOpen, initialAnnouncement.text]);
+  }, [isOpen, initialAnnouncement]);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
