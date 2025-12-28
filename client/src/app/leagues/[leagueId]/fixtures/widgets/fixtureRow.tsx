@@ -1,7 +1,7 @@
 import TruncatedText from '@/components/formattedText/truncatedText';
 import TeamForm from '@/components/teamForm/TeamForm';
 import { Fixture, League } from '@/util/definitions';
-import { shouldGrantAccessToFeature } from '@/util/helpers';
+import { meetsMinimumTierLevel } from '@/util/helpers';
 import { Card, CardBody, Link } from '@heroui/react';
 
 export default function FixtureRow({
@@ -18,9 +18,8 @@ export default function FixtureRow({
   const awayPoints =
     fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
 
-  const shouldShowTeamForm = shouldGrantAccessToFeature(
+  const shouldShowTeamForm = meetsMinimumTierLevel(
     'pro',
-    league.leagueLevel,
     league.leagueOwner.accountType
   );
 

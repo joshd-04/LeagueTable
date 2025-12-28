@@ -122,7 +122,11 @@ export default function FixturesClient({
                 {filteredFixtures.length > 0 ? (
                   filteredFixtures.map((fixture, i) =>
                     +matchweekViewing > league.currentMatchweek ? (
-                      <FixtureRowFuture fixture={fixture} key={i} />
+                      <FixtureRowFuture
+                        league={league}
+                        fixture={fixture}
+                        key={i}
+                      />
                     ) : (
                       <FixtureRow
                         league={league}
