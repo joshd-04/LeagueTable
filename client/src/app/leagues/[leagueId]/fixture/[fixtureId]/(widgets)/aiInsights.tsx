@@ -24,7 +24,7 @@ export default function AiInsights({
       <CardBody className="flex flex-col gap-2 text-sm">
         <p className="text-base">AI insights</p>
         {!showInsights ? (
-          <p>AI insights are not available for this league</p>
+          <p>AI insights are not yet available as a feature</p>
         ) : isFutureFixture ? (
           <p>
             AI Insights not available yet. Come back when matchweek{' '}

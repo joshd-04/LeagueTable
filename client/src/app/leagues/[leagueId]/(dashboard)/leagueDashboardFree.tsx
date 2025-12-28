@@ -88,7 +88,7 @@ export default function LeagueDashboardFree() {
         </Heading1>
       </LeagueBanner>
 
-      <div className="flex flex-col gap-5 mx-[20px] mb-5">
+      <div className="flex flex-col gap-5 mx-5 mb-5">
         <LeagueDetailsRibbon league={league} />
         <div className="w-full grid grid-cols-4 grid-rows-[repeat(3,min-content)]  gap-5">
           <Upgrade league={league} />

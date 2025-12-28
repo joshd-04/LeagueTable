@@ -1,4 +1,4 @@
-import { AccountTypeInterface } from './definitions';
+import { AccountTypeInterface, League, User } from './definitions';
 
 export function handleColorThemeToggle(newColorTheme: 'light' | 'dark') {
   if (newColorTheme === 'light') {
@@ -78,6 +78,12 @@ export function calculatePrice(
   return price;
 }
 
+/**
+ * Helper function that returns true if the level meets the required tier level.
+ * A level represents 'free', 'pro' or 'pro+'.
+ * Useful if you need to determine access for account-dependent features.
+ * Account-dependent feature: availability is determined by the user’s subscription and provides read-only or additive insights without modifying league state.
+ */
 export function meetsMinimumTierLevel(
   requiredLevel: AccountTypeInterface,
   level: AccountTypeInterface
@@ -93,7 +99,12 @@ export function meetsMinimumTierLevel(
   }
   return false;
 }
-
+/**
+ * Helper function that returns true if the league level & account level meet the required level for the feature.
+ * A level represents 'free', 'pro' or 'pro+'.
+ * Useful if you need to determine access for league-dependent features.
+ * League-dependent feature: availability is determined by the league’s tier at creation and affects league state or structure.
+ */
 export function shouldGrantAccessToFeature(
   featureLevel: AccountTypeInterface,
   leagueLevel: AccountTypeInterface,
@@ -103,4 +114,18 @@ export function shouldGrantAccessToFeature(
     meetsMinimumTierLevel(featureLevel, accountType) &&
     meetsMinimumTierLevel(featureLevel, leagueLevel)
   );
+}
+
+export function doesUserOwnThisLeague(
+  league: League,
+  user: User | null | undefined,
+  isLoggedIn: boolean
+) {
+  let userOwnsThisLeague = false;
+  if (isLoggedIn && user !== undefined && user !== null) {
+    if (user.id === league.leagueOwner._id) {
+      userOwnsThisLeague = true;
+    }
+  }
+  return userOwnsThisLeague;
 }

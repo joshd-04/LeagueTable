@@ -188,6 +188,7 @@ function DetailsRibbon({
             setDivisionFilter(value);
           }}
           disallowEmptySelection={true}
+          aria-label="Filter fixtures by division"
         >
           {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
         </Select>

@@ -99,7 +99,7 @@ export default function LeagueDashboardStandard() {
         </Heading1>
       </LeagueBanner>
       <div
-        className="flex flex-col gap-5 mx-[20px] mb-5"
+        className="flex flex-col gap-5 mx-5 mb-5"
         style={{ marginRight: `${mr}px` }}
       >
         <LeagueDetailsRibbon league={league} />

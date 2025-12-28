@@ -88,7 +88,7 @@ export default function FixtureFuture({
               {fixture.matchweek} starts!
             </p>
           </div>
-          <MatchPreview fixture={fixture} />
+          <MatchPreview league={league} fixture={fixture} />
           <HeadToHead
             fixture={fixture}
             league={league}

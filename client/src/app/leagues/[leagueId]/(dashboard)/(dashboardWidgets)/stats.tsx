@@ -197,7 +197,7 @@ function StatsTablePlayerBased({
         aria-label="Example static collection table w-full"
         fullWidth
         classNames={{
-          wrapper: `border-none shadow-none drop-shadow-none outline-none px-0`,
+          wrapper: `bg-transparent border-none shadow-none drop-shadow-none outline-none px-0`,
         }}
       >
         <TableHeader>
@@ -239,7 +239,7 @@ function StatsTableTeamBased({
         aria-label="Example static collection table w-full"
         fullWidth
         classNames={{
-          wrapper: `border-none shadow-none drop-shadow-none outline-none px-0`,
+          wrapper: `bg-transparent border-none shadow-none drop-shadow-none outline-none px-0`,
         }}
       >
         <TableHeader>

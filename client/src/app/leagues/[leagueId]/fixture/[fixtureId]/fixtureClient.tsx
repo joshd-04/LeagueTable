@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import AiInsights from './(widgets)/aiInsights';
+import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
 
 export default function FixtureClient({
   league,
@@ -70,6 +71,7 @@ export default function FixtureClient({
     }
   }
   const router = useRouter();
+  const mr = useScrollbarMargin(20);
 
   function handleFixtureToResultCompletion(isSuccess: boolean) {
     if (isSuccess) {
@@ -122,21 +124,25 @@ export default function FixtureClient({
           </div>
         </div>
       </LeagueBanner>
-      <DetailsRibbon
-        league={league}
-        fixture={fixture}
-        setSelectedFixture={setSelectedFixture}
-        onFixtureToResultOpen={onFixtureToResultOpen}
-      />
-      <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
-        <AiInsights league={league} fixture={fixture} />
-        <MatchPreview fixture={fixture} />
-        <HeadToHead
-          fixture={fixture}
+      <div
+        className="flex flex-col gap-5 mx-5 mb-5"
+        style={{ marginRight: `${mr}px` }}
+      >
+        <DetailsRibbon
           league={league}
-          userOwnsThisLeague={userOwnsThisLeague}
-          
+          fixture={fixture}
+          setSelectedFixture={setSelectedFixture}
+          onFixtureToResultOpen={onFixtureToResultOpen}
         />
+        <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-5 ">
+          <AiInsights league={league} fixture={fixture} />
+          <MatchPreview league={league} fixture={fixture} />
+          <HeadToHead
+            fixture={fixture}
+            league={league}
+            userOwnsThisLeague={userOwnsThisLeague}
+          />
+        </div>
       </div>
       <FixtureToResult
         leagueType={league.leagueType}

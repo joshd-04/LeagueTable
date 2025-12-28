@@ -66,7 +66,7 @@ export async function getHeadToHeadController(
 
     // this endpoint assumes team names are unique
     const allResults = league.results as unknown as IResultSchema[];
-    const lastFiveResults = allResults
+    const headtohead = allResults
       .filter((result) => {
         return (
           (result.homeTeamDetails.name === teamAName &&
@@ -75,12 +75,11 @@ export async function getHeadToHeadController(
             result.awayTeamDetails.name === teamAName)
         );
       })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     res
       .status(200)
-      .json({ status: 'success', data: { lastFiveResults: lastFiveResults } });
+      .json({ status: 'success', data: { headtohead: headtohead } });
   } catch (e: any) {
     console.error(e);
     return next(

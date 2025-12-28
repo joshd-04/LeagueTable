@@ -24,11 +24,11 @@ export default function HeadToHead({
     'pro',
     league.leagueOwner.accountType
   );
-  // const shouldShowHeadToHead = true;
+  // const shouldShowHeadToHead = false;
 
   return (
     <Card className="h-full w-full px-[10px] py-[6px]">
-      <CardBody className="flex flex-col gap-2">
+      <CardBody className="flex flex-col gap-4">
         {/* <p className="text-base">Head-to-head record</p> */}
         <span className="flex flex-row gap-2 items-center">
           <ProChip />
@@ -51,14 +51,15 @@ function HeadToHeadLocked({
 }) {
   if (userOwnsThisLeague) {
     return (
-      <div className="text-sm">
+      <div className="text-sm flex flex-col gap-2">
         <p className="text-warning">
           Head-to-head is currently disabled for your league.
         </p>
-        <p>
-          Upgrade your account to pro level to unlock H2H for this league
-          instantly. Only you can see this message.
+        <p className="">
+          Upgrade your account to pro level to instantly unlock H2H for this
+          league.
         </p>
+        <p className="text-default-500"> Only you can see this message.</p>
       </div>
     );
   }
@@ -89,25 +90,31 @@ function HeadToHeadBody({
         )}/${encodeURIComponent(fixture.awayTeamDetails.name)}`,
         { method: 'GET' }
       ),
-    queryKey: ['headtohead'],
+    queryKey: [
+      'headtohead',
+      league._id,
+      fixture.homeTeamDetails.name,
+      fixture.awayTeamDetails.name,
+    ],
   });
 
-  const results: Result[] = data?.data.lastFiveResults;
+  const results: Result[] = data?.data.headtohead;
   return (
     <div>
       {isLoading ? (
         <p className="text-sm">Loading...</p>
       ) : results.length > 0 ? (
-        <>
-          <p className="text-sm">Last 5 meetings:</p>
+        <div className="flex flex-col gap-2">
           <div>
-            <div className="w-[70%] flex flex-col gap-1">
+            <div className="w-full flex flex-col gap-1 max-h-[300px] overflow-auto">
               {results.map((result, i) => (
-                <ResultRow league={league} result={result} key={i} />
+                <div key={i} className="flex flex-col gap-1">
+                  <ResultRow league={league} result={result} />
+                </div>
               ))}
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <p className="text-sm">No history found</p>
       )}
@@ -133,20 +140,40 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
   );
 
   return (
+    // <motion.div
+    //   className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center px-[10px]"
+    //   onClick={(e) => handleResultClick(e)}
+    //   whileTap={{ scale: 0.98 }}
+    // >
+    //   <p className="text-sm w-max h-min flex-none">Season {result.season}</p>
+    //   <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
+    //     <p className="text-base w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+    //       {result.homeTeamDetails.name}
+    //     </p>
+    //     <p className="text-base w-full text-center">
+    //       {homeGoals} <span className="text-muted">-</span> {awayGoals}
+    //     </p>
+    //     <p className="text-base w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+    //       {result.awayTeamDetails.name}
+    //     </p>
+    //   </div>
+    // </motion.div>
     <motion.div
-      className="bg-[var(--bg)] hover:bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] hover:border-transparent hover:cursor-pointer flex flex-row justify-baseline items-center px-[10px]"
+      className="bg-content2 hover:bg-content3 h-[36px] border-0 border-divider  flex flex-row justify-baseline items-center rounded-[10px] hover:cursor-pointer transition-colors duration-250"
       onClick={(e) => handleResultClick(e)}
       whileTap={{ scale: 0.98 }}
     >
-      <p className="text-sm w-max h-min flex-none">Season {result.season}</p>
-      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end">
-        <p className="text-base w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+      <p className="flex-none w-max h-min text-sm px-[10px]">
+        Season {result.season}
+      </p>
+      <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
+        <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.homeTeamDetails.name}
         </p>
-        <p className="text-base w-full text-center">
+        <p className="w-full text-center font-normal text-muted">
           {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
-        <p className="text-base w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {result.awayTeamDetails.name}
         </p>
       </div>
