@@ -4,7 +4,7 @@ import TeamFormLocked from '@/components/teamForm/TeamFormLocked';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, Team } from '@/util/definitions';
-import { shouldGrantAccessToFeature } from '@/util/helpers';
+import { meetsMinimumTierLevel } from '@/util/helpers';
 import {
   Card,
   CardBody,
@@ -58,20 +58,30 @@ export default function TableWidget({
   const teams: Team[] | undefined = data?.data.teams;
 
   const [displayAsProLeague, setDisplayAsProLeague] = useState(
-    shouldGrantAccessToFeature(
-      'pro',
-      league.leagueLevel,
-      league.leagueOwner.accountType
-    )
+    /* League-dependent */
+    // shouldGrantAccessToFeature(
+    //   'pro',
+    //   league.leagueLevel,
+    //   league.leagueOwner.accountType
+    // );
+
+    /* Account dependent */
+    meetsMinimumTierLevel('pro', league.leagueOwner.accountType)
   );
 
   useEffect(() => {
+    /* League-dependent */
+    // setDisplayAsProLeague(
+    //   shouldGrantAccessToFeature(
+    //     'pro',
+    //     league.leagueLevel,
+    //     league.leagueOwner.accountType
+    //   )
+    // );
+
+    /* Account dependent */
     setDisplayAsProLeague(
-      shouldGrantAccessToFeature(
-        'pro',
-        league.leagueLevel,
-        league.leagueOwner.accountType
-      )
+      meetsMinimumTierLevel('pro', league.leagueOwner.accountType)
     );
   }, [league]);
 
@@ -248,7 +258,7 @@ function TableComponent({
   ];
 
   // If its supposed to have the team form, display it but display a locked symbol if the league owner is no longer pro
-  if (['pro', 'pro+'].includes(league.leagueLevel)) {
+  if (displayAsProLeague) {
     columns.push({ key: 'form', label: 'Form' });
   }
 
