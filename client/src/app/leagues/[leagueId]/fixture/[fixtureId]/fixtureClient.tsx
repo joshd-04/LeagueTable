@@ -16,6 +16,7 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import AiInsights from './(widgets)/aiInsights';
 import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
+import { individualTeamPagesEnabled } from '@/util/featureToggle';
 
 export default function FixtureClient({
   league,
@@ -97,31 +98,41 @@ export default function FixtureClient({
             <p className="text-sm">Home</p>
             <p className="text-sm">Away</p>
           </div>
-          <div className="flex flex-row justify-between gap-[20px]">
-            <LinkButton
-              color="var(--text)"
-              bgHoverColor="transparent"
-              borderlessButton={true}
-              underlineEffect={true}
-              shadowEffect={false}
-              href={'/'}
-              style={{ padding: 0, width: 'max-content' }}
-            >
+          {individualTeamPagesEnabled ? (
+            <div className="flex flex-row justify-between gap-[20px]">
+              <LinkButton
+                color="var(--text)"
+                bgHoverColor="transparent"
+                borderlessButton={true}
+                underlineEffect={true}
+                shadowEffect={false}
+                href={'/'}
+                style={{ padding: 0, width: 'max-content' }}
+              >
+                <Heading1>{fixture.homeTeamDetails.name}</Heading1>
+              </LinkButton>
+              <Heading1>v</Heading1>
+              <LinkButton
+                color="var(--text)"
+                bgHoverColor="transparent"
+                borderlessButton={true}
+                underlineEffect={true}
+                shadowEffect={false}
+                href={'/'}
+                style={{ padding: 0, width: 'max-content' }}
+              >
+                <Heading1>{fixture.awayTeamDetails.name}</Heading1>
+              </LinkButton>
+            </div>
+          ) : (
+            <div className="flex flex-row justify-between gap-[20px]">
               <Heading1>{fixture.homeTeamDetails.name}</Heading1>
-            </LinkButton>
-            <Heading1> v </Heading1>
-            <LinkButton
-              color="var(--text)"
-              bgHoverColor="transparent"
-              borderlessButton={true}
-              underlineEffect={true}
-              shadowEffect={false}
-              href={'/'}
-              style={{ padding: 0, width: 'max-content' }}
-            >
+
+              <Heading1>v</Heading1>
+
               <Heading1>{fixture.awayTeamDetails.name}</Heading1>
-            </LinkButton>
-          </div>
+            </div>
+          )}
         </div>
       </LeagueBanner>
       <div

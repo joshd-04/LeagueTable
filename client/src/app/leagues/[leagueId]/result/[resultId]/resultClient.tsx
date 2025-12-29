@@ -8,6 +8,9 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchOutcome from './(resultWidgets)/matchOutcome';
 import AsItStood from './(resultWidgets)/asItStood';
 import { individualTeamPagesEnabled } from '@/util/featureToggle';
+import { Button, Link } from '@heroui/react';
+import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
+import AiSummary from './(resultWidgets)/aiSummary';
 
 export default function ResultClient({
   league,
@@ -17,6 +20,7 @@ export default function ResultClient({
   result: Result;
 }) {
   const { user, isLoggedIn } = useAccount();
+  const mr = useScrollbarMargin(20);
 
   const homeGoals = result.basicOutcome.reduce(
     (acc, team) => (team === 'home' ? acc + 1 : acc),
@@ -89,33 +93,35 @@ export default function ResultClient({
           )}
         </div>
       </LeagueBanner>
-      <div className="flex flex-col gap-[20px] mx-[20px]">
-        <div className="grid  grid-rows-1 grid-cols-[1fr_auto_1fr] place-items-center gap-12">
-          <p className="text-base justify-self-end">
-            Season {result.season} Matchweek {result.matchweek}
-          </p>
-          <LinkButton
-            color="var(--text)"
-            bgHoverColor="var(--bg)"
-            borderlessButton={true}
-            underlineEffect={false}
-            href={`/leagues/${league._id}`}
-          >
-            {league.name}
-          </LinkButton>
-          <p className="text-base justify-self-start">
-            {league.tables[result.division - 1].name} (div {result.division})
-          </p>
-          {result.neutralGround && <p className="text-base">Neutral Ground</p>}
-        </div>
-        <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-[20px]">
-          <div className="p-[20px] h-full w-full bg-[var(--bg)] rounded-[10px] border-1 border-[var(--border)] flex flex-col gap-2">
-            <p className="text-base">AI insights</p>
-          </div>
+      <div
+        className="flex flex-col gap-5 mx-5"
+        style={{ marginRight: `${mr}px` }}
+      >
+        <DetailsRibbon league={league} result={result} />
+        <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-5">
+          <AiSummary league={league} result={result} />
           <MatchOutcome result={result} />
-          <AsItStood result={result} />
+          <AsItStood league={league} result={result} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function DetailsRibbon({ league, result }: { league: League; result: Result }) {
+  return (
+    <div className="grid grid-rows-1 grid-cols-3 place-self-center place-items-center text-base">
+      <p className="justify-self-end">
+        Season {league.currentSeason} Matchweek {league.currentMatchweek}
+      </p>
+
+      <Button as={Link} href={`/leagues/${league._id}`} variant="flat">
+        {league.name}
+      </Button>
+      <p className="text-base justify-self-start">
+        {league.tables[result.division - 1].name} (div {result.division})
+      </p>
+      {result.neutralGround && <p className="text-base">Neutral Ground</p>}
     </div>
   );
 }

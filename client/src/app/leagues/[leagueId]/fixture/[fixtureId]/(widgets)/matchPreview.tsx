@@ -100,7 +100,7 @@ function PreviewTable({
     },
     {
       key: 'goalDiff',
-      label: 'Goal Diff',
+      label: 'Goal diff',
       homeValue: () => (homeGD > 0 ? `+${homeGD}` : homeGD),
       awayValue: () => (awayGD > 0 ? `+${awayGD}` : awayGD),
     },
