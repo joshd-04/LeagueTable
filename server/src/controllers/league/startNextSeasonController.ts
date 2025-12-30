@@ -1,14 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
 import League from '../../models/leagueModel';
 import {
+  AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
   ITeamsSchema,
+  IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
 import { Types } from 'mongoose';
 import Team from '../../models/teamModel';
-import { generateFixtures, sortTeams } from '../../util/helpers';
+import {
+  generateFixtures,
+  meetsMinimumTierLevel,
+  sortTeams,
+} from '../../util/helpers';
 
 export async function startNextSeasonController(
   req: Request,
@@ -29,7 +35,10 @@ export async function startNextSeasonController(
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
     try {
-      league = await League.findById(leagueId).populate('tables.teams');
+      league = await League.findById(leagueId).populate([
+        { path: 'tables.teams' },
+        { path: 'leagueOwner' },
+      ]);
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -46,12 +55,59 @@ export async function startNextSeasonController(
       );
     }
 
-    if (league.leagueOwner.toString() !== userId) {
+    if (league.leagueOwner._id.toString() !== userId) {
       return next(
         new ErrorHandling(403, {
           message: `You are not permitted to make edits to this league`,
         })
       );
+    }
+    // Based on the league type (basic/advanced), restrict access if the owner doesnt have correct account level
+    const leagueOwner = league.leagueOwner as unknown as IUserSchema;
+
+    let requiredLevel: AccountTypeInterface = 'pro+';
+    switch (league.leagueType) {
+      case 'basic':
+        requiredLevel = 'free';
+        break;
+      case 'advanced':
+        requiredLevel = 'pro';
+        break;
+      default:
+        requiredLevel = 'pro+';
+        break;
+    }
+    const isValid = meetsMinimumTierLevel(
+      requiredLevel,
+      leagueOwner.accountType
+    );
+    if (!isValid) {
+      switch (requiredLevel) {
+        case 'free':
+          return next(
+            new ErrorHandling(403, {
+              message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
+            })
+          );
+        case 'pro':
+          return next(
+            new ErrorHandling(403, {
+              message: `Pro required to manage this league. Renew your subscription to continue.`,
+            })
+          );
+        case 'pro+':
+          return next(
+            new ErrorHandling(403, {
+              message: `Pro+ required to manage this league. Renew your subscription to continue.`,
+            })
+          );
+        default:
+          return next(
+            new ErrorHandling(403, {
+              message: `We could not verify your account subscription tier.`,
+            })
+          );
+      }
     }
 
     // Make sure the league has teams

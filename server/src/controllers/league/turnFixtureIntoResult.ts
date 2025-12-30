@@ -1,15 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import League from '../../models/leagueModel';
 import {
+  AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
   ITeamsSchema,
+  IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
 import Team from '../../models/teamModel';
 import {
   calculateTeamPoints,
   findLeaguePosition,
+  meetsMinimumTierLevel,
   sortTeams,
 } from '../../util/helpers';
 import Fixture from '../../models/fixtureModel';
@@ -74,6 +77,7 @@ export async function turnFixtureIntoResult(
           path: 'fixtures',
           populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
+        { path: 'leagueOwner' },
       ]);
     } catch {
       return next(
@@ -98,6 +102,75 @@ export async function turnFixtureIntoResult(
           message: `You are not permitted to make edits to this league`,
         })
       );
+    }
+
+    // Safety check: make sure fixture is in the same season
+    const isDifferentSeason = fixture.season !== league.currentSeason;
+    if (isDifferentSeason) {
+      return next(
+        new ErrorHandling(403, {
+          message: `This fixture is from a different season and cannot be updated.`,
+        })
+      );
+    }
+
+    // Check if the fixture is NOT a future fixture
+    const isFutureFixture = fixture.matchweek > league.currentMatchweek;
+
+    if (isFutureFixture) {
+      return next(
+        new ErrorHandling(403, {
+          message: `This fixture isn't released yet. Progress through the season to upload the result.`,
+        })
+      );
+    }
+
+    // Based on the league type (basic/advanced), restrict access if the owner doesnt have correct account level
+    const leagueOwner = league.leagueOwner as unknown as IUserSchema;
+
+    let requiredLevel: AccountTypeInterface = 'pro+';
+    switch (league.leagueType) {
+      case 'basic':
+        requiredLevel = 'free';
+        break;
+      case 'advanced':
+        requiredLevel = 'pro';
+        break;
+      default:
+        requiredLevel = 'pro+';
+        break;
+    }
+    const isValid = meetsMinimumTierLevel(
+      requiredLevel,
+      leagueOwner.accountType
+    );
+    if (!isValid) {
+      switch (requiredLevel) {
+        case 'free':
+          return next(
+            new ErrorHandling(403, {
+              message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
+            })
+          );
+        case 'pro':
+          return next(
+            new ErrorHandling(403, {
+              message: `Pro required to manage this league. Renew your subscription to continue.`,
+            })
+          );
+        case 'pro+':
+          return next(
+            new ErrorHandling(403, {
+              message: `Pro+ required to manage this league. Renew your subscription to continue.`,
+            })
+          );
+        default:
+          return next(
+            new ErrorHandling(403, {
+              message: `We could not verify your account subscription tier.`,
+            })
+          );
+      }
     }
 
     // Check that basic outcome given in correct format
@@ -161,6 +234,7 @@ export async function turnFixtureIntoResult(
       );
     }
 
+    // Start creating the result
     const homeTeamPosition = await findLeaguePosition(
       league,
       homeDetails.division,

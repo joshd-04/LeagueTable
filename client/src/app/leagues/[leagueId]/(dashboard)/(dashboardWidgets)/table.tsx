@@ -459,10 +459,10 @@ function TableFeaturesRestrictedTooltipContent() {
   return (
     <div className="p-[6px] py-[10px] flex flex-col gap-2">
       <div className="flex flex-row gap-2 items-center">
-        <AiOutlineExclamationCircle className="w-6 h-6 text-warning" />
-        <p className="text-base text-warning">Table Features Restricted</p>
+        <AiOutlineExclamationCircle className="w-6 h-6 dark:text-warning" />
+        <p className="text-base dark:text-warning">Table Features Restricted</p>
       </div>
-      <div className="flex flex-col gap-1 text-muted">
+      <div className="flex flex-col gap-1 text-foreground">
         <p className="text-xs">
           This table no longer has its extra features, such as:
         </p>

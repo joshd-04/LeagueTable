@@ -10,7 +10,7 @@ import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
 import MatchPreview from './(widgets)/matchPreview';
 import HeadToHead from './(widgets)/headToHead';
 import { useRouter } from 'next/navigation';
-import { addToast, Button, Link, useDisclosure } from '@heroui/react';
+import { Button, Link, useDisclosure } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -78,11 +78,12 @@ export default function FixtureClient({
     if (isSuccess) {
       router.push(`/leagues/${league._id}/result/${fixture._id}`);
     } else {
-      addToast({
-        title: 'Something went wrong',
-        description: 'Could not convert this fixture into a result',
-        color: 'warning',
-      });
+      // Error toasts are now handled by the fixture to result form itself using API message
+      // addToast({
+      //   title: 'Something went wrong',
+      //   description: 'Could not convert this fixture into a result',
+      //   color: 'warning',
+      // });
     }
   }
 
@@ -178,6 +179,12 @@ function DetailsRibbon({
   setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
   onFixtureToResultOpen: () => void;
 }) {
+  // Just incase, make sure the seasons are verified here too
+  const isFutureFixture =
+    (fixture.matchweek > league.currentMatchweek &&
+      fixture.season == league.currentSeason) ||
+    fixture.season > league.currentSeason;
+
   return (
     <div className="grid grid-rows-1 grid-cols-3 place-self-center place-items-center text-base">
       <p className="justify-self-end">
@@ -195,6 +202,7 @@ function DetailsRibbon({
           setSelectedFixture(fixture);
           onFixtureToResultOpen();
         }}
+        isDisabled={isFutureFixture}
       >
         Upload result
       </Button>

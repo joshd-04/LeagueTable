@@ -1,7 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import League from '../../models/leagueModel';
-import { IFixtureSchema, ILeagueSchema } from '../../util/definitions';
+import {
+  AccountTypeInterface,
+  IFixtureSchema,
+  ILeagueSchema,
+  IUserSchema,
+} from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
+import { meetsMinimumTierLevel } from '../../util/helpers';
 
 export async function startNextMatchweek(
   req: Request,
@@ -15,10 +21,18 @@ export async function startNextMatchweek(
     let league: ILeagueSchema | null;
 
     try {
-      league = await League.findById(leagueId).populate({
-        path: 'fixtures',
-        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
-      });
+      // league = await League.findById(leagueId).populate({
+      //   path: 'fixtures',
+      //   populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+      //   path: 'leagueOwner',
+      // });
+      league = await League.findById(leagueId).populate([
+        {
+          path: 'fixtures',
+          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+        },
+        { path: 'leagueOwner' },
+      ]);
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -35,12 +49,60 @@ export async function startNextMatchweek(
       );
     }
 
-    if (userId !== league.leagueOwner.toString()) {
+    if (userId !== league.leagueOwner._id.toString()) {
       return next(
         new ErrorHandling(403, {
           message: `You are not permitted to make edits to this league`,
         })
       );
+    }
+
+    // Based on the league type (basic/advanced), restrict access if the owner doesnt have correct account level
+    const leagueOwner = league.leagueOwner as unknown as IUserSchema;
+
+    let requiredLevel: AccountTypeInterface = 'pro+';
+    switch (league.leagueType) {
+      case 'basic':
+        requiredLevel = 'free';
+        break;
+      case 'advanced':
+        requiredLevel = 'pro';
+        break;
+      default:
+        requiredLevel = 'pro+';
+        break;
+    }
+    const isValid = meetsMinimumTierLevel(
+      requiredLevel,
+      leagueOwner.accountType
+    );
+    if (!isValid) {
+      switch (requiredLevel) {
+        case 'free':
+          return next(
+            new ErrorHandling(403, {
+              message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
+            })
+          );
+        case 'pro':
+          return next(
+            new ErrorHandling(403, {
+              message: `Pro required to manage this league. Renew your subscription to continue.`,
+            })
+          );
+        case 'pro+':
+          return next(
+            new ErrorHandling(403, {
+              message: `Pro+ required to manage this league. Renew your subscription to continue.`,
+            })
+          );
+        default:
+          return next(
+            new ErrorHandling(403, {
+              message: `We could not verify your account subscription tier.`,
+            })
+          );
+      }
     }
 
     if (league.currentMatchweek >= league.finalMatchweek) {

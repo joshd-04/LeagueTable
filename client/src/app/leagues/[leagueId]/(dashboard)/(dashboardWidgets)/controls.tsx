@@ -40,21 +40,54 @@ export default function Controls({
 
   const { mutateAsync: matchweekMutation } = useMutation({
     mutationFn: handleStartNextMatchweek,
-    onSuccess: () => {
-      invalidateDashboardQueries();
-      addToast({
-        title: 'Success!',
-        description: `Matchweek ${currentMatchweek + 1} is underway`,
-        shouldShowTimeoutProgress: true,
-        color: 'success',
-      });
+    // onSuccess: () => {
+    //   invalidateDashboardQueries();
+    //   addToast({
+    //     title: 'Success!',
+    //     description: `Matchweek ${currentMatchweek + 1} is underway`,
+    //     shouldShowTimeoutProgress: true,
+    //     color: 'success',
+    //   });
+    // },
+    // onError: () => {
+    //   addToast({
+    //     title: 'Something went wrong',
+    //     description: `We could not start matchweek ${currentMatchweek + 1}`,
+    //     shouldShowTimeoutProgress: true,
+    //     color: 'danger',
+    //   });
+    // },
+    onSuccess: (response) => {
+      if (response.status === 'success') {
+        invalidateDashboardQueries();
+        addToast({
+          title: 'Success!',
+          description: `Matchweek ${currentMatchweek + 1} is underway`,
+          shouldShowTimeoutProgress: true,
+          color: 'success',
+        });
+      } else if (response.status === 'fail') {
+        addToast({
+          title: 'Something went wrong',
+          description: `${response.data.message}`,
+          shouldShowTimeoutProgress: true,
+          color: 'warning',
+        });
+      } else {
+        addToast({
+          title: 'We ran into a problem',
+          description: response.message,
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
+      }
     },
-    onError: () => {
+    onError: (e) => {
       addToast({
-        title: 'Something went wrong',
-        description: `We could not start matchweek ${currentMatchweek + 1}`,
-        shouldShowTimeoutProgress: true,
+        title: 'We ran into a problem',
+        description: e.message,
         color: 'danger',
+        shouldShowTimeoutProgress: true,
       });
     },
   });
@@ -69,24 +102,60 @@ export default function Controls({
   const { mutateAsync: seasonMutation } = useMutation({
     mutationFn: handleStartNextSeason,
 
-    onSuccess: () => {
-      invalidateDashboardQueries();
-      if (setSeasonViewing) {
-        setSeasonViewing((prev) => prev + 1);
+    // onSuccess: () => {
+    //   invalidateDashboardQueries();
+    //   if (setSeasonViewing) {
+    //     setSeasonViewing((prev) => prev + 1);
+    //   }
+    //   addToast({
+    //     title: 'Success!',
+    //     description: `The next season is underway`,
+    //     shouldShowTimeoutProgress: true,
+    //     color: 'success',
+    //   });
+    // },
+    // onError: () => {
+    //   addToast({
+    //     title: 'Something went wrong',
+    //     description: `We could not start the next season`,
+    //     shouldShowTimeoutProgress: true,
+    //     color: 'danger',
+    //   });
+    // },
+    onSuccess: (response) => {
+      if (response.status === 'success') {
+        invalidateDashboardQueries();
+        if (setSeasonViewing) {
+          setSeasonViewing((prev) => prev + 1);
+        }
+        addToast({
+          title: 'Success!',
+          description: `The next season is underway`,
+          shouldShowTimeoutProgress: true,
+          color: 'success',
+        });
+      } else if (response.status === 'fail') {
+        addToast({
+          title: 'Something went wrong',
+          description: `${response.data.message}`,
+          shouldShowTimeoutProgress: true,
+          color: 'warning',
+        });
+      } else {
+        addToast({
+          title: 'We ran into a problem',
+          description: response.message,
+          color: 'danger',
+          shouldShowTimeoutProgress: true,
+        });
       }
-      addToast({
-        title: 'Success!',
-        description: `The next season is underway`,
-        shouldShowTimeoutProgress: true,
-        color: 'success',
-      });
     },
-    onError: () => {
+    onError: (e) => {
       addToast({
-        title: 'Something went wrong',
-        description: `We could not start the next season`,
-        shouldShowTimeoutProgress: true,
+        title: 'We ran into a problem',
+        description: e.message,
         color: 'danger',
+        shouldShowTimeoutProgress: true,
       });
     },
   });
