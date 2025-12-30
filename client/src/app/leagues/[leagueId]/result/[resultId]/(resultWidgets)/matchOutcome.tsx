@@ -1,5 +1,6 @@
 import { Result } from '@/util/definitions';
 import { Card, CardBody } from '@heroui/react';
+import { PiSoccerBallFill } from 'react-icons/pi';
 
 export default function MatchOutcome({ result }: { result: Result }) {
   function calculateScore(index: number) {
@@ -166,7 +167,16 @@ function MatchOutcomeRowAdvanced({
       {goal.team === 'home' ? (
         <div className="place-self-start flex flex-col items-start text-sm">
           <p>Goal: {homeTeamDetails.name}</p>
-          <p>⚽ {goal.scorer}</p>
+          <span className="flex flex-row gap-1 items-center">
+            <PiSoccerBallFill
+              className={`w-4 h-4 inline ${
+                goal.isOwnGoal ? 'fill-danger' : 'fill-white'
+              }`}
+            />
+            <p>
+              {goal.scorer} {goal.isOwnGoal && '(OG)'}
+            </p>
+          </span>
           {goal.assist && <p>👟 {goal.assist}</p>}
         </div>
       ) : (
@@ -190,7 +200,16 @@ function MatchOutcomeRowAdvanced({
       {goal.team === 'away' ? (
         <div className="place-self-end flex flex-col items-end text-sm">
           <p>Goal: {awayTeamDetails.name}</p>
-          <p>⚽ {goal.scorer}</p>
+          <span className="flex flex-row gap-1 items-center">
+            <PiSoccerBallFill
+              className={`w-4 h-4 inline ${
+                goal.isOwnGoal ? 'fill-danger' : 'fill-white'
+              }`}
+            />
+            <p>
+              {goal.scorer} {goal.isOwnGoal && '(OG)'}
+            </p>
+          </span>
           {goal.assist && <p>👟 {goal.assist}</p>}
         </div>
       ) : (

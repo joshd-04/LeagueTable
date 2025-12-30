@@ -8,6 +8,8 @@ import { useMutation } from '@tanstack/react-query';
 import {
   addToast,
   Button,
+  Checkbox,
+  cn,
   Input,
   Modal,
   ModalBody,
@@ -194,6 +196,7 @@ function ResultFormAdvanced({
   const [goalScorer, setGoalScorer] = useState<string>('');
   const [assist, setAssist] = useState<string>('');
   const [goalScorerError, setGoalScorerError] = useState('');
+  const [isOwnGoal, setIsOwnGoal] = useState(false);
 
   const [didJustAttemptToAddEvent, setDidJustAttemptToAddEvent] =
     useState(false);
@@ -201,18 +204,18 @@ function ResultFormAdvanced({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   function addGoal(team: 'home' | 'away') {
-    if (goalScorer.toString().length === 0) {
+    if (goalScorer.toString().trim().length === 0) {
       setGoalScorerError('Scorer is required');
       return false;
     }
-    const assister = `${assist}`.length === 0 ? undefined : `${assist}`;
+    const assister = `${assist.trim()}`.length === 0 ? undefined : `${assist}`;
     setMatchStory((prev) => [
       ...prev,
       {
         team: team,
         scorer: `${goalScorer}`,
         assist: assister,
-        isOwnGoal: false,
+        isOwnGoal: isOwnGoal,
       },
     ]);
     setTimeout(() => {
@@ -230,6 +233,13 @@ function ResultFormAdvanced({
     });
     return true;
   }
+
+  function resetInputs() {
+    setGoalScorer('');
+    setAssist('');
+    setIsOwnGoal(false);
+  }
+
   return (
     <>
       <div className="max-h-[300px] min-h-[300px] overflow-auto ">
@@ -241,61 +251,19 @@ function ResultFormAdvanced({
             <p className="place-self-center text-muted">No events</p>
           ) : (
             matchStory.map((goal, i) => (
-              <div
+              <GoalRow
+                fixture={fixture}
+                goal={goal}
                 key={i}
-                className={`w-full flex flex-row justify-between gap-4 items-center rounded-lg pl-4 ${
-                  goal.team === 'home' ? 'bg-content3' : 'bg-content2'
-                }`}
-              >
-                <div
-                  className={`w-full my-2 ${
-                    goal.team === 'home' ? 'text-left' : 'text-right'
-                  } `}
-                >
-                  <div>
-                    <p>
-                      {goal.team === 'home'
-                        ? fixture.homeTeamDetails.name
-                        : fixture.awayTeamDetails.name}{' '}
-                      ({calculateScore(i)})
-                    </p>
-                    <span
-                      className="flex flex-row gap-1 items-center"
-                      style={{
-                        placeSelf: goal.team === 'home' ? 'start' : 'end',
-                      }}
-                    >
-                      <PiSoccerBallFill className="w-4 h-4 fill-white inline" />
-                      <p>{goal.scorer}</p>
-                    </span>
-                    {goal.assist && (
-                      <span
-                        className="flex flex-row gap-1 items-center"
-                        style={{
-                          placeSelf: goal.team === 'home' ? 'start' : 'end',
-                        }}
-                      >
-                        <GiRunningShoe className="w-4 h-4 fill-white inline" />
-                        <p>{goal.assist}</p>
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Button
-                  color="danger"
-                  onPress={() => removeGoal(i)}
-                  className="text-sm place-self-center"
-                  variant="light"
-                  isIconOnly
-                >
-                  <FaTrashAlt className="w-4 h-4 fill-danger" />
-                </Button>
-              </div>
+                goalIndex={i}
+                removeGoal={removeGoal}
+                calculateScore={calculateScore}
+              />
             ))
           )}
         </div>
       </div>
-      <div className="flex flex-col justify-center items-center gap-2">
+      <div className="flex flex-col justify-center items-center w-full gap-4">
         <div className="flex flex-col justify-center items-center w-full gap-2">
           <Input
             type="text"
@@ -305,18 +273,40 @@ function ResultFormAdvanced({
             onValueChange={setGoalScorer}
             errorMessage={goalScorerError}
             isRequired
-            isInvalid={didJustAttemptToAddEvent && goalScorer.length === 0}
+            fullWidth
+            isInvalid={
+              didJustAttemptToAddEvent && goalScorer.trim().length === 0
+            }
             label="Goal scorer"
             onFocus={() => setDidJustAttemptToAddEvent(false)}
           />
-          <Input
-            type="text"
-            size="sm"
-            radius="md"
-            value={assist}
-            onValueChange={setAssist}
-            label="Assist"
-          />
+          <div className="max-w-full overflow-clip w-full flex flex-row items-stretch gap-4">
+            <Input
+              type="text"
+              size="sm"
+              radius="md"
+              className="min-w-0 flex-1"
+              value={assist}
+              onValueChange={setAssist}
+              label="Assist"
+            />
+            <Checkbox
+              aria-label={'Mark as own goal'}
+              classNames={{
+                base: cn(
+                  'shrink-0 inline-flex min-w-max bg-content2 min-h-full my-0 mr-1',
+                  'hover:bg-content3 items-center justify-start',
+                  'cursor-pointer rounded-lg gap-2 px-4 border-2 border-transparent',
+                  'data-[selected=true]:border-primary transition-colors duration-200'
+                ),
+                label: 'w-full text-sm',
+              }}
+              isSelected={isOwnGoal}
+              onValueChange={setIsOwnGoal}
+            >
+              <div className="w-full flex justify-between gap-2">Own goal</div>
+            </Checkbox>
+          </div>
         </div>
 
         <div className="grid grid-rows-1 grid-cols-2 w-full gap-2">
@@ -325,8 +315,7 @@ function ResultFormAdvanced({
             onPress={() => {
               const success = addGoal('home');
               if (success) {
-                setGoalScorer('');
-                setAssist('');
+                resetInputs();
               } else {
                 setDidJustAttemptToAddEvent(true);
               }
@@ -340,8 +329,7 @@ function ResultFormAdvanced({
             onPress={() => {
               const success = addGoal('away');
               if (success) {
-                setGoalScorer('');
-                setAssist('');
+                resetInputs();
               } else {
                 setDidJustAttemptToAddEvent(true);
               }
@@ -353,5 +341,77 @@ function ResultFormAdvanced({
         </div>
       </div>
     </>
+  );
+}
+
+function GoalRow({
+  fixture,
+  goal,
+  goalIndex,
+  removeGoal,
+  calculateScore,
+}: {
+  fixture: Fixture;
+  goal: GoalAdvanced;
+  goalIndex: number;
+  removeGoal: (i: number) => void;
+  calculateScore: (i: number) => string;
+}) {
+  return (
+    <div
+      className={`w-full flex flex-row justify-between gap-4 items-center rounded-lg pl-4 ${
+        goal.team === 'home' ? 'bg-content3' : 'bg-content2'
+      }`}
+    >
+      <div
+        className={`w-full my-2 ${
+          goal.team === 'home' ? 'text-left' : 'text-right'
+        } `}
+      >
+        <div>
+          <p>
+            {goal.team === 'home'
+              ? fixture.homeTeamDetails.name
+              : fixture.awayTeamDetails.name}{' '}
+            ({calculateScore(goalIndex)})
+          </p>
+          <span
+            className="flex flex-row gap-1 items-center"
+            style={{
+              placeSelf: goal.team === 'home' ? 'start' : 'end',
+            }}
+          >
+            <PiSoccerBallFill
+              className={`w-4 h-4 inline ${
+                goal.isOwnGoal ? 'fill-danger' : 'fill-white'
+              }`}
+            />
+            <p>
+              {goal.scorer} {goal.isOwnGoal && '(OG)'}
+            </p>
+          </span>
+          {goal.assist && (
+            <span
+              className="flex flex-row gap-1 items-center"
+              style={{
+                placeSelf: goal.team === 'home' ? 'start' : 'end',
+              }}
+            >
+              <GiRunningShoe className="w-4 h-4 fill-white inline" />
+              <p>{goal.assist}</p>
+            </span>
+          )}
+        </div>
+      </div>
+      <Button
+        color="danger"
+        onPress={() => removeGoal(goalIndex)}
+        className="text-sm place-self-center"
+        variant="light"
+        isIconOnly
+      >
+        <FaTrashAlt className="w-4 h-4 fill-danger" />
+      </Button>
+    </div>
   );
 }

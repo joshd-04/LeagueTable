@@ -42,6 +42,8 @@ export async function turnFixtureIntoResult(
         }[]
       | null = req.body.detailedOutcome || null;
 
+    console.log(detailedOutcome);
+
     // Check if fixture exists
     let fixture: IFixtureSchema | null;
     try {
@@ -229,7 +231,7 @@ export async function turnFixtureIntoResult(
     if (detailedOutcomeFlag === true) {
       return next(
         new ErrorHandling(400, {
-          message: `Property 'detailedOutcome' is required because this league is an 'advanced' league. Make sure the same number of goals are provided as the basicOutcome. Property 'detailedOutcome' must have a team: "home" | "away", scorer: str, assist?: str | undefined`,
+          message: `Property 'detailedOutcome' is required because this league is an 'advanced' league. Make sure the same number of goals are provided as the basicOutcome. Property 'detailedOutcome' must have a team: "home" | "away", scorer: str, assist?: str | undefined, isOwnGoal?: boolean | undefined`,
         })
       );
     }

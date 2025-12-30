@@ -32,6 +32,7 @@ const resultSchema: Schema<IResultSchema> = new mongoose.Schema({
       team: { type: String, required: true },
       scorer: { type: String, required: true },
       assist: { type: String },
+      isOwnGoal: { type: Boolean },
     },
   ],
 });
