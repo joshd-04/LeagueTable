@@ -56,11 +56,12 @@ export async function myAssociatedLeaguesFetcherController(
         name: league.name,
         currentSeason: league.currentSeason,
         currentMatchweek: league.currentMatchweek,
-        numDivisions: league.tables.length,
-        numTeams: league.tables.reduce(
-          (acc, table) => acc + table.numberOfTeams,
-          0
-        ),
+        numDivisions: league.tables.filter(
+          (table) => table.season === league.currentSeason
+        ).length,
+        numTeams: league.tables
+          .filter((table) => table.season === league.currentSeason)
+          .reduce((acc, table) => acc + table.numberOfTeams, 0),
         owner: {
           name: leagueOwner.username,
           _id: leagueOwner._id,
@@ -80,11 +81,13 @@ export async function myAssociatedLeaguesFetcherController(
         name: league.name,
         currentSeason: league.currentSeason,
         currentMatchweek: league.currentMatchweek,
-        numDivisions: league.tables.length,
-        numTeams: league.tables.reduce(
-          (acc, table) => acc + table.numberOfTeams,
-          0
-        ),
+
+        numDivisions: league.tables.filter(
+          (table) => table.season === league.currentSeason
+        ).length,
+        numTeams: league.tables
+          .filter((table) => table.season === league.currentSeason)
+          .reduce((acc, table) => acc + table.numberOfTeams, 0),
         owner: {
           name: leagueOwner.username,
           _id: leagueOwner._id,
@@ -102,11 +105,12 @@ export async function myAssociatedLeaguesFetcherController(
         name: league.name,
         currentSeason: league.currentSeason,
         currentMatchweek: league.currentMatchweek,
-        numDivisions: league.tables.length,
-        numTeams: league.tables.reduce(
-          (acc, table) => acc + table.numberOfTeams,
-          0
-        ),
+        numDivisions: league.tables.filter(
+          (table) => table.season === league.currentSeason
+        ).length,
+        numTeams: league.tables
+          .filter((table) => table.season === league.currentSeason)
+          .reduce((acc, table) => acc + table.numberOfTeams, 0),
         owner: {
           name: leagueOwner.username,
           _id: leagueOwner._id,

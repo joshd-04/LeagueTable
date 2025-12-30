@@ -6,6 +6,10 @@ import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { League, SeasonStats } from '@/util/definitions';
 import {
+  meetsMinimumTierLevel,
+  shouldGrantAccessToFeature,
+} from '@/util/helpers';
+import {
   Card,
   CardBody,
   Select,
@@ -52,6 +56,12 @@ export default function Stats({
       accessLevel: 'pro',
     },
     {
+      key: 'ownGoals',
+      label: 'Own goals',
+      unit: 'Own goals',
+      accessLevel: 'pro',
+    },
+    {
       key: 'cleansheets',
       label: 'Cleansheets',
       unit: 'Cleansheets',
@@ -62,9 +72,11 @@ export default function Stats({
   const [availableStats, setAvailableStats] = useState<IStat[]>([]);
 
   const [selectedStat, setSelectedStat] = useState<IStat | undefined>(
-    league.leagueOwner.accountType === 'pro' &&
-      league.leagueLevel === 'pro' &&
-      league.leagueType === 'advanced'
+    shouldGrantAccessToFeature(
+      'pro',
+      league.leagueLevel,
+      league.leagueOwner.accountType
+    ) && league.leagueType === 'advanced'
       ? allPossibleStats.find((s) => s.key === 'topScorers')
       : allPossibleStats.find((s) => s.key === 'cleansheets')
   );
@@ -118,14 +130,16 @@ export default function Stats({
           }}
           disabledKeys={availableStats
             .filter((s) => {
-              if (
-                (accountType === 'pro' || accountType === 'free') &&
-                s.accessLevel === 'pro+'
-              )
-                return true;
-              if (accountType === 'free' && s.accessLevel === 'pro')
-                return true;
-              return false;
+              // if (
+              //   (accountType === 'pro' || accountType === 'free') &&
+              //   s.accessLevel === 'pro+'
+              // )
+              //   return true;
+              // if (accountType === 'free' && s.accessLevel === 'pro')
+              //   return true;
+              if (meetsMinimumTierLevel(s.accessLevel, accountType))
+                return false;
+              return true;
             })
             .map((s) => s.key)}
         >
@@ -164,6 +178,14 @@ export default function Stats({
               data={
                 stats.mostAssists.find((x) => x.division === divisionViewing)
                   ?.data
+              }
+            />
+          )) ||
+          (selectedStat.key === 'ownGoals' && (
+            <StatsTablePlayerBased
+              stat={selectedStat}
+              data={
+                stats.ownGoals.find((x) => x.division === divisionViewing)?.data
               }
             />
           )) ||

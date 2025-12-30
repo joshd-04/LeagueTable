@@ -134,6 +134,10 @@ export interface SeasonStats {
     division: number;
     data: { position: number; player: string; team: string; value: number }[];
   }[];
+  ownGoals: {
+    division: number;
+    data: { position: number; player: string; team: string; value: number }[];
+  }[];
 }
 
 export interface Team {

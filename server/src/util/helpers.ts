@@ -276,6 +276,12 @@ export function isTeam(doc: any): doc is ITeamsSchema {
   return doc && typeof doc === 'object' && 'name' in doc && 'division' in doc;
 }
 
+/**
+ * Helper function that returns true if the level meets the required tier level.
+ * A level represents 'free', 'pro' or 'pro+'.
+ * Useful if you need to determine access for account-dependent features.
+ * Account-dependent feature: availability is determined by the user’s subscription and provides read-only or additive insights without modifying league state.
+ */
 export function meetsMinimumTierLevel(
   requiredLevel: AccountTypeInterface,
   level: AccountTypeInterface
@@ -290,4 +296,20 @@ export function meetsMinimumTierLevel(
     return false;
   }
   return false;
+}
+/**
+ * Helper function that returns true if the league level & account level meet the required level for the feature.
+ * A level represents 'free', 'pro' or 'pro+'.
+ * Useful if you need to determine access for league-dependent features.
+ * League-dependent feature: availability is determined by the league’s tier at creation and affects league state or structure.
+ */
+export function shouldGrantAccessToFeature(
+  featureLevel: AccountTypeInterface,
+  leagueLevel: AccountTypeInterface,
+  accountType: AccountTypeInterface
+) {
+  return (
+    meetsMinimumTierLevel(featureLevel, accountType) &&
+    meetsMinimumTierLevel(featureLevel, leagueLevel)
+  );
 }

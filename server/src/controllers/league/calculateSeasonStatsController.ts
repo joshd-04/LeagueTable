@@ -7,6 +7,7 @@ import {
   IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
+import { meetsMinimumTierLevel } from '../../util/helpers';
 
 interface statsInterface {
   topScorers?: {
@@ -19,6 +20,15 @@ interface statsInterface {
     }[];
   }[];
   mostAssists?: {
+    division: number;
+    data: {
+      position?: number;
+      player: string;
+      team: string;
+      value: number;
+    }[];
+  }[];
+  ownGoals?: {
     division: number;
     data: {
       position?: number;
@@ -85,7 +95,7 @@ export async function calculateSeasonStatsController(
     }
 
     /* 
-    For top scorers and top assisters:
+    For top scorers, top assisters and own goals:
     1. League type must be 'advanced'
     2. The league level must be atleast pro
     3. The league owner must still be a pro user
@@ -98,21 +108,24 @@ export async function calculateSeasonStatsController(
 
     if (
       league.leagueType === 'advanced' &&
-      ['pro', 'pro+'].includes(league.leagueLevel) &&
-      ['pro', 'pro+'].includes(accountType)
+      meetsMinimumTierLevel('pro', league.leagueLevel) &&
+      meetsMinimumTierLevel('pro', accountType)
     ) {
       stats.topScorers = [];
       stats.mostAssists = [];
+      stats.ownGoals = [];
       for (let i = 0; i < league.divisionsCount; i++) {
         stats.topScorers.push({ division: i + 1, data: [] });
         stats.mostAssists.push({ division: i + 1, data: [] });
+        stats.ownGoals.push({ division: i + 1, data: [] });
       }
     } else if (
       league.leagueType === 'advanced' &&
-      ['pro', 'pro+'].includes(league.leagueLevel)
+      meetsMinimumTierLevel('pro', league.leagueLevel)
     ) {
       stats.topScorers = [];
       stats.mostAssists = [];
+      stats.ownGoals = [];
     }
 
     // Get this season's results
@@ -181,7 +194,7 @@ export async function calculateSeasonStatsController(
         // advanced leagues are pro leagues, ensure the account is atleast pro
         if (
           league.leagueType !== 'advanced' ||
-          !['pro', 'pro+'].includes(accountType)
+          !meetsMinimumTierLevel('pro', accountType)
         )
           return;
         result.detailedOutcome?.forEach((goal) => {
@@ -231,6 +244,31 @@ export async function calculateSeasonStatsController(
               stats.mostAssists[division - 1].data[index].value += 1;
             }
           }
+          if (stats.ownGoals !== undefined && goal.isOwnGoal) {
+            let team: string;
+
+            // If an own goal is scored in favour of the home team, the own goal was scored by the away team
+            if (goal.team === 'home') {
+              team = result.awayTeamDetails.name;
+            } else {
+              team = result.homeTeamDetails.name;
+            }
+            const isInList = stats.ownGoals[division - 1].data.some(
+              (x) => x.player === goal.scorer && x.team === team
+            );
+            if (!isInList) {
+              stats.ownGoals[division - 1].data.push({
+                team: team,
+                player: goal.scorer,
+                value: 1,
+              });
+            } else {
+              const index = stats.ownGoals[division - 1].data.findIndex(
+                (div) => div.team === team && div.player === goal.scorer
+              );
+              stats.ownGoals[division - 1].data[index].value += 1;
+            }
+          }
         });
       });
     });
@@ -244,6 +282,7 @@ export async function calculateSeasonStatsController(
         datapoint.position = i + 1;
       });
     });
+    
     stats.topScorers?.forEach((division) => {
       division.data.sort((a, b) => {
         return b.value - a.value;
@@ -252,7 +291,17 @@ export async function calculateSeasonStatsController(
         datapoint.position = i + 1;
       });
     });
+
     stats.mostAssists?.forEach((division) => {
+      division.data.sort((a, b) => {
+        return b.value - a.value;
+      });
+      division.data.forEach((datapoint, i) => {
+        datapoint.position = i + 1;
+      });
+    });
+
+    stats.ownGoals?.forEach((division) => {
       division.data.sort((a, b) => {
         return b.value - a.value;
       });
