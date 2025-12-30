@@ -116,7 +116,7 @@ export default function Stats({
     <Card className="p-[10px] h-full w-full row-span-2">
       <CardBody className="flex flex-col gap-2">
         <Select
-          className="max-w-xs"
+          className="max-w-full"
           style={{ cursor: 'pointer' }}
           size="sm"
           items={availableStats}
