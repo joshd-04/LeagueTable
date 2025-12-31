@@ -28,6 +28,7 @@ import LeagueDashboardSkeleton from './(dashboardWidgets)/dashboardSkeleton';
 import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
 import {
   doesUserOwnThisLeague,
+  meetsMinimumTierLevel,
   shouldGrantAccessToFeature,
 } from '@/util/helpers';
 import Upgrade from './(dashboardWidgets)/upgrade';
@@ -166,21 +167,9 @@ export default function LeagueDashboard() {
   const userOwnsThisLeague = doesUserOwnThisLeague(league, user, isLoggedIn);
 
   const features: featuresAvailable = {
-    announcement: shouldGrantAccessToFeature(
-      'pro',
-      league.leagueLevel,
-      league.leagueOwner.accountType
-    ),
-    seasonRewind: shouldGrantAccessToFeature(
-      'pro',
-      league.leagueLevel,
-      league.leagueOwner.accountType
-    ),
-    newsFeed: shouldGrantAccessToFeature(
-      'pro',
-      league.leagueLevel,
-      league.leagueOwner.accountType
-    ),
+    announcement: meetsMinimumTierLevel('pro', league.leagueLevel),
+    seasonRewind: meetsMinimumTierLevel('pro', league.leagueLevel),
+    newsFeed: meetsMinimumTierLevel('pro', league.leagueLevel),
   };
 
   return (
