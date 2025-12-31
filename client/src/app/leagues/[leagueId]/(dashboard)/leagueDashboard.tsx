@@ -17,7 +17,12 @@ import LatestResults from './(dashboardWidgets)/latestResults';
 import NextFixtures from './(dashboardWidgets)/nextFixtures';
 import SeasonRewind from './(dashboardWidgets)/seasonRewind';
 import Stats from './(dashboardWidgets)/stats';
-import { useParams } from 'next/navigation';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import LeagueDetailsRibbon from './(dashboardWidgets)/leagueDetailsRibbon';
 import LeagueDashboardSkeleton from './(dashboardWidgets)/dashboardSkeleton';
 import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
@@ -26,6 +31,7 @@ import {
   shouldGrantAccessToFeature,
 } from '@/util/helpers';
 import Upgrade from './(dashboardWidgets)/upgrade';
+import ViewingOldSeasonAlert from '@/components/alerts/viewingOldSeason';
 
 interface featuresAvailable {
   announcement: boolean;
@@ -40,8 +46,14 @@ export default function LeagueDashboard() {
   const [divisionViewing, setDivisionViewing] = useState(1);
   const [seasonViewing, setSeasonViewing] = useState(-1);
 
+  const [oldSeasonAlertVisible, setOldSeasonAlertVisible] = useState(false);
+
   const { leagueId } = useParams();
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const searchParams = useSearchParams();
 
   const { data: leagueQueryData, isLoading: leagueQueryIsLoading } = useQuery({
     queryFn: () =>
@@ -61,9 +73,72 @@ export default function LeagueDashboard() {
   useEffect(() => {
     // This runs only on the first fetch
     if (!leagueQueryIsLoading && !!league) {
-      setSeasonViewing(league.currentSeason);
+      const params = new URLSearchParams(searchParams.toString());
+
+      const seasonParam = params.get('season');
+      const seasonParamGiven = seasonParam !== null;
+      const seasonParamIsNumber = !Number.isNaN(seasonParam);
+      const seasonParamInValidRange =
+        seasonParam &&
+        +seasonParam >= 1 &&
+        +seasonParam <= league.currentSeason;
+
+      const allowSeasonRewind = shouldGrantAccessToFeature(
+        'pro',
+        league.leagueLevel,
+        league.leagueOwner.accountType
+      );
+
+      if (
+        seasonParamGiven &&
+        allowSeasonRewind &&
+        seasonParamIsNumber &&
+        seasonParamInValidRange
+      ) {
+        try {
+          setSeasonViewing(Number(seasonParam));
+          if (+seasonParam !== league.currentSeason) {
+            setOldSeasonAlertVisible(true);
+          }
+        } catch {
+          setSeasonViewing(league.currentSeason);
+        }
+      } else {
+        setSeasonViewing(league.currentSeason);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [league, leagueQueryIsLoading]);
+
+  // This effect handles query parameter 'season' e.g. ?season=2
+  useEffect(() => {
+    if (!league) return;
+
+    // Handle Old Season Alert visibility
+    if (seasonViewing === league.currentSeason) {
+      setOldSeasonAlertVisible(false);
+    }
+
+    // Handle URL Search Param
+    const params = new URLSearchParams(searchParams.toString());
+    const allowSeasonRewind = shouldGrantAccessToFeature(
+      'pro',
+      league.leagueLevel,
+      league.leagueOwner.accountType
+    );
+
+    // If league doesn't have season rewind, clear the season param
+    if (!allowSeasonRewind) {
+      params.delete('season');
+    } else if (seasonViewing !== league.currentSeason) {
+      params.set('season', String(seasonViewing));
+    } else {
+      params.delete('season');
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seasonViewing]);
 
   function invalidateDashboardQueries() {
     queryClient.invalidateQueries({ queryKey: ['league', leagueId] });
@@ -110,6 +185,13 @@ export default function LeagueDashboard() {
 
   return (
     <div className="flex flex-col gap-5">
+      <ViewingOldSeasonAlert
+        seasonViewing={seasonViewing}
+        setSeasonViewing={setSeasonViewing}
+        oldSeasonAlertVisible={oldSeasonAlertVisible}
+        setOldSeasonAlertVisible={setOldSeasonAlertVisible}
+        league={league}
+      />
       <LeagueBanner leagueLevel={league.leagueLevel}>
         <Heading1
           style={{
