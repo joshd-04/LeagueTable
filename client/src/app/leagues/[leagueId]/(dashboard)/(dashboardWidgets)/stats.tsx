@@ -160,7 +160,7 @@ export default function Stats({
         </Select>
         {stats === undefined || selectedStat === undefined || isLoading ? (
           <TableRowSkeleton
-            numRows={league.tables[divisionViewing - 1].numberOfTeams}
+            numRows={Math.floor(league.teamsCount / league.divisionsCount)}
           />
         ) : (
           (selectedStat.key === 'topScorers' && (
@@ -290,13 +290,11 @@ function StatsTableTeamBased({
 
 function TableRowSkeleton({ numRows }: { numRows: number }) {
   return (
-    <div className="flex flex-col gap-[2px]">
+    <div className="flex flex-col gap-3 animate-pulse mt-4">
+      <div className="w-full h-8 bg-content3 rounded-[5px]"></div>
       {Array.from(Array(numRows).keys()).map((_x, i) => {
         return (
-          <div
-            key={i}
-            className="w-full h-[30px] bg-[var(--bg-light)] animate-pulse rounded-[5px]"
-          ></div>
+          <div key={i} className="w-full h-8 bg-content2 rounded-[5px]"></div>
         );
       })}
     </div>

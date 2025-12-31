@@ -75,10 +75,35 @@ export async function leagueFetcherController(
       );
     }
 
+    // Send a filtered leagueObj to prevent tables, fixtures & results creating unnecessary data usage
+    const cleanLeagueObj = {
+      _id: league._id,
+      name: league.name,
+      leagueLevel: league.leagueLevel,
+      announcement: league.announcement,
+      // newsFeed?: { season: number, matchweek: number, news: string[] },
+      leagueOwner: league.leagueOwner,
+      currentSeason: league.currentSeason,
+      currentMatchweek: league.currentMatchweek,
+      finalMatchweek: league.finalMatchweek,
+      maxSeasonLimit: league.maxSeasonLimit,
+      divisionsCount: league.divisionsCount,
+      teamsCount: league.tables
+        .filter((table) => table.season === league.currentSeason)
+        .reduce((acc, cur) => acc + cur.numberOfTeams, 0),
+      leagueType: league.leagueType,
+      tables: league.tables.filter(
+        (table) => table.season === league.currentSeason
+      ),
+
+      fixturesCount: league.fixtures.length,
+      setup: league.setup,
+    };
+
     res.status(200).json({
       status: 'success',
       data: {
-        league: league.toObject(),
+        league: cleanLeagueObj,
       },
     });
   } catch (e: any) {

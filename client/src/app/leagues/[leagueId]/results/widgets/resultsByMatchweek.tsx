@@ -48,7 +48,8 @@ export default function ResultsByMatchweek({
       return;
     const fetchData = async () => {
       const { data } = await refetchResults();
-      console.log(data);
+      
+      
       if (data.status === 'success') {
         setDisplayedResults(data.data.results);
         window.scrollTo({

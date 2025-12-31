@@ -167,7 +167,7 @@ export default function Controls({
   const isNextSznButtonDisabled =
     !(
       league.currentMatchweek === league.finalMatchweek &&
-      league.fixtures.length === 0
+      league.fixturesCount === 0
     ) && !(league.currentSeason === 0 && league.currentMatchweek === 0);
 
   return (

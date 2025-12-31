@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 
 function getScrollbarWidth() {
-  console.log(window.innerWidth, document.documentElement.clientWidth);
   return window.innerWidth - document.documentElement.clientWidth;
 }
 

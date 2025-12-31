@@ -7,7 +7,7 @@ export default function Upgrade({ league }: { league: League }) {
   if (
     league.currentSeason === league.maxSeasonLimit &&
     league.currentMatchweek === league.finalMatchweek &&
-    league.fixtures.length === 0
+    league.fixturesCount === 0
   )
     warningLevel = 'heavy';
 

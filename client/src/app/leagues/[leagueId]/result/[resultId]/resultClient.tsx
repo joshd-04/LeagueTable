@@ -36,6 +36,7 @@ export default function ResultClient({
   if (isLoggedIn && user !== undefined && user !== null) {
     if (user.id === league.leagueOwner._id) {
       userOwnsThisLeague = true;
+      console.log('user owns this league: ', userOwnsThisLeague);
     }
   }
 
@@ -119,7 +120,9 @@ function DetailsRibbon({ league, result }: { league: League; result: Result }) {
         {league.name}
       </Button>
       <p className="text-base justify-self-start">
-        {league.tables[result.division - 1].name} (div {result.division})
+        {/* FIXME: Result object returned from API should include table name too */}
+        {/* {league.tables[result.division - 1].name} (div {result.division}) */}
+        FIX ME
       </p>
       {result.neutralGround && <p className="text-base">Neutral Ground</p>}
     </div>

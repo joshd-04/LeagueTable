@@ -41,9 +41,6 @@ export default function Announcement({
     league.announcement ?? { text: '', date: new Date() }
   );
 
-  // console.log(league.announcement);
-  // console.log(announcement);
-
   const shouldDisable = !shouldGrantAccessToFeature(
     'pro',
     league.leagueLevel,
@@ -72,9 +69,7 @@ export default function Announcement({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  useEffect(() => {
-    console.log(announcement);
-  }, [announcement]);
+ 
 
   return (
     <>

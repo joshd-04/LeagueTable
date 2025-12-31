@@ -186,7 +186,7 @@ export async function calculateSeasonStatsController(
 
     if (requestedSeason !== undefined) {
       const isValidNum = !Number.isNaN(+requestedSeason);
-      console.log(requestedSeason, isValidNum);
+
       const inValidRange =
         isValidNum &&
         Number(requestedSeason) >= 1 &&

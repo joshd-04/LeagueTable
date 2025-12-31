@@ -4,11 +4,7 @@ import { IoPersonSharp } from 'react-icons/io5';
 
 export default function LeagueDetailsRibbon({ league }: { league: League }) {
   const { user } = useAccount();
-  const teamsCount = league.tables
-    .filter((table) => table.season === league.currentSeason)
-    .reduce((acc, cur) => {
-      return acc + cur.numberOfTeams;
-    }, 0);
+  const teamsCount = league.teamsCount;
 
   return (
     <div className="flex flex-row justify-center items-center gap-[50px] text-base">

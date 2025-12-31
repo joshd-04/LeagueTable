@@ -21,7 +21,8 @@ export interface League {
   currentSeason: number;
   finalMatchweek: number;
   divisionsCount: number;
-  fixtures: string[];
+  teamsCount: number;
+  fixturesCount: number;
   leagueOwner: {
     accountType: AccountTypeInterface;
     username: string;
@@ -30,7 +31,6 @@ export interface League {
   leagueType: 'basic' | 'advanced';
   maxSeasonLimit: number | null;
   name: string;
-  results: string[];
   tables: {
     division: number;
     name: string;
