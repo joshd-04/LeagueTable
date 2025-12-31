@@ -7,7 +7,10 @@ import {
   IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { meetsMinimumTierLevel } from '../../util/helpers';
+import {
+  meetsMinimumTierLevel,
+  shouldGrantAccessToFeature,
+} from '../../util/helpers';
 
 interface statsInterface {
   topScorers?: {
@@ -103,8 +106,15 @@ export async function calculateSeasonStatsController(
     If the league type is advanced and the league level is pro, but the user is no longer a pro user, do not give them pro data.
     */
 
+    const requestedSeason = req.query.season;
     const accountType = (league.leagueOwner as unknown as IUserSchema)
       .accountType;
+
+    const allowSeasonRewind = shouldGrantAccessToFeature(
+      'pro',
+      league.leagueLevel,
+      accountType
+    );
 
     if (
       league.leagueType === 'advanced' &&
@@ -131,25 +141,91 @@ export async function calculateSeasonStatsController(
     // Get this season's results
     const allResults = league.results as unknown as IResultSchema[];
     let results: IResultSchema[] = [];
-    if (league.leagueLevel === 'free' || req.query.season === undefined) {
-      // Get this seasons results
-      results = allResults.filter(
-        (result) => result.season === league.currentSeason
-      );
-    } else {
+
+    // if (!allowSeasonRewind || requestedSeason === undefined) {
+    //   // Get this seasons results
+    //   results = allResults.filter(
+    //     (result) => result.season === league.currentSeason
+    //   );
+    // } else {
+    //   if (
+    //     requestedSeason !== undefined &&
+    //     Number.isInteger(Number(requestedSeason))
+    //   ) {
+    //     results = allResults.filter(
+    //       (result) => result.season === Number(requestedSeason)
+    //     );
+    //   } else {
+    //     results = allResults.filter(
+    //       (result) => result.season === league.currentSeason
+    //     );
+    //   }
+    // }
+
+    /*
+    IF the user has requested a specific season,
+
+        Find out what season they want
+        IF requested season is not a number,
+            RETURN error
+        ELSE IF requested season is not in valid range,
+            RETURN error
+        ELSE IF requested season is current season,
+            RETURN current season's data
+        ELSE (requested season is a number, is in the valid range and is not the current season)
+            DETERMINE if the season rewind is allowed
+            IF season rewind allowed,
+                RETURN requested season's data
+            ELSE
+                RETURN error
+    
+    ELSE
+        RETURN current season's data
+    */
+    let seasonFilter = league.currentSeason;
+
+    if (requestedSeason !== undefined) {
+      const isValidNum = !Number.isNaN(+requestedSeason);
+      console.log(requestedSeason, isValidNum);
+      const inValidRange =
+        isValidNum &&
+        Number(requestedSeason) >= 1 &&
+        Number(requestedSeason) <= league.currentSeason;
+
       if (
-        req.query.season !== undefined &&
-        Number.isInteger(Number(req.query.season))
+        isValidNum &&
+        inValidRange &&
+        +requestedSeason !== league.currentSeason
       ) {
-        results = allResults.filter(
-          (result) => result.season === Number(req.query.season)
+        if (allowSeasonRewind) {
+          seasonFilter = +requestedSeason;
+        } else {
+          return next(
+            new ErrorHandling(403, {
+              message: `Upgrade to PRO to view data for season ${requestedSeason}.`,
+            })
+          );
+        }
+      } else if (!isValidNum) {
+        return next(
+          new ErrorHandling(400, {
+            message: `Invalid season query given`,
+          })
         );
-      } else {
-        results = allResults.filter(
-          (result) => result.season === league.currentSeason
+      } else if (!inValidRange) {
+        return next(
+          new ErrorHandling(400, {
+            message: `Season query outside valid range`,
+          })
         );
+      } else if (+requestedSeason === league.currentSeason) {
+        seasonFilter = league.currentSeason;
       }
+    } else {
+      seasonFilter = league.currentSeason;
     }
+
+    results = allResults.filter((result) => result.season === seasonFilter);
 
     // Process results by divison
     stats.cleansheets.forEach((div) => {
@@ -282,7 +358,7 @@ export async function calculateSeasonStatsController(
         datapoint.position = i + 1;
       });
     });
-    
+
     stats.topScorers?.forEach((division) => {
       division.data.sort((a, b) => {
         return b.value - a.value;
