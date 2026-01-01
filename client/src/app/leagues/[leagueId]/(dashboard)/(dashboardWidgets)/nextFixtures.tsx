@@ -200,7 +200,7 @@ function FixtureRow({
         <div
           onMouseEnter={() => setEditHover(true)}
           onMouseLeave={() => setEditHover(false)}
-          className="px-[10px] hover:bg-content3 h-full flex flex-col justify-center items-center rounded-[10px] ml-1"
+          className="px-[10px] hover:bg-content3 h-full flex flex-col justify-center items-center rounded-[10px] ml-1 transition-colors duration-250"
           tabIndex={0}
           onClick={(e) => {
             e.stopPropagation();

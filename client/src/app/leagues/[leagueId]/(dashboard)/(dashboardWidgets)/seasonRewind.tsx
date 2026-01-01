@@ -82,7 +82,7 @@ export default function SeasonRewind({
         >
           <p
             className={`text-sm text-center font-semibold ${
-              seasonViewing > 0 ? '' : 'text-warning'
+              seasonViewing > 0 ? 'text-white' : 'text-warning'
             }`}
           >
             {seasonViewing > 0
