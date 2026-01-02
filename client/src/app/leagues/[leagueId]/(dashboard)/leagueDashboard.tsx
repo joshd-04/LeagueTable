@@ -45,8 +45,8 @@ export default function LeagueDashboard() {
   const { user, isLoggedIn } = useAccount();
   const [league, setLeague] = useState<League | undefined>(undefined);
   const [divisionViewing, setDivisionViewing] = useState(1);
-  const [seasonViewing, setSeasonViewing] = useState(-1);
 
+  const [seasonViewing, setSeasonViewing] = useState(-1);
   const [oldSeasonAlertVisible, setOldSeasonAlertVisible] = useState(false);
 
   const { leagueId } = useParams();
@@ -67,7 +67,6 @@ export default function LeagueDashboard() {
 
   useEffect(() => {
     if (leagueQueryData !== undefined && !leagueQueryIsLoading) {
-      
       setLeague(leagueQueryData.data.league);
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
