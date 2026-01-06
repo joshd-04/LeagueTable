@@ -10,7 +10,7 @@ import AsItStood from './(resultWidgets)/asItStood';
 import { individualTeamPagesEnabled } from '@/util/featureToggle';
 import { Button, Link } from '@heroui/react';
 import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
-import AiSummary from './(resultWidgets)/aiSummary';
+import HeadToHead from '../../fixture/[fixtureId]/(widgets)/headToHead';
 
 export default function ResultClient({
   league,
@@ -100,9 +100,18 @@ export default function ResultClient({
       >
         <DetailsRibbon league={league} result={result} />
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-5">
-          <AiSummary league={league} result={result} />
-          <MatchOutcome result={result} />
+          {/* <AiSummary league={league} result={result} /> */}
+
           <AsItStood league={league} result={result} />
+          <MatchOutcome result={result} />
+          <HeadToHead
+            teams={{
+              home: result.homeTeamDetails.name,
+              away: result.awayTeamDetails.name,
+            }}
+            league={league}
+            userOwnsThisLeague={userOwnsThisLeague}
+          />
         </div>
       </div>
     </div>

@@ -330,14 +330,14 @@ const defaultPricingData: PricingData = {
           pro: createCellContent.check('text-primary-foreground'),
           proplus: createCellContent.check('text-primary'),
         },
-        {
-          title: 'AI fixture preview',
-          description:
-            'View AI generated fixture previews based off previous meetings. Available from season 2 onwards.',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.cross('text-primary-foreground/50'),
-          proplus: createCellContent.check('text-primary'),
-        },
+        // {
+        //   title: 'AI fixture preview',
+        //   description:
+        //     'View AI generated fixture previews based off previous meetings. Available from season 2 onwards.',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.cross('text-primary-foreground/50'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
       ],
     },
     {
@@ -377,6 +377,7 @@ const defaultPricingData: PricingData = {
         },
         {
           title: 'Team form',
+          isImplemented: true,
           description: 'Visual indicator showing every teams last 5 results',
           free: createCellContent.cross('text-default-400'),
           pro: createCellContent.check('text-primary-foreground'),

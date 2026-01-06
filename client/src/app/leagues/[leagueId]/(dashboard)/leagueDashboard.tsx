@@ -4,7 +4,6 @@ import { League } from '@/util/definitions';
 import { useEffect, useState } from 'react';
 
 import SeasonSummaryStats from './(dashboardWidgets)/seasonSummaryStats';
-import NewsFeed from './(dashboardWidgets)/newsFeed';
 import Heading1 from '@/components/text/Heading1';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
@@ -33,11 +32,13 @@ import {
 } from '@/util/helpers';
 import Upgrade from './(dashboardWidgets)/upgrade';
 import ViewingOldSeasonAlert from '@/components/alerts/viewingOldSeason';
+import EngagementStats from './(dashboardWidgets)/engagementStats';
 
 interface featuresAvailable {
   announcement: boolean;
   seasonRewind: boolean;
-  newsFeed: boolean;
+  leaguePopularity: boolean;
+  // newsFeed: boolean;
 }
 
 // We need to check if user owns this league before it gets rendered. new api endpoint?
@@ -170,7 +171,8 @@ export default function LeagueDashboard() {
   const features: featuresAvailable = {
     announcement: meetsMinimumTierLevel('pro', league.leagueLevel),
     seasonRewind: meetsMinimumTierLevel('pro', league.leagueLevel),
-    newsFeed: meetsMinimumTierLevel('pro', league.leagueLevel),
+    leaguePopularity: meetsMinimumTierLevel('pro', league.leagueLevel),
+    // newsFeed: meetsMinimumTierLevel('pro', league.leagueLevel),
   };
 
   return (
@@ -231,7 +233,16 @@ export default function LeagueDashboard() {
               seasonViewing={features.seasonRewind ? seasonViewing : undefined}
             />
           )}
-          {features.newsFeed ? <NewsFeed /> : <div></div>}
+          {/* {features.newsFeed ? <NewsFeed /> : <div></div>} */}
+          {features.seasonRewind ? (
+            <SeasonRewind
+              league={league}
+              seasonViewing={seasonViewing}
+              setSeasonViewing={setSeasonViewing}
+            />
+          ) : (
+            <div></div>
+          )}
           <TableWidget
             key={league._id}
             league={league}
@@ -245,15 +256,7 @@ export default function LeagueDashboard() {
             seasonViewing={features.seasonRewind ? seasonViewing : undefined}
             divisionViewing={divisionViewing}
           />
-          {features.seasonRewind ? (
-            <SeasonRewind
-              league={league}
-              seasonViewing={seasonViewing}
-              setSeasonViewing={setSeasonViewing}
-            />
-          ) : (
-            <div></div>
-          )}
+          {features.leaguePopularity ? <EngagementStats /> : <div></div>}
         </div>
       </div>
     </div>

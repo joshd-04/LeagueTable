@@ -31,7 +31,9 @@ export default function AiInsights({
             {fixture.matchweek} starts!
           </p>
         ) : (
-          <p>[AI Insights go here]</p>
+          <p>
+            [AI Insights go here, but they are not available yet as a feature.]
+          </p>
         )}
       </CardBody>
     </Card>

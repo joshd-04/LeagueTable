@@ -3,7 +3,7 @@
 import ProChip from '@/components/chips/ProChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { Fixture, League, Result } from '@/util/definitions';
+import { League, Result } from '@/util/definitions';
 import { meetsMinimumTierLevel } from '@/util/helpers';
 import { Card, CardBody } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -12,11 +12,11 @@ import { useRouter } from 'next/navigation';
 import { MouseEvent } from 'react';
 
 export default function HeadToHead({
-  fixture,
+  teams,
   league,
   userOwnsThisLeague,
 }: {
-  fixture: Fixture;
+  teams: { home: string; away: string };
   league: League;
   userOwnsThisLeague: boolean;
 }) {
@@ -35,7 +35,7 @@ export default function HeadToHead({
           <p className="align-middle inline text-base">Head-to-head record</p>
         </span>
         {shouldShowHeadToHead ? (
-          <HeadToHeadBody fixture={fixture} league={league} />
+          <HeadToHeadBody teams={teams} league={league} />
         ) : (
           <HeadToHeadLocked userOwnsThisLeague={userOwnsThisLeague} />
         )}
@@ -77,25 +77,20 @@ function HeadToHeadLocked({
  */
 function HeadToHeadBody({
   league,
-  fixture,
+  teams,
 }: {
   league: League;
-  fixture: Fixture;
+  teams: { home: string; away: string };
 }) {
   const { data, isLoading } = useQuery({
     queryFn: () =>
       fetchAPI(
         `${API_URL}/leagues/${league._id}/headtohead/${encodeURIComponent(
-          fixture.homeTeamDetails.name
-        )}/${encodeURIComponent(fixture.awayTeamDetails.name)}`,
+          teams.home
+        )}/${encodeURIComponent(teams.away)}`,
         { method: 'GET' }
       ),
-    queryKey: [
-      'headtohead',
-      league._id,
-      fixture.homeTeamDetails.name,
-      fixture.awayTeamDetails.name,
-    ],
+    queryKey: ['headtohead', league._id, teams.home, teams.away],
   });
 
   const results: Result[] = data?.data.headtohead;

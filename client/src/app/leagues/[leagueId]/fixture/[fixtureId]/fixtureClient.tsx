@@ -150,7 +150,10 @@ export default function FixtureClient({
           <AiInsights league={league} fixture={fixture} />
           <MatchPreview league={league} fixture={fixture} />
           <HeadToHead
-            fixture={fixture}
+            teams={{
+              home: fixture.homeTeamDetails.name,
+              away: fixture.awayTeamDetails.name,
+            }}
             league={league}
             userOwnsThisLeague={userOwnsThisLeague}
           />
