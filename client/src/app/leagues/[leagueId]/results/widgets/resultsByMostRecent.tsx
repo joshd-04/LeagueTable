@@ -3,24 +3,50 @@ import { API_URL } from '@/util/config';
 import { League, Result } from '@/util/definitions';
 import { Spinner } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import ResultRow from './resultRow';
+import ViewingOldSeasonAlert from '@/components/alerts/viewingOldSeason';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function ResultsByMostRecent({
   league,
   handleClick,
+  seasonViewing,
+  setSeasonViewing,
+  oldSeasonAlertVisible,
+  setOldSeasonAlertVisible,
 }: {
   league: League;
   handleClick: (id: string) => void;
+  seasonViewing: number;
+  setSeasonViewing: Dispatch<SetStateAction<number>>;
+  oldSeasonAlertVisible: boolean;
+  setOldSeasonAlertVisible: Dispatch<SetStateAction<boolean>>;
 }) {
   const [results, setResults] = useState<Result[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (params.get('matchweek')) {
+      params.delete('matchweek');
+
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const { data: resultsData, isLoading: resultsAreLoading } = useQuery({
     queryFn: () =>
-      fetchAPI(`${API_URL}/leagues/${league._id}/results`, {
-        method: 'GET',
-      }),
-    queryKey: ['resultsRecent', league._id],
+      fetchAPI(
+        `${API_URL}/leagues/${league._id}/results?season=${seasonViewing}`,
+        {
+          method: 'GET',
+        }
+      ),
+    queryKey: ['resultsRecent', league._id, seasonViewing],
     staleTime: 1000 * 60 * 1,
     gcTime: 1000 * 60 * 10,
   });
@@ -56,11 +82,20 @@ export default function ResultsByMostRecent({
 
   return (
     <div className="flex flex-col gap-[20px]">
+      <ViewingOldSeasonAlert
+        seasonViewing={seasonViewing}
+        setSeasonViewing={setSeasonViewing}
+        oldSeasonAlertVisible={oldSeasonAlertVisible}
+        setOldSeasonAlertVisible={setOldSeasonAlertVisible}
+        league={league}
+      />
       {organisedResults.map((data, i) => (
         <div key={i}>
           <p className="font-bold mb-[10px] place-self-center text-sm">
             Matchweek {data.matchweek}{' '}
-            {+data.matchweek > league.currentMatchweek && '(future)'}
+            {+data.matchweek > league.currentMatchweek &&
+              seasonViewing === league.currentSeason &&
+              '(future)'}
           </p>
           <div className="flex flex-col gap-[10px]">
             {data.results.map((result, i) => (

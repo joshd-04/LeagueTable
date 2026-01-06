@@ -71,6 +71,7 @@ export default function LeagueDashboard() {
     }
   }, [leagueQueryData, leagueQueryIsLoading]);
 
+  // This effect handles fetching the season value from the URL
   useEffect(() => {
     // This runs only on the first fetch
     if (!leagueQueryIsLoading && !!league) {
@@ -111,7 +112,7 @@ export default function LeagueDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [league, leagueQueryIsLoading]);
 
-  // This effect handles query parameter 'season' e.g. ?season=2
+  // This effect handles setting query parameter 'season' e.g. ?season=2
   useEffect(() => {
     if (!league) return;
 

@@ -55,6 +55,8 @@ export default function NextFixtures({
   const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
   const router = useRouter();
 
+  const isFixturesDisabled = seasonViewing !== league.currentSeason;
+
   return (
     <>
       <Card
@@ -64,15 +66,22 @@ export default function NextFixtures({
         onMouseEnter={() => setIsHoveringOuterPanel(true)}
         onMouseLeave={() => setIsHoveringOuterPanel(false)}
         isPressable
+        isDisabled={isFixturesDisabled}
         onClick={(e) => {
           e.stopPropagation();
+          if (isFixturesDisabled) return;
           router.push(`/leagues/${league._id}/fixtures`);
         }}
+        disableRipple={isFixturesDisabled}
         style={{
-          background: isHoveringOuterPanel
-            ? 'hsl(var(--heroui-content3)/1)'
-            : 'hsl(var(--heroui-content1)/1)',
-          borderColor: isHoveringOuterPanel ? 'transparent' : 'var(--border)',
+          background:
+            isHoveringOuterPanel && !isFixturesDisabled
+              ? 'hsl(var(--heroui-content3)/1)'
+              : 'hsl(var(--heroui-content1)/1)',
+          borderColor:
+            isHoveringOuterPanel && !isFixturesDisabled
+              ? 'transparent'
+              : 'var(--border)',
         }}
       >
         <CardBody className="flex flex-col gap-2">

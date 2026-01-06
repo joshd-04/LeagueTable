@@ -31,7 +31,7 @@ export default function LatestResults({
   const mostRecentResults: Result[] = data?.data.results.slice(0, 3);
 
   function handleCardClick() {
-    router.push(`/leagues/${league._id}/results`);
+    router.push(`/leagues/${league._id}/results?season=${seasonViewing}`);
   }
 
   return (
