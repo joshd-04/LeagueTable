@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import ResultRow from './resultRow';
 import NoResults from './noResults';
 import PaginationComponent from '@/components/pagination/Pagination';
-import { shouldGrantAccessToFeature } from '@/util/helpers';
 
 export default function ResultsByMatchweek({
   league,
@@ -21,9 +20,6 @@ export default function ResultsByMatchweek({
   const router = useRouter();
   const searchParams = useSearchParams();
   const matchweek = Number(searchParams.get('matchweek')) ?? null;
-
-  const [seasonViewing, setSeasonViewing] = useState(-1);
-  const [oldSeasonAlertVisible, setOldSeasonAlertVisible] = useState(false);
 
   const specifiedPage =
     matchweek >= 1 && matchweek <= league.finalMatchweek ? matchweek : null;
@@ -46,46 +42,6 @@ export default function ResultsByMatchweek({
     gcTime: 1000 * 60 * 10,
     enabled: false,
   });
-
-  useEffect(() => {
-    // This runs only on the first fetch
-    if (!isFetchingResults && !!refetchResults) {
-      const params = new URLSearchParams(searchParams.toString());
-
-      const seasonParam = params.get('season');
-      const seasonParamGiven = seasonParam !== null;
-      const seasonParamIsNumber = !Number.isNaN(seasonParam);
-      const seasonParamInValidRange =
-        seasonParam &&
-        +seasonParam >= 1 &&
-        +seasonParam <= league.currentSeason;
-
-      const allowSeasonRewind = shouldGrantAccessToFeature(
-        'pro',
-        league.leagueLevel,
-        league.leagueOwner.accountType
-      );
-
-      if (
-        seasonParamGiven &&
-        allowSeasonRewind &&
-        seasonParamIsNumber &&
-        seasonParamInValidRange
-      ) {
-        try {
-          setSeasonViewing(Number(seasonParam));
-          if (+seasonParam !== league.currentSeason) {
-            setOldSeasonAlertVisible(true);
-          }
-        } catch {
-          setSeasonViewing(league.currentSeason);
-        }
-      } else {
-        setSeasonViewing(league.currentSeason);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayedResults, isFetchingResults]);
 
   useEffect(() => {
     if (matchweekViewing < 1 || matchweekViewing > league.currentMatchweek)
