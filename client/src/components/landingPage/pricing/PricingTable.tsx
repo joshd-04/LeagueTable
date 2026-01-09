@@ -112,29 +112,29 @@ const defaultPricingData: PricingData = {
       desktopHeaderClassName:
         'relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-primary before:rounded-t-medium',
     },
-    {
-      id: 'proplus',
-      name: 'Pro+',
-      description:
-        'For organisers who want premium polish and zero limitations.',
-      monthlyPrice: 5,
-      priceUnit: '/per year',
-      mobileFeatures: [
-        { text: 'Team pages' },
-        { text: 'Graphs & data visuals' },
-        { text: 'Fixture categories & notifications' },
-        { text: 'Data PNG download' },
-      ],
-      buttonText: 'Contact us',
-      buttonVariant: 'flat',
-      buttonColor: 'default',
-      mobileCardClassName:
-        'border-medium! border-content3 bg-content2 dark:border-content2 dark:bg-content1',
-      desktopColumnClassName:
-        'before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1',
-      desktopHeaderClassName:
-        'relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1 before:rounded-t-medium',
-    },
+    // {
+    //   id: 'proplus',
+    //   name: 'Pro+',
+    //   description:
+    //     'For organisers who want premium polish and zero limitations.',
+    //   monthlyPrice: 5,
+    //   priceUnit: '/per year',
+    //   mobileFeatures: [
+    //     { text: 'Team pages' },
+    //     { text: 'Graphs & data visuals' },
+    //     { text: 'Fixture categories & notifications' },
+    //     { text: 'Data PNG download' },
+    //   ],
+    //   buttonText: 'Contact us',
+    //   buttonVariant: 'flat',
+    //   buttonColor: 'default',
+    //   mobileCardClassName:
+    //     'border-medium! border-content3 bg-content2 dark:border-content2 dark:bg-content1',
+    //   desktopColumnClassName:
+    //     'before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1',
+    //   desktopHeaderClassName:
+    //     'relative px-6 pt-6 xl:px-8 xl:pt-8 before:absolute before:h-full before:inset-0 before:-z-10 before:bg-content2 dark:before:bg-content1 before:rounded-t-medium',
+    // },
   ],
   categories: [
     {
@@ -234,14 +234,14 @@ const defaultPricingData: PricingData = {
           pro: createCellContent.check('text-primary-foreground'),
           proplus: createCellContent.check('text-primary'),
         },
-        {
-          title: 'Team pages',
-          description:
-            'Dedicated dashboards for each team displaying stats, achievements, records & more.',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.cross('text-primary-foreground/50'),
-          proplus: createCellContent.check('text-primary'),
-        },
+        // {
+        //   title: 'Team pages',
+        //   description:
+        //     'Dedicated dashboards for each team displaying stats, achievements, records & more.',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.cross('text-primary-foreground/50'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
       ],
     },
     {
@@ -271,22 +271,22 @@ const defaultPricingData: PricingData = {
           pro: createCellContent.check('text-primary-foreground'),
           proplus: createCellContent.check('text-primary'),
         },
-        {
-          title: 'Big-match tags',
-          description:
-            'Mark specific fixtures as big games to build excitement',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.check('text-primary-foreground'),
-          proplus: createCellContent.check('text-primary'),
-        },
-        {
-          title: 'Notifications',
-          description:
-            'Automatically send in-app notifications to league followers before and after big events',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.cross('text-primary-foreground/50'),
-          proplus: createCellContent.check('text-primary'),
-        },
+        // {
+        //   title: 'Big-match tags',
+        //   description:
+        //     'Mark specific fixtures as big games to build excitement',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.check('text-primary-foreground'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
+        // {
+        //   title: 'Notifications',
+        //   description:
+        //     'Automatically send in-app notifications to league followers before and after big events',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.cross('text-primary-foreground/50'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
       ],
     },
     {
@@ -309,6 +309,7 @@ const defaultPricingData: PricingData = {
         },
         {
           title: 'Head-to-head record',
+          isImplemented: true,
           description: 'Easily see the previous results of two teams',
           free: createCellContent.cross('text-default-400'),
           pro: createCellContent.check('text-primary-foreground'),
@@ -322,14 +323,14 @@ const defaultPricingData: PricingData = {
           pro: createCellContent.check('text-primary-foreground'),
           proplus: createCellContent.check('text-primary'),
         },
-        {
-          title: 'Match summary',
-          description:
-            'Manually add match summaries for league viewers to read and understand how the match panned out',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.check('text-primary-foreground'),
-          proplus: createCellContent.check('text-primary'),
-        },
+        // {
+        //   title: 'Match summary',
+        //   description:
+        //     'Manually add match summaries for league viewers to read and understand how the match panned out',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.check('text-primary-foreground'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
         // {
         //   title: 'AI fixture preview',
         //   description:
@@ -385,19 +386,23 @@ const defaultPricingData: PricingData = {
         },
         {
           title: 'Home/away stats',
+          isImplemented: true,
           description: 'Tables showing home and away data',
           free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.check('text-primary-foreground'),
+          pro: createCellContent.text(
+            'Coming soon',
+            'text-medium text-center text-primary-foreground/70'
+          ),
           proplus: createCellContent.check('text-primary'),
         },
-        {
-          title: 'Deeper insights',
-          description:
-            'More in-depth analytics such as streaks, momentum and trends',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.cross('text-primary-foreground/50'),
-          proplus: createCellContent.check('text-primary'),
-        },
+        // {
+        //   title: 'Deeper insights',
+        //   description:
+        //     'More in-depth analytics such as streaks, momentum and trends',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.cross('text-primary-foreground/50'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
       ],
     },
     {
@@ -429,21 +434,21 @@ const defaultPricingData: PricingData = {
           pro: createCellContent.check('text-primary-foreground'),
           proplus: createCellContent.check('text-primary'),
         },
-        {
-          title: 'Team colors',
-          description: 'Give colors to represent each team',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.cross('text-primary-foreground/50'),
-          proplus: createCellContent.check('text-primary'),
-        },
-        {
-          title: 'Custom logo',
-          description:
-            'Replace the LeagueX logo in the top left corner with your own logo',
-          free: createCellContent.cross('text-default-400'),
-          pro: createCellContent.cross('text-primary-foreground/50'),
-          proplus: createCellContent.check('text-primary'),
-        },
+        // {
+        //   title: 'Team colors',
+        //   description: 'Give colors to represent each team',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.cross('text-primary-foreground/50'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
+        // {
+        //   title: 'Custom logo',
+        //   description:
+        //     'Replace the LeagueX logo in the top left corner with your own logo',
+        //   free: createCellContent.cross('text-default-400'),
+        //   pro: createCellContent.cross('text-primary-foreground/50'),
+        //   proplus: createCellContent.check('text-primary'),
+        // },
       ],
     },
   ],

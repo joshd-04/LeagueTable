@@ -50,6 +50,12 @@ export async function favoriteLeagueController(
     await User.findByIdAndUpdate(userId, {
       $push: { favoriteLeagues: leagueId },
     });
+
+    // Increment league favorites count
+    await League.findByIdAndUpdate(leagueId, {
+      $inc: { 'engagement.favoritesCount': 1 },
+    });
+    
   } catch (e: any) {
     next(
       new ErrorHandling(

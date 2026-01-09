@@ -61,6 +61,11 @@ export async function followLeagueController(
     await User.findByIdAndUpdate(userId, {
       $push: { followedLeagues: leagueId },
     });
+
+    // Increment league followers count
+    await League.findByIdAndUpdate(leagueId, {
+      $inc: { 'engagement.followersCount': 1 },
+    });
   } catch (e: any) {
     next(
       new ErrorHandling(

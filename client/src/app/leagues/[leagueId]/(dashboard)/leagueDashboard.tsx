@@ -8,7 +8,7 @@ import Heading1 from '@/components/text/Heading1';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import TableWidget from './(dashboardWidgets)/table';
 import Announcement from './(dashboardWidgets)/announcement';
 import Controls from './(dashboardWidgets)/controls';
@@ -65,6 +65,21 @@ export default function LeagueDashboard() {
       }),
     queryKey: ['league', leagueId],
   });
+  const { mutateAsync: addViewMutation } = useMutation({
+    mutationFn: () =>
+      fetchAPI(`${API_URL}/leagues/${leagueId}/view`, {
+        method: 'POST',
+        credentials: 'include',
+      }),
+    mutationKey: ['league-view', leagueId],
+  });
+
+  useEffect(() => {
+    setTimeout(async () => {
+      await addViewMutation();
+    }, 3000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (leagueQueryData !== undefined && !leagueQueryIsLoading) {
@@ -256,7 +271,11 @@ export default function LeagueDashboard() {
             seasonViewing={features.seasonRewind ? seasonViewing : undefined}
             divisionViewing={divisionViewing}
           />
-          {features.leaguePopularity ? <EngagementStats /> : <div></div>}
+          {features.leaguePopularity ? (
+            <EngagementStats league={league} />
+          ) : (
+            <div></div>
+          )}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../../models/userModel';
 import { ErrorHandling } from '../../util/errorChecking';
 import { Types } from 'mongoose';
+import League from '../../models/leagueModel';
 
 export async function unfavoriteLeagueController(
   req: Request,
@@ -39,6 +40,17 @@ export async function unfavoriteLeagueController(
     await User.findByIdAndUpdate(userId, {
       $pull: { favoriteLeagues: leagueId },
     });
+
+    // Decrement league favorites count
+    await League.findByIdAndUpdate(leagueId, [
+      {
+        $set: {
+          'engagement.favoritesCount': {
+            $max: [{ $subtract: ['$engagement.favoritesCount', 1] }, 0],
+          },
+        },
+      },
+    ]);
   } catch (e: any) {
     next(
       new ErrorHandling(

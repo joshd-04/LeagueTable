@@ -56,6 +56,13 @@ const leagueSchema: Schema<ILeagueSchema> = new mongoose.Schema({
     teamsAdded: { type: Boolean },
     leagueFinished: { type: Boolean },
   },
+  engagement: {
+    followersCount: { type: Number, default: 0 },
+    favoritesCount: { type: Number, default: 0 },
+    totalViews: { type: Number, default: 0 },
+    viewsThisWeek: { type: Number, default: 0 },
+    viewsThisWeekUpdatedAt: { type: Date },
+  },
 });
 
 const League: Model<ILeagueSchema> = mongoose.model('leagues', leagueSchema);

@@ -98,6 +98,7 @@ export async function leagueFetcherController(
 
       fixturesCount: league.fixtures.length,
       setup: league.setup,
+      engagement: league.engagement,
     };
 
     res.status(200).json({

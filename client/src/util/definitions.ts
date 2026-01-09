@@ -41,6 +41,12 @@ export interface League {
     teams: Team[];
     _id: string;
   }[];
+  engagement: {
+    totalViews: number;
+    viewsThisWeek?: number;
+    followersCount?: number;
+    favoritesCount?: number;
+  };
 }
 
 export interface Fixture {

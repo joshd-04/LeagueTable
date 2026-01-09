@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../../models/userModel';
 import { ErrorHandling } from '../../util/errorChecking';
 import { Types } from 'mongoose';
+import League from '../../models/leagueModel';
 
 export async function unfollowLeagueController(
   req: Request,
@@ -39,6 +40,17 @@ export async function unfollowLeagueController(
     await User.findByIdAndUpdate(userId, {
       $pull: { followedLeagues: leagueId },
     });
+
+    // Decrement league followers count
+    await League.findByIdAndUpdate(leagueId, [
+      {
+        $set: {
+          'engagement.followersCount': {
+            $max: [{ $subtract: ['$engagement.followersCount', 1] }, 0],
+          },
+        },
+      },
+    ]);
   } catch (e: any) {
     next(
       new ErrorHandling(

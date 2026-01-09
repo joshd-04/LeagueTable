@@ -12,6 +12,7 @@ import {
   calculateSeasonStatsController,
   calculateSeasonSummaryController,
   getAnnouncementController,
+  getEngagementStats,
   getFixtureByIdController,
   getFixtureResultStatusByIdController,
   getFixturesController,
@@ -21,6 +22,7 @@ import {
   leagueCreationController,
   leagueFetcherController,
   myAssociatedLeaguesFetcherController,
+  RegisterViewController,
   setAnnouncementController,
   startNextMatchweek,
   startNextSeasonController,
@@ -40,11 +42,11 @@ import morgan from 'morgan';
 import { getResultByIdController } from './controllers/league/getResultByIdController';
 import { BACKEND_PORT, FRONTEND_URL } from './config';
 import session from 'express-session';
-import MongoStore from 'connect-mongo';
 import { sessionStore } from './util/sessionStore';
 import { requireAuth } from './middleware/authRequired';
 import dotenv from 'dotenv';
 import sessionAbsoluteExpirationMiddleware from './middleware/sessionAbsoluteExpirationMiddleware';
+import { visitorIdMiddleware } from './middleware/visitorIdMiddleware';
 
 dotenv.config();
 
@@ -123,6 +125,12 @@ app.post(
   leagueCreationController
 );
 
+app.post(
+  '/api/leagues/:leagueId/view',
+  visitorIdMiddleware,
+  RegisterViewController
+);
+
 // Gets all league id's with minimal info that are associated with you e.g. yours or favorites etc
 app.get(
   '/api/leagues/associated',
@@ -174,6 +182,8 @@ app.get(
   '/api/leagues/:id/season-summary-stats',
   calculateSeasonSummaryController
 );
+
+app.get('/api/leagues/:id/engagement-stats', getEngagementStats);
 
 app.get('/api/leagues/:id/stats', calculateSeasonStatsController);
 app.get('/api/leagues/:id/teams', getTeamsController);

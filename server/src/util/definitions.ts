@@ -25,6 +25,13 @@ export interface ILeagueSchema extends Document {
     teamsAdded: boolean;
     leagueFinished: boolean;
   };
+  engagement: {
+    followersCount: number;
+    favoritesCount: number;
+    totalViews: number;
+    viewsThisWeek: number;
+    viewsThisWeekUpdatedAt: Date;
+  };
 }
 
 export interface ITable {
