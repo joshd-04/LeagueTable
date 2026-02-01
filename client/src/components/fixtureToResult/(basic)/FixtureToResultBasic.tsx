@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
 import { Fixture } from '@/util/definitions';
 
@@ -32,6 +32,13 @@ export default function FixtureToResultBasic({
   onResolution?: (isSuccess: boolean) => void;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
+
+  const [userRequestedNilNil, setUserRequestedNilNil] = useState(false);
+
+  // If the user changes the goal count, reset the nilnil value
+  useEffect(() => {
+    setUserRequestedNilNil(false);
+  }, [matchStory]);
 
   function mutationFunction() {
     const basicOutcome = matchStory;
@@ -152,11 +159,15 @@ export default function FixtureToResultBasic({
                   className="font-semibold text-sm"
                   color="primary"
                   onPress={() => {
-                    handleSubmit();
+                    if (matchStory.length === 0 && !userRequestedNilNil) {
+                      setUserRequestedNilNil(true);
+                    } else {
+                      handleSubmit();
+                    }
                   }}
                   isLoading={isPending}
                 >
-                  Submit
+                  {userRequestedNilNil ? 'Submit 0-0?' : 'Submit'}
                 </Button>
               </ModalFooter>
             </>
