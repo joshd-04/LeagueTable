@@ -9,13 +9,13 @@ function resolveIdentity(req: Request) {
   return null;
 }
 
-function getStartOfISOWeek(date = new Date()) {
-  const d = new Date(date);
-  const day = d.getDay() || 7;
-  if (day !== 1) d.setDate(d.getDate() - day + 1);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
+// function getStartOfISOWeek(date = new Date()) {
+//   const d = new Date(date);
+//   const day = d.getDay() || 7;
+//   if (day !== 1) d.setDate(d.getDate() - day + 1);
+//   d.setHours(0, 0, 0, 0);
+//   return d;
+// }
 
 export async function RegisterViewController(
   req: Request,
@@ -58,7 +58,7 @@ export async function RegisterViewController(
   }
 
   const now = new Date();
-  const startOfWeek = getStartOfISOWeek(now);
+  // const startOfWeek = getStartOfISOWeek(now);
 
   const league = await League.findById(leagueId, {
     'engagement.viewsThisWeekUpdatedAt': 1,
@@ -76,11 +76,11 @@ export async function RegisterViewController(
     Date.now() - league.engagement.viewsThisWeekUpdatedAt.getTime() <=
       1000 * 60 * 60 * 24 * 7;
 
-  console.log(withinOneWeek);
-  console.log(
-    Date.now() - league.engagement.viewsThisWeekUpdatedAt.getTime() <=
-      1000 * 60 * 60 * 24 * 7
-  );
+  // console.log(withinOneWeek);
+  // console.log(
+  //   Date.now() - league.engagement.viewsThisWeekUpdatedAt.getTime() <=
+  //     1000 * 60 * 60 * 24 * 7
+  // );
 
   const update: any = {
     $inc: {

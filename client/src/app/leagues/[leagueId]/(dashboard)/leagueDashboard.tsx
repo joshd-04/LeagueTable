@@ -65,6 +65,7 @@ export default function LeagueDashboard() {
       }),
     queryKey: ['league', leagueId],
   });
+
   const { mutateAsync: addViewMutation } = useMutation({
     mutationFn: () =>
       fetchAPI(`${API_URL}/leagues/${leagueId}/view`, {
