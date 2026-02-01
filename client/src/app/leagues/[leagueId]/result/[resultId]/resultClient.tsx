@@ -129,9 +129,7 @@ function DetailsRibbon({ league, result }: { league: League; result: Result }) {
         {league.name}
       </Button>
       <p className="text-base justify-self-start">
-        {/* FIXME: Result object returned from API should include table name too */}
-        {/* {league.tables[result.division - 1].name} (div {result.division}) */}
-        FIX ME
+        {league.tables[result.division - 1].name} (Division {result.division})
       </p>
       {result.neutralGround && <p className="text-base">Neutral Ground</p>}
     </div>

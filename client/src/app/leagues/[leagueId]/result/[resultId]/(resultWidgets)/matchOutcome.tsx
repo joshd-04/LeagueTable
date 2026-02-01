@@ -1,5 +1,5 @@
 import { Result } from '@/util/definitions';
-import { Card, CardBody } from '@heroui/react';
+import { Button, Card, CardBody } from '@heroui/react';
 import { PiSoccerBallFill } from 'react-icons/pi';
 
 export default function MatchOutcome({ result }: { result: Result }) {
@@ -14,49 +14,56 @@ export default function MatchOutcome({ result }: { result: Result }) {
     return `${homeGoals}-${awayGoals}`;
   }
   return (
-    <Card className="h-full w-full px-[10px] py-[6px]">
-      <CardBody className="flex flex-col gap-2">
-        <p className="text-base">Match outcome</p>
-        <div
-          className="max-h-[24rem] overflow-y-auto flex flex-col items-center  gap-2 "
-          style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'hsl(var(--heroui-foreground)/0.5) transparent',
-          }}
-        >
-          <p className="text-sm">Match start. 0-0</p>
-          {result.detailedOutcome !== undefined &&
-          result.detailedOutcome.length !== 0
-            ? result.detailedOutcome.map((goal, i) => {
-                const score = calculateScore(i);
-                return (
-                  <MatchOutcomeRowAdvanced
-                    goal={goal}
-                    homeTeamDetails={result.homeTeamDetails}
-                    awayTeamDetails={result.awayTeamDetails}
-                    score={score}
-                    key={i}
-                  />
-                );
-              })
-            : result.basicOutcome.map((goal, i) => {
-                const score = calculateScore(i);
-                return (
-                  <MatchOutcomeRowBasic
-                    goal={goal}
-                    homeTeamDetails={result.homeTeamDetails}
-                    awayTeamDetails={result.awayTeamDetails}
-                    score={score}
-                    key={i}
-                  />
-                );
-              })}
-          <p className="text-sm">
-            Full time: {calculateScore(result.basicOutcome.length - 1)}
-          </p>
-        </div>
-      </CardBody>
-    </Card>
+    <>
+      <Card className="h-full w-full px-[10px] py-[6px]">
+        <CardBody className="flex flex-col gap-2">
+          <div className="flex flex-row justify-between">
+            <p className="text-base">Match outcome</p>
+            <Button variant="flat" size="sm" color="secondary">
+              Edit
+            </Button>
+          </div>
+          <div
+            className="max-h-[24rem] overflow-y-auto flex flex-col items-center  gap-2 "
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'hsl(var(--heroui-foreground)/0.5) transparent',
+            }}
+          >
+            <p className="text-sm">Match start. 0-0</p>
+            {result.detailedOutcome !== undefined &&
+            result.detailedOutcome.length !== 0
+              ? result.detailedOutcome.map((goal, i) => {
+                  const score = calculateScore(i);
+                  return (
+                    <MatchOutcomeRowAdvanced
+                      goal={goal}
+                      homeTeamDetails={result.homeTeamDetails}
+                      awayTeamDetails={result.awayTeamDetails}
+                      score={score}
+                      key={i}
+                    />
+                  );
+                })
+              : result.basicOutcome.map((goal, i) => {
+                  const score = calculateScore(i);
+                  return (
+                    <MatchOutcomeRowBasic
+                      goal={goal}
+                      homeTeamDetails={result.homeTeamDetails}
+                      awayTeamDetails={result.awayTeamDetails}
+                      score={score}
+                      key={i}
+                    />
+                  );
+                })}
+            <p className="text-sm">
+              Full time: {calculateScore(result.basicOutcome.length - 1)}
+            </p>
+          </div>
+        </CardBody>
+      </Card>
+    </>
   );
 }
 

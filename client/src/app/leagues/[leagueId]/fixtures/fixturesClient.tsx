@@ -166,12 +166,12 @@ function DetailsRibbon({
   const items = [
     { key: '0', label: 'All fixtures' },
     // FIXME: Send network request to get table names
-    // ...league.tables
-    //   .filter((t) => t.season === league.currentSeason)
-    //   .map((t) => ({
-    //     key: String(t.division),
-    //     label: t.name,
-    //   })),
+    ...league.tables
+      .filter((t) => t.season === league.currentSeason)
+      .map((t) => ({
+        key: String(t.division),
+        label: t.name,
+      })),
   ];
   return (
     <div className="flex flex-col gap-[20px] mx-[20px] items-center">

@@ -47,13 +47,13 @@ export default function PricingComponent() {
     },
     {
       tierName: 'Pro',
-      tierCaption: 'For users who want longer leagues and more control.',
+      tierCaption: 'For users who want flexibility and more features.',
       tierPriceMonthly: 3,
       features: [
         { text: 'Unlimited seasons' },
         { text: 'Goal scorers, assists & more stats' },
-        { text: 'League announcements' },
         { text: 'Season rewind' },
+        { text: 'Customisation' },
       ],
       callToAction: { buttonText: 'Get started' },
       featured: {
@@ -62,19 +62,19 @@ export default function PricingComponent() {
         textColor: 'hsl(var(--heroui-primary-foreground) / 1)',
       },
     },
-    {
-      tierName: 'Pro+',
-      tierCaption:
-        'For organisers who want premium polish and zero limitations.',
-      tierPriceMonthly: 5,
-      features: [
-        { text: 'Team pages' },
-        { text: 'Graphs & data visuals' },
-        { text: 'Fixture categories & notifications' },
-        { text: 'Data PNG download' },
-      ],
-      callToAction: { buttonText: 'Coming soon' },
-    },
+    // {
+    //   tierName: 'Pro+',
+    //   tierCaption:
+    //     'For organisers who want premium polish and zero limitations.',
+    //   tierPriceMonthly: 5,
+    //   features: [
+    //     { text: 'Team pages' },
+    //     { text: 'Graphs & data visuals' },
+    //     { text: 'Fixture categories & notifications' },
+    //     { text: 'Data PNG download' },
+    //   ],
+    //   callToAction: { buttonText: 'Coming soon' },
+    // },
   ];
 
   const [view, setView] = useState<'monthly' | 'yearly'>('monthly');
@@ -133,7 +133,7 @@ function PricingGrid({
   pricingData: PricingTierInterface[];
 }) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
       {pricingData.map((p, i) => (
         <PricingTile view={view} pricingTier={p} key={i} />
       ))}
@@ -155,7 +155,7 @@ function PricingTile({
       className={`p-3 overflow-visible text-start ${
         pricingTier.featured
           ? 'shadow-2xl shadow-primary/30'
-          : ' border-medium! border-default-100 lg:mt-12'
+          : ' border-medium! border-default-100'
       }`}
       style={{
         backgroundColor: pricingTier.featured?.color || 'transparent',
