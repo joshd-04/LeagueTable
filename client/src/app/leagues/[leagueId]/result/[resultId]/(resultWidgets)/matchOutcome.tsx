@@ -1,8 +1,27 @@
-import { Result } from '@/util/definitions';
-import { Button, Card, CardBody } from '@heroui/react';
+import EditResultModal from '@/components/editFixtureModal/EditResultModal';
+import useAccount from '@/hooks/useAccount';
+import { League, Result } from '@/util/definitions';
+import { doesUserOwnThisLeague } from '@/util/helpers';
+import { Button, Card, CardBody, useDisclosure } from '@heroui/react';
+import { useState } from 'react';
 import { PiSoccerBallFill } from 'react-icons/pi';
 
-export default function MatchOutcome({ result }: { result: Result }) {
+export default function MatchOutcome({
+  league,
+  result,
+}: {
+  league: League;
+  result: Result;
+}) {
+  const [r, setR] = useState<Result | null>(result);
+  const {
+    isOpen: isEditResultModalOpen,
+    onOpen: onEditResultModalOpen,
+    onClose: onEditResultModalClose,
+  } = useDisclosure();
+  const { isLoggedIn, user } = useAccount();
+  const userOwnsThisLeague = doesUserOwnThisLeague(league, user, isLoggedIn);
+
   function calculateScore(index: number) {
     let homeGoals = 0;
     let awayGoals = 0;
@@ -19,9 +38,18 @@ export default function MatchOutcome({ result }: { result: Result }) {
         <CardBody className="flex flex-col gap-2">
           <div className="flex flex-row justify-between">
             <p className="text-base">Match outcome</p>
-            <Button variant="flat" size="sm" color="secondary">
-              Edit
-            </Button>
+            {userOwnsThisLeague && (
+              <Button
+                variant="flat"
+                size="sm"
+                color="secondary"
+                onPress={() => {
+                  onEditResultModalOpen();
+                }}
+              >
+                Edit
+              </Button>
+            )}
           </div>
           <div
             className="max-h-[24rem] overflow-y-auto flex flex-col items-center  gap-2 "
@@ -63,6 +91,15 @@ export default function MatchOutcome({ result }: { result: Result }) {
           </div>
         </CardBody>
       </Card>
+      <EditResultModal
+        league={league}
+        resultObj={r}
+        setSelectedResult={setR}
+        isModalOpen={isEditResultModalOpen}
+        onModalClose={onEditResultModalClose}
+        // invalidateDashboardQueries={}
+        // onResolution={}
+      />
     </>
   );
 }

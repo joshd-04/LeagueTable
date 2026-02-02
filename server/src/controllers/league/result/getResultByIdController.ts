@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
 
 export async function getResultByIdController(
   req: Request,

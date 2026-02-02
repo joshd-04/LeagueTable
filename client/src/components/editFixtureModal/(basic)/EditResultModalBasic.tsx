@@ -31,7 +31,9 @@ export default function EditResultModalBasic({
   invalidateDashboardQueries?: () => void;
   onResolution?: (isSuccess: boolean) => void;
 }) {
-  const [matchStory, setMatchStory] = useState<('home' | 'away')[]>([]);
+  const [matchStory, setMatchStory] = useState<('home' | 'away')[]>(
+    resultObj.basicOutcome || []
+  );
 
   const [userRequestedNilNil, setUserRequestedNilNil] = useState(false);
 

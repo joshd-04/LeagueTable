@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
-import { IFixtureSchema, ILeagueSchema } from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
+import League from '../../../models/leagueModel';
+import { IFixtureSchema, ILeagueSchema } from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
 
 export async function getFixturesController(
   req: Request,

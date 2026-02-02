@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
-import { ErrorHandling } from '../../util/errorChecking';
+import League from '../../../models/leagueModel';
+import { ErrorHandling } from '../../../util/errorChecking';
 import { Types } from 'mongoose';
-import User from '../../models/userModel';
-import { ILeagueSchema } from '../../util/definitions';
+import User from '../../../models/userModel';
+import { ILeagueSchema } from '../../../util/definitions';
 
 interface LeagueCreationReqBody {
   name: string;

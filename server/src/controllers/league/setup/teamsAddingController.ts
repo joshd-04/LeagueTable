@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
-import { ILeagueSchema } from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
+import League from '../../../models/leagueModel';
+import { ILeagueSchema } from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
 import { Types } from 'mongoose';
-import Team from '../../models/teamModel';
+import Team from '../../../models/teamModel';
 
 // Need to check if tables have been added first
 export async function teamsAddingController(

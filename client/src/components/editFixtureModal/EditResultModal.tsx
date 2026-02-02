@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Result } from '@/util/definitions';
-import EditResultModalBasic from './(basic)/EditFixtureModalBasic';
+import { League, Result } from '@/util/definitions';
+import EditResultModalBasic from './(basic)/EditResultModalBasic';
 import EditResultModalAdvanced from './(advanced)/EditResultModalAdvanced';
+import useAccount from '@/hooks/useAccount';
+import { doesUserOwnThisLeague } from '@/util/helpers';
 
 export default function EditResultModal({
-  leagueType,
+  league,
   resultObj,
   setSelectedResult,
   isModalOpen,
@@ -12,7 +14,7 @@ export default function EditResultModal({
   invalidateDashboardQueries,
   onResolution,
 }: {
-  leagueType: 'basic' | 'advanced';
+  league: League;
   resultObj: Result | null;
   setSelectedResult: Dispatch<SetStateAction<Result | null>>;
   isModalOpen: boolean;
@@ -20,7 +22,14 @@ export default function EditResultModal({
   invalidateDashboardQueries?: () => void;
   onResolution?: (isSuccess: boolean) => void;
 }) {
+  const { isLoggedIn, user } = useAccount();
+  const userOwnsThisLeague = doesUserOwnThisLeague(league, user, isLoggedIn);
+
+  if (!userOwnsThisLeague) return null;
+
   if (!resultObj) return null;
+
+  const leagueType = league.leagueType;
   if (leagueType === 'advanced') {
     return (
       <EditResultModalAdvanced

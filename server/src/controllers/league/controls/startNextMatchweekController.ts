@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
   IUserSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
-import { meetsMinimumTierLevel } from '../../util/helpers';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
+import { meetsMinimumTierLevel } from '../../../util/helpers';
 
 export async function startNextMatchweek(
   req: Request,

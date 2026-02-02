@@ -1,20 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
   ITeamsSchema,
   IUserSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
 import { Types } from 'mongoose';
-import Team from '../../models/teamModel';
+import Team from '../../../models/teamModel';
 import {
   generateFixtures,
   meetsMinimumTierLevel,
   sortTeams,
-} from '../../util/helpers';
+} from '../../../util/helpers';
 
 export async function startNextSeasonController(
   req: Request,

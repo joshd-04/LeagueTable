@@ -13,13 +13,14 @@ import {
 import { Types } from 'mongoose';
 import Fixture from '../models/fixtureModel';
 import League from '../models/leagueModel';
+import Result from '../models/resultModel';
 
 export type RequiredFields = { [key: string]: string[] };
 
 export function enforceRequiredFields(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const requiredFields = rF;
   if (!req.body) return;
@@ -41,8 +42,57 @@ export function enforceRequiredFields(
   } else next();
 }
 
-export function calculateTeamPoints(team: ITeamsSchema) {
-  return team.wins * 3 + team.draws * 1;
+export async function calculateTeamPoints(
+  team: ITeamsSchema,
+  asOfTheEndOfMathweek?: number,
+  season?: number,
+) {
+  const league = await League.findById(team.leagueId);
+  if (!league) return 0;
+
+  if (!asOfTheEndOfMathweek || !season) return team.wins * 3 + team.draws * 1;
+
+  const seasonOfInterest = season || league.currentSeason;
+  const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
+
+  const homeResults = await Result.find({
+    'homeTeamDetails.teamId': team._id,
+    season: seasonOfInterest,
+    matchweek: { $lte: matchweekOfInterest },
+  });
+  const awayResults = await Result.find({
+    'awayTeamDetails.teamId': team._id,
+    season: seasonOfInterest,
+    matchweek: { $lte: matchweekOfInterest },
+  });
+
+  const points =
+    homeResults.reduce((points, result) => {
+      const homeGoals = result.basicOutcome.filter(
+        (goal) => goal === 'home',
+      ).length;
+      const awayGoals = result.basicOutcome.filter(
+        (goal) => goal === 'away',
+      ).length;
+
+      if (homeGoals > awayGoals) return points + 3;
+      if (homeGoals === awayGoals) return points + 1;
+      return points;
+    }, 0) +
+    awayResults.reduce((points, result) => {
+      const homeGoals = result.basicOutcome.filter(
+        (goal) => goal === 'home',
+      ).length;
+      const awayGoals = result.basicOutcome.filter(
+        (goal) => goal === 'away',
+      ).length;
+
+      if (homeGoals < awayGoals) return points + 3;
+      if (homeGoals === awayGoals) return points + 1;
+      return points;
+    }, 0);
+
+  return points;
 }
 
 export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
@@ -52,6 +102,16 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
   });
   if (league === null) return teams;
   const allResults = league.results as unknown as IResultSchema[];
+
+  const entries = await Promise.all(
+    teams.map(async (team) => {
+      const points = await calculateTeamPoints(team);
+      const teamId: Types.ObjectId = team._id as Types.ObjectId;
+      return [teamId.toString(), points] as const;
+    }),
+  );
+
+  const teamPoints: Record<string, number> = Object.fromEntries(entries);
 
   /* compareFn: positive = swap, negative = dont swap, equal = equal
   descending order: b-a
@@ -65,8 +125,8 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
   */
   teams.sort((teamA, teamB) => {
     // 1. More points
-    const pointsA = calculateTeamPoints(teamA);
-    const pointsB = calculateTeamPoints(teamB);
+    const pointsA = teamPoints[teamA._id as string];
+    const pointsB = teamPoints[teamB._id as string];
 
     if (pointsA !== pointsB) {
       return pointsB - pointsA;
@@ -92,12 +152,12 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
     const homeResult = allResults.find(
       (result) =>
         result.homeTeamDetails.name === teamA.name &&
-        result.awayTeamDetails.name === teamB.name
+        result.awayTeamDetails.name === teamB.name,
     );
     const awayResult = allResults.find(
       (result) =>
         result.homeTeamDetails.name === teamB.name &&
-        result.awayTeamDetails.name === teamA.name
+        result.awayTeamDetails.name === teamA.name,
     );
     let teamAPoints = 0;
     let teamBPoints = 0;
@@ -107,11 +167,11 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
     if (homeResult) {
       const teamAGoalsResult = homeResult.basicOutcome.reduce(
         (acc, goal) => (goal === 'home' ? acc + 1 : acc),
-        0
+        0,
       );
       const teamBGoalsResult = homeResult.basicOutcome.reduce(
         (acc, goal) => (goal === 'away' ? acc + 1 : acc),
-        0
+        0,
       );
       teamAGoals += teamAGoalsResult;
       teamBGoals += teamBGoalsResult;
@@ -127,11 +187,11 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
     if (awayResult) {
       const teamBGoalsResult = awayResult.basicOutcome.reduce(
         (acc, goal) => (goal === 'home' ? acc + 1 : acc),
-        0
+        0,
       );
       const teamAGoalsResult = awayResult.basicOutcome.reduce(
         (acc, goal) => (goal === 'away' ? acc + 1 : acc),
-        0
+        0,
       );
       teamAGoals += teamAGoalsResult;
       teamBGoals += teamBGoalsResult;
@@ -254,15 +314,15 @@ export async function findLeaguePosition(
   league: ILeagueSchema,
   division: number,
   season: number,
-  teamName: string
+  teamName: string,
 ) {
   const teams = await sortTeams(
     String(league._id),
     (
       league.tables.find(
-        (table) => table.division === division && table.season === season
+        (table) => table.division === division && table.season === season,
       ) as ITable
-    ).teams as ITeamsSchema[]
+    ).teams as ITeamsSchema[],
   );
   return teams.map((team) => team.name).indexOf(teamName) + 1;
 }
@@ -284,7 +344,7 @@ export function isTeam(doc: any): doc is ITeamsSchema {
  */
 export function meetsMinimumTierLevel(
   requiredLevel: AccountTypeInterface,
-  level: AccountTypeInterface
+  level: AccountTypeInterface,
 ) {
   if (requiredLevel === 'free') return true;
   if (requiredLevel === 'pro') {
@@ -306,7 +366,7 @@ export function meetsMinimumTierLevel(
 export function shouldGrantAccessToFeature(
   featureLevel: AccountTypeInterface,
   leagueLevel: AccountTypeInterface,
-  accountType: AccountTypeInterface
+  accountType: AccountTypeInterface,
 ) {
   return (
     meetsMinimumTierLevel(featureLevel, accountType) &&

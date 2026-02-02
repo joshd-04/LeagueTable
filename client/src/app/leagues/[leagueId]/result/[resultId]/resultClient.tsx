@@ -103,7 +103,7 @@ export default function ResultClient({
           {/* <AiSummary league={league} result={result} /> */}
 
           <AsItStood league={league} result={result} />
-          <MatchOutcome result={result} />
+          <MatchOutcome league={league} result={result} />
           <HeadToHead
             teams={{
               home: result.homeTeamDetails.name,

@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
   ITeamsSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
-import { findLeaguePosition, isTeam, sortTeams } from '../../util/helpers';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
+import { findLeaguePosition, isTeam, sortTeams } from '../../../util/helpers';
 
 export async function getFixtureResultStatusByIdController(
   req: Request,
@@ -68,15 +68,13 @@ export async function getFixtureResultStatusByIdController(
       );
     }
 
-    res
-      .status(200)
-      .json({
-        status: 'success',
-        data: {
-          isFixture: outcome === 'fixture',
-          isResult: outcome === 'result',
-        },
-      });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        isFixture: outcome === 'fixture',
+        isResult: outcome === 'result',
+      },
+    });
   } catch (e: any) {
     console.error(e);
     return next(

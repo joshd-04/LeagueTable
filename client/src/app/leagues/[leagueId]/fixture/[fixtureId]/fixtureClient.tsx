@@ -160,7 +160,7 @@ export default function FixtureClient({
         </div>
       </div>
       <FixtureToResult
-        leagueType={league.leagueType}
+        league={league}
         fixtureObj={selectedFixture}
         isModalOpen={isFixtureToResultOpen}
         onModalClose={onFixtureToResultClose}

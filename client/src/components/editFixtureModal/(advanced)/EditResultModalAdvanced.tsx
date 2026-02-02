@@ -36,7 +36,9 @@ export default function EditResultModalAdvanced({
   invalidateDashboardQueries?: () => void;
   onResolution?: (isSuccess: boolean) => void;
 }) {
-  const [matchStory, setMatchStory] = useState<GoalAdvanced[]>([]);
+  const [matchStory, setMatchStory] = useState<GoalAdvanced[]>(
+    resultObj.detailedOutcome || []
+  );
   const [userRequestedNilNil, setUserRequestedNilNil] = useState(false);
 
   // If the user changes the goal count, reset the nilnil value
@@ -64,7 +66,7 @@ export default function EditResultModalAdvanced({
     };
 
     return fetchAPI(`${API_URL}/result`, {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(x),
       credentials: 'include',

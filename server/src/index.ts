@@ -39,7 +39,7 @@ import {
   unfollowLeagueController,
 } from './controllers/user';
 import morgan from 'morgan';
-import { getResultByIdController } from './controllers/league/getResultByIdController';
+import { getResultByIdController } from './controllers/league/result/getResultByIdController';
 import { BACKEND_PORT, FRONTEND_URL } from './config';
 import session from 'express-session';
 import { sessionStore } from './util/sessionStore';

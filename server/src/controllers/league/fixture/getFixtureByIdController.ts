@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   IFixtureSchema,
   ILeagueSchema,
   ITeamsSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
-import { findLeaguePosition, isTeam, sortTeams } from '../../util/helpers';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
+import { findLeaguePosition, isTeam, sortTeams } from '../../../util/helpers';
 
 export async function getFixtureByIdController(
   req: Request,

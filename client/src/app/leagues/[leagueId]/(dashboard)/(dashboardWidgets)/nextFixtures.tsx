@@ -129,7 +129,7 @@ export default function NextFixtures({
         </CardBody>
       </Card>
       <FixtureToResult
-        leagueType={league.leagueType}
+        league={league}
         fixtureObj={selectedFixture}
         isModalOpen={isFixtureToResultOpen}
         onModalClose={onFixtureToResultClose}

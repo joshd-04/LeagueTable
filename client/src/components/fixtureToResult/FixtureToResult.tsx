@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Fixture } from '@/util/definitions';
+import { Fixture, League } from '@/util/definitions';
 import FixtureToResultBasic from './(basic)/FixtureToResultBasic';
 import FixtureToResultAdvanced from './(advanced)/FixtureToResultAdvanced';
+import useAccount from '@/hooks/useAccount';
+import { doesUserOwnThisLeague } from '@/util/helpers';
 
 export default function FixtureToResult({
-  leagueType,
+  league,
   fixtureObj,
   setSelectedFixture,
   isModalOpen,
@@ -12,7 +14,7 @@ export default function FixtureToResult({
   invalidateDashboardQueries,
   onResolution,
 }: {
-  leagueType: 'basic' | 'advanced';
+  league: League;
   fixtureObj: Fixture | null;
   setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
   isModalOpen: boolean;
@@ -20,7 +22,13 @@ export default function FixtureToResult({
   invalidateDashboardQueries?: () => void;
   onResolution?: (isSuccess: boolean) => void;
 }) {
+  const { isLoggedIn, user } = useAccount();
+  const userOwnsThisLeague = doesUserOwnThisLeague(league, user, isLoggedIn);
+
+  if (!userOwnsThisLeague) return null;
   if (!fixtureObj) return null;
+
+  const leagueType = league.leagueType;
   if (leagueType === 'advanced') {
     return (
       <FixtureToResultAdvanced

@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
   IUserSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
-import { shouldGrantAccessToFeature } from '../../util/helpers';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
+import { shouldGrantAccessToFeature } from '../../../util/helpers';
 
 export async function getResultsController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     /* 
@@ -41,7 +41,7 @@ export async function getResultsController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -49,7 +49,7 @@ export async function getResultsController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
     let allResults = league.results as unknown as IResultSchema[];
@@ -59,7 +59,7 @@ export async function getResultsController(
     } else {
       // sort by date
       allResults.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
       );
     }
 
@@ -91,7 +91,7 @@ export async function getResultsController(
     const allowSeasonRewind = shouldGrantAccessToFeature(
       'pro',
       league.leagueLevel,
-      accountType
+      accountType,
     );
 
     let seasonFilter = league.currentSeason;
@@ -101,7 +101,7 @@ export async function getResultsController(
 
       const inValidRange =
         isValidNum &&
-        Number(requestedSeason) >= 1 &&
+        Number(requestedSeason) >= 0 &&
         Number(requestedSeason) <= league.currentSeason;
 
       if (
@@ -115,20 +115,20 @@ export async function getResultsController(
           return next(
             new ErrorHandling(403, {
               message: `League owner must upgrade to PRO to view data for season ${requestedSeason}.`,
-            })
+            }),
           );
         }
       } else if (!isValidNum) {
         return next(
           new ErrorHandling(400, {
             message: `Invalid season query given`,
-          })
+          }),
         );
       } else if (!inValidRange) {
         return next(
           new ErrorHandling(400, {
             message: `Season query outside valid range`,
-          })
+          }),
         );
       } else if (+requestedSeason === league.currentSeason) {
         seasonFilter = league.currentSeason;
@@ -175,13 +175,13 @@ export async function getResultsController(
         return next(
           new ErrorHandling(400, {
             message: `Invalid matchweek query given`,
-          })
+          }),
         );
       } else if (!inValidRange) {
         return next(
           new ErrorHandling(400, {
             message: `Matchweek query outside valid range. 1-${league.finalMatchweek}.`,
-          })
+          }),
         );
       }
     } else {
@@ -190,7 +190,7 @@ export async function getResultsController(
 
     if (matchweekFilter !== null) {
       results = results.filter(
-        (result) => result.matchweek === matchweekFilter
+        (result) => result.matchweek === matchweekFilter,
       );
     }
 
@@ -205,8 +205,8 @@ export async function getResultsController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the results. ${e.message}`
-      )
+        `There was an error fetching the results. ${e.message}`,
+      ),
     );
   }
 }

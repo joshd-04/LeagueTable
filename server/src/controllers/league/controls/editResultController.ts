@@ -1,29 +1,30 @@
 import { NextFunction, Request, Response } from 'express';
-import League from '../../models/leagueModel';
+import League from '../../../models/leagueModel';
 import {
   AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
+  IResultSchema,
   ITeamsSchema,
   IUserSchema,
-} from '../../util/definitions';
-import { ErrorHandling } from '../../util/errorChecking';
-import Team from '../../models/teamModel';
+} from '../../../util/definitions';
+import { ErrorHandling } from '../../../util/errorChecking';
+import Team from '../../../models/teamModel';
 import {
   calculateTeamPoints,
   findLeaguePosition,
   meetsMinimumTierLevel,
   sortTeams,
-} from '../../util/helpers';
-import Fixture from '../../models/fixtureModel';
-import Result from '../../models/resultModel';
+} from '../../../util/helpers';
+import Fixture from '../../../models/fixtureModel';
+import Result from '../../../models/resultModel';
 
-export async function turnFixtureIntoResult(
+export async function editResultController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
-  /*  Args: fixtureId, basicOutcome, detailedOutcome?
+  /*  Args: resultId, basicOutcome, detailedOutcome?
     
         Returns: 
   
@@ -31,7 +32,7 @@ export async function turnFixtureIntoResult(
     */
   const userId = req.session.user?._id;
   try {
-    const fixtureId = req.body.fixtureId;
+    const resultId = req.body.resultId;
     const basicOutcome: ('home' | 'away')[] = req.body.basicOutcome;
     const detailedOutcome:
       | {
@@ -42,31 +43,29 @@ export async function turnFixtureIntoResult(
         }[]
       | null = req.body.detailedOutcome || null;
 
-    console.log(detailedOutcome);
-
-    // Check if fixture exists
-    let fixture: IFixtureSchema | null;
+    // Check if result exists
+    let result: IResultSchema | null;
     try {
-      fixture = await Fixture.findById(fixtureId).populate([
+      result = await Result.findById(resultId).populate([
         { path: 'homeTeamDetails' },
         { path: 'awayTeamDetails' },
       ]);
     } catch {
       return next(
         new ErrorHandling(404, {
-          message: `Fixture with ID '${fixtureId}' not found`,
-        })
+          message: `Fixture with ID '${resultId}' not found`,
+        }),
       );
     }
-    if (!fixture) {
+    if (!result) {
       return next(
         new ErrorHandling(404, {
-          message: `Fixture with ID '${fixtureId}' not found`,
-        })
+          message: `Fixture with ID '${resultId}' not found`,
+        }),
       );
     }
-    const homeDetails = fixture.homeTeamDetails as unknown as ITeamsSchema;
-    const awayDetails = fixture.awayTeamDetails as unknown as ITeamsSchema;
+    const homeDetails = result.homeTeamDetails as unknown as ITeamsSchema;
+    const awayDetails = result.awayTeamDetails as unknown as ITeamsSchema;
 
     const leagueId = homeDetails.leagueId;
     let league: ILeagueSchema | null;
@@ -85,7 +84,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -93,7 +92,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -102,28 +101,28 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(403, {
           message: `You are not permitted to make edits to this league`,
-        })
+        }),
       );
     }
 
     // Safety check: make sure fixture is in the same season
-    const isDifferentSeason = fixture.season !== league.currentSeason;
+    const isDifferentSeason = result.season !== league.currentSeason;
     if (isDifferentSeason) {
       return next(
         new ErrorHandling(403, {
           message: `This fixture is from a different season and cannot be updated.`,
-        })
+        }),
       );
     }
 
     // Check if the fixture is NOT a future fixture
-    const isFutureFixture = fixture.matchweek > league.currentMatchweek;
+    const isFutureFixture = result.matchweek > league.currentMatchweek;
 
     if (isFutureFixture) {
       return next(
         new ErrorHandling(403, {
           message: `This fixture isn't released yet. Progress through the season to upload the result.`,
-        })
+        }),
       );
     }
 
@@ -144,7 +143,7 @@ export async function turnFixtureIntoResult(
     }
     const isValid = meetsMinimumTierLevel(
       requiredLevel,
-      leagueOwner.accountType
+      leagueOwner.accountType,
     );
     if (!isValid) {
       switch (requiredLevel) {
@@ -152,25 +151,25 @@ export async function turnFixtureIntoResult(
           return next(
             new ErrorHandling(403, {
               message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
-            })
+            }),
           );
         case 'pro':
           return next(
             new ErrorHandling(403, {
               message: `Pro required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         case 'pro+':
           return next(
             new ErrorHandling(403, {
               message: `Pro+ required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         default:
           return next(
             new ErrorHandling(403, {
               message: `We could not verify your account subscription tier.`,
-            })
+            }),
           );
       }
     }
@@ -191,7 +190,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(400, {
           message: `Property 'basicOutcome' must be an array of "home" or "away"`,
-        })
+        }),
       );
     }
 
@@ -232,7 +231,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(400, {
           message: `Property 'detailedOutcome' is required because this league is an 'advanced' league. Make sure the same number of goals are provided as the basicOutcome. Property 'detailedOutcome' must have a team: "home" | "away", scorer: str, assist?: str | undefined, isOwnGoal?: boolean | undefined`,
-        })
+        }),
       );
     }
 
@@ -240,22 +239,23 @@ export async function turnFixtureIntoResult(
     const homeTeamPosition = await findLeaguePosition(
       league,
       homeDetails.division,
-      fixture.season,
-      homeDetails.name
+      result.season,
+      homeDetails.name,
     );
     const awayTeamPosition = await findLeaguePosition(
       league,
       awayDetails.division,
-      fixture.season,
-      awayDetails.name
+      result.season,
+      awayDetails.name,
     );
 
-    const result = await Result.create({
-      _id: fixtureId,
+    // TODO: PICK UP FROM HERE TO FINISH EDIT RESULT FUNCTIONALITY
+    const updatedResult = await Result.findByIdAndUpdate(resultId, {
+      _id: resultId,
       date: Date.now(),
-      season: fixture.season,
-      division: fixture.division,
-      matchweek: fixture.matchweek,
+      season: result.season,
+      division: result.division,
+      matchweek: result.matchweek,
       homeTeamDetails: {
         teamId: homeDetails._id,
         name: homeDetails.name,
@@ -275,8 +275,8 @@ export async function turnFixtureIntoResult(
         matchesPlayed: awayDetails.matchesPlayed,
         points: calculateTeamPoints(awayDetails),
       },
-      neutralGround: fixture.neutralGround,
-      kickoff: fixture.kickoff,
+      neutralGround: result.neutralGround,
+      kickoff: result.kickoff,
       basicOutcome: basicOutcome,
       detailedOutcome: detailedOutcome || undefined,
     });
@@ -287,9 +287,9 @@ export async function turnFixtureIntoResult(
     });
 
     // Delete fixture from fixture list
-    await Fixture.findByIdAndDelete(fixtureId);
+    await Fixture.findByIdAndDelete(resultId);
     await League.findByIdAndUpdate(leagueId, {
-      $pull: { fixtures: fixtureId },
+      $pull: { fixtures: resultId },
     });
 
     // If that was the last fixture, and this is the last season, set the season finished flag to true
@@ -311,19 +311,19 @@ export async function turnFixtureIntoResult(
     let newAwayForm: string;
     const homeGoals = basicOutcome.reduce(
       (prev, val) => (val === 'home' ? prev + 1 : prev),
-      0
+      0,
     );
     const awayGoals = basicOutcome.reduce(
       (prev, val) => (val === 'away' ? prev + 1 : prev),
-      0
+      0,
     );
 
     const matchOutcome: 'home' | 'draw' | 'away' =
       homeGoals === awayGoals
         ? 'draw'
         : homeGoals > awayGoals
-        ? 'home'
-        : 'away';
+          ? 'home'
+          : 'away';
 
     let newHomeFormArr = homeDetails.form.split('');
     const homeLetter =
@@ -427,8 +427,8 @@ export async function turnFixtureIntoResult(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error turning the fixture into a result. ${e.message}`
-      )
+        `There was an error turning the fixture into a result. ${e.message}`,
+      ),
     );
   }
 }
