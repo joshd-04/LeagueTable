@@ -3,7 +3,10 @@ import useAccount from '@/hooks/useAccount';
 import { League } from '@/util/definitions';
 import { SingleResultDTO } from '@/util/dto/results';
 import { doesUserOwnThisLeague } from '@/util/helpers';
-import { Button, Card, CardBody, useDisclosure } from '@heroui/react';
+import { addToast, Button, Card, CardBody, useDisclosure } from '@heroui/react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { title } from 'process';
 import { useState } from 'react';
 import { PiSoccerBallFill } from 'react-icons/pi';
 
@@ -22,6 +25,7 @@ export default function MatchOutcome({
   } = useDisclosure();
   const { isLoggedIn, user } = useAccount();
   const userOwnsThisLeague = doesUserOwnThisLeague(league, user, isLoggedIn);
+  const router = useRouter();
 
   function calculateScore(index: number) {
     let homeGoals = 0;
@@ -33,6 +37,21 @@ export default function MatchOutcome({
     });
     return `${homeGoals}-${awayGoals}`;
   }
+
+  function onEditResolution(isSuccess: boolean) {
+    if (isSuccess) {
+      router.refresh();
+      addToast({
+        title: 'Success!',
+        description: 'Result has been edited',
+        color: 'success',
+        shouldShowTimeoutProgress: true,
+        timeout: 3000,
+      });
+    }
+    setR(null);
+  }
+
   return (
     <>
       <Card className="h-full w-full px-[10px] py-[6px]">
@@ -100,7 +119,7 @@ export default function MatchOutcome({
         isModalOpen={isEditResultModalOpen}
         onModalClose={onEditResultModalClose}
         // invalidateDashboardQueries={}
-        // onResolution={}
+        onResolution={onEditResolution}
       />
     </>
   );

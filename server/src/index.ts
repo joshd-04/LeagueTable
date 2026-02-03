@@ -11,6 +11,7 @@ import connectDB from './util/db';
 import {
   calculateSeasonStatsController,
   calculateSeasonSummaryController,
+  editResultController,
   getAnnouncementController,
   getEngagementStats,
   getFixtureByIdController,
@@ -76,7 +77,7 @@ app.use(
   cors({
     origin: FRONTEND_URL, // allow your frontend
     credentials: true,
-  })
+  }),
 );
 app.use(morgan('dev'));
 app.use(cookieParser());
@@ -97,7 +98,7 @@ app.use(
       maxAge: 30 * 60 * 1000, // 30 minutes sliding window
     },
     rolling: true, // enables sliding expiration
-  })
+  }),
 );
 
 app.use(sessionAbsoluteExpirationMiddleware);
@@ -122,27 +123,27 @@ app.post(
   '/api/leagues',
   requireAuth,
   enforceRequiredFields,
-  leagueCreationController
+  leagueCreationController,
 );
 
 app.post(
   '/api/leagues/:leagueId/view',
   visitorIdMiddleware,
-  RegisterViewController
+  RegisterViewController,
 );
 
 // Gets all league id's with minimal info that are associated with you e.g. yours or favorites etc
 app.get(
   '/api/leagues/associated',
   requireAuth,
-  myAssociatedLeaguesFetcherController
+  myAssociatedLeaguesFetcherController,
 );
 app.get('/api/leagues/:id/announcement', getAnnouncementController);
 app.patch(
   '/api/leagues/:id/announcement',
   requireAuth,
   enforceRequiredFields,
-  setAnnouncementController
+  setAnnouncementController,
 );
 app.get('/api/leagues/:id', leagueFetcherController);
 
@@ -150,26 +151,26 @@ app.post(
   '/api/leagues/:id/tables',
   requireAuth,
   enforceRequiredFields,
-  tablesAddingController
+  tablesAddingController,
 );
 
 app.post(
   '/api/leagues/:id/teams',
   requireAuth,
   enforceRequiredFields,
-  teamsAddingController
+  teamsAddingController,
 );
 
 app.post(
   '/api/leagues/:id/start-next-season',
   requireAuth,
-  startNextSeasonController
+  startNextSeasonController,
 );
 
 app.post(
   '/api/leagues/:id/start-next-matchweek',
   requireAuth,
-  startNextMatchweek
+  startNextMatchweek,
 );
 
 app.get('/api/leagues/:leagueId/fixtures/:fixtureId', getFixtureByIdController);
@@ -180,7 +181,7 @@ app.get('/api/leagues/:id/results', getResultsController);
 
 app.get(
   '/api/leagues/:id/season-summary-stats',
-  calculateSeasonSummaryController
+  calculateSeasonSummaryController,
 );
 
 app.get('/api/leagues/:id/engagement-stats', getEngagementStats);
@@ -191,14 +192,21 @@ app.get('/api/leagues/:id/headtohead/:teamA/:teamB', getHeadToHeadController);
 
 app.get(
   '/api/leagues/:leagueId/fixture-result-status/:matchId',
-  getFixtureResultStatusByIdController
+  getFixtureResultStatusByIdController,
 );
 
 app.post(
   '/api/result',
   requireAuth,
   enforceRequiredFields,
-  turnFixtureIntoResult
+  turnFixtureIntoResult,
+);
+
+app.patch(
+  '/api/result',
+  requireAuth,
+  enforceRequiredFields,
+  editResultController,
 );
 
 // User endpoints
@@ -206,28 +214,28 @@ app.patch(
   '/api/users/favorites',
   requireAuth,
   enforceRequiredFields,
-  favoriteLeagueController
+  favoriteLeagueController,
 );
 
 app.delete(
   '/api/users/favorites',
   requireAuth,
   enforceRequiredFields,
-  unfavoriteLeagueController
+  unfavoriteLeagueController,
 );
 
 app.patch(
   '/api/users/following',
   requireAuth,
   enforceRequiredFields,
-  followLeagueController
+  followLeagueController,
 );
 
 app.delete(
   '/api/users/following',
   requireAuth,
   enforceRequiredFields,
-  unfollowLeagueController
+  unfollowLeagueController,
 );
 
 /*
@@ -254,14 +262,14 @@ app.use(
     error: ErrorHandling | Error,
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     if (error instanceof ErrorHandling) {
       res.status(error.statusCode).json(error.outputMessage());
     } else {
       res.status(500).json(error);
     }
-  }
+  },
 );
 
 // Start the server

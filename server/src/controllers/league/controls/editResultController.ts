@@ -23,7 +23,8 @@ export async function editResultController(
     */
   const userId = req.session.user?._id;
   try {
-    const resultId = req.body.resultId;
+    // Due to clash with POST /result and enforceRequiredField, we are using fixtureId instead of a preferred resultId in reqbody
+    const resultId = req.body.fixtureId;
     const basicOutcome: ('home' | 'away')[] = req.body.basicOutcome;
     const detailedOutcome:
       | {
@@ -41,14 +42,14 @@ export async function editResultController(
     } catch {
       return next(
         new ErrorHandling(404, {
-          message: `Fixture with ID '${resultId}' not found`,
+          message: `Result with ID '${resultId}' not found`,
         }),
       );
     }
     if (!result) {
       return next(
         new ErrorHandling(404, {
-          message: `Fixture with ID '${resultId}' not found`,
+          message: `Result with ID '${resultId}' not found`,
         }),
       );
     }
@@ -61,7 +62,7 @@ export async function editResultController(
       league = await League.findById(leagueId).populate([
         { path: 'tables.teams' },
         {
-          path: 'fixtures',
+          path: 'results',
         },
         { path: 'leagueOwner' },
       ]);
@@ -90,17 +91,17 @@ export async function editResultController(
       );
     }
 
-    // Safety check: make sure fixture is in the same season
+    // Safety check: make sure result is in the same season
     const isDifferentSeason = result.season !== league.currentSeason;
     if (isDifferentSeason) {
       return next(
         new ErrorHandling(403, {
-          message: `This fixture is from a different season and cannot be updated.`,
+          message: `This result is from a different season and cannot be updated.`,
         }),
       );
     }
 
-    // Check if the fixture is NOT a future fixture
+    // Check if the result is NOT a future fixture
     const isFutureFixture = result.matchweek > league.currentMatchweek;
 
     if (isFutureFixture) {
@@ -221,16 +222,8 @@ export async function editResultController(
     }
 
     // TODO: PICK UP FROM HERE TO FINISH EDIT RESULT FUNCTIONALITY
-    // side quest: dont store details like position, form, points etc in storage, instead calculate in real time. pickup from #002
+
     const updatedResult = await Result.findByIdAndUpdate(resultId, {
-      date: Date.now(),
-      season: result.season,
-      division: result.division,
-      matchweek: result.matchweek,
-      homeTeamId: result._id,
-      awayTeamId: result._id,
-      neutralGround: result.neutralGround,
-      kickoff: result.kickoff,
       basicOutcome: basicOutcome,
       detailedOutcome: detailedOutcome || undefined,
     });
@@ -258,7 +251,9 @@ export async function editResultController(
     //   });
     // }
 
-    res.status(200).json({ status: 'success', data: { result: result } });
+    res
+      .status(200)
+      .json({ status: 'success', data: { result: updatedResult } });
   } catch (e: any) {
     console.error(e);
     return next(

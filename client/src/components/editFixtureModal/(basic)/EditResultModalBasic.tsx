@@ -48,7 +48,7 @@ export default function EditResultModalBasic({
       basicOutcome: basicOutcome,
     };
     return fetchAPI(`${API_URL}/result`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(x),
       credentials: 'include',

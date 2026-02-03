@@ -16,5 +16,6 @@ export { startNextSeasonController } from './controls/startNextSeasonController'
 export { tablesAddingController } from './setup/tablesAddingController';
 export { teamsAddingController } from './setup/teamsAddingController';
 export { turnFixtureIntoResult } from './controls/turnFixtureIntoResult';
+export { editResultController } from './controls/editResultController';
 export { getEngagementStats } from './getEngagementStatsController';
 export { RegisterViewController } from './registerViewController';
