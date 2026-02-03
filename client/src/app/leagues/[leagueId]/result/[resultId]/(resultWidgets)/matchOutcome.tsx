@@ -4,10 +4,8 @@ import { League } from '@/util/definitions';
 import { SingleResultDTO } from '@/util/dto/results';
 import { doesUserOwnThisLeague } from '@/util/helpers';
 import { addToast, Button, Card, CardBody, useDisclosure } from '@heroui/react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { title } from 'process';
-import { useState } from 'react';
+
 import { PiSoccerBallFill } from 'react-icons/pi';
 
 export default function MatchOutcome({
@@ -17,7 +15,6 @@ export default function MatchOutcome({
   league: League;
   resultDTO: SingleResultDTO;
 }) {
-  const [r, setR] = useState<SingleResultDTO | null>(resultDTO);
   const {
     isOpen: isEditResultModalOpen,
     onOpen: onEditResultModalOpen,
@@ -49,7 +46,6 @@ export default function MatchOutcome({
         timeout: 3000,
       });
     }
-    setR(null);
   }
 
   return (
@@ -114,11 +110,9 @@ export default function MatchOutcome({
       </Card>
       <EditResultModal
         league={league}
-        resultObj={r}
-        setSelectedResult={setR}
+        resultObj={resultDTO}
         isModalOpen={isEditResultModalOpen}
         onModalClose={onEditResultModalClose}
-        // invalidateDashboardQueries={}
         onResolution={onEditResolution}
       />
     </>

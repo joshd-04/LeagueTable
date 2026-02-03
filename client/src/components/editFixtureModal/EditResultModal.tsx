@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
 import { League } from '@/util/definitions';
 import EditResultModalBasic from './(basic)/EditResultModalBasic';
 import EditResultModalAdvanced from './(advanced)/EditResultModalAdvanced';
@@ -9,7 +8,6 @@ import { SingleResultDTO } from '@/util/dto/results';
 export default function EditResultModal({
   league,
   resultObj,
-  setSelectedResult,
   isModalOpen,
   onModalClose,
   invalidateDashboardQueries,
@@ -17,7 +15,6 @@ export default function EditResultModal({
 }: {
   league: League;
   resultObj: SingleResultDTO | null;
-  setSelectedResult: Dispatch<SetStateAction<SingleResultDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
@@ -37,7 +34,6 @@ export default function EditResultModal({
         resultObj={resultObj}
         isModalOpen={isModalOpen}
         onModalClose={onModalClose}
-        setSelectedResult={setSelectedResult}
         invalidateDashboardQueries={invalidateDashboardQueries}
         onResolution={onResolution}
       />
@@ -48,7 +44,6 @@ export default function EditResultModal({
       resultObj={resultObj}
       isModalOpen={isModalOpen}
       onModalClose={onModalClose}
-      setSelectedResult={setSelectedResult}
       invalidateDashboardQueries={invalidateDashboardQueries}
       onResolution={onResolution}
     />

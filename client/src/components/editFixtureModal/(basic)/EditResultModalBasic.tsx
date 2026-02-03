@@ -17,14 +17,12 @@ import { SingleResultDTO } from '@/util/dto/results';
 
 export default function EditResultModalBasic({
   resultObj,
-  setSelectedResult,
   isModalOpen,
   onModalClose,
   invalidateDashboardQueries,
   onResolution,
 }: {
   resultObj: SingleResultDTO;
-  setSelectedResult: Dispatch<SetStateAction<SingleResultDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
@@ -105,7 +103,6 @@ export default function EditResultModalBasic({
       isOpen={isModalOpen}
       onOpenChange={(open) => {
         if (!open) {
-          setSelectedResult(null);
           onModalClose?.();
         }
       }}
@@ -116,7 +113,6 @@ export default function EditResultModalBasic({
             const response = await fixtureToResultBasicMutation();
             if (response.status === 'success') {
               onClose();
-              setSelectedResult(null);
               onModalClose?.();
             }
           }
@@ -150,7 +146,6 @@ export default function EditResultModalBasic({
                   variant="light"
                   onPress={() => {
                     onClose();
-                    setSelectedResult(null);
                     onModalClose?.();
                   }}
                 >

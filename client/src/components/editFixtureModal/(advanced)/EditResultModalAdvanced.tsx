@@ -22,14 +22,12 @@ import { SingleResultDTO } from '@/util/dto/results';
 
 export default function EditResultModalAdvanced({
   resultObj,
-  setSelectedResult,
   isModalOpen,
   onModalClose,
   invalidateDashboardQueries,
   onResolution,
 }: {
   resultObj: SingleResultDTO;
-  setSelectedResult: Dispatch<SetStateAction<SingleResultDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
@@ -112,7 +110,6 @@ export default function EditResultModalAdvanced({
       isOpen={isModalOpen}
       onOpenChange={(open) => {
         if (!open) {
-          setSelectedResult(null);
           onModalClose?.();
         }
       }}
@@ -123,7 +120,6 @@ export default function EditResultModalAdvanced({
             const response = await fixtureToResultAdvancedMutation();
             if (response.status === 'success') {
               onClose();
-              setSelectedResult(null);
               onModalClose?.();
             }
           }
@@ -157,7 +153,6 @@ export default function EditResultModalAdvanced({
                   variant="light"
                   onPress={() => {
                     onClose();
-                    setSelectedResult(null);
                     onModalClose?.();
                   }}
                 >
