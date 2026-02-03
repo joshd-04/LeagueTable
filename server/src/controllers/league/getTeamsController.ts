@@ -7,7 +7,7 @@ import {
   ITeamsSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { sortTeams } from '../../util/helpers';
+import { calculateTeamDetails, sortTeams } from '../../util/helpers';
 
 interface statsInterface {
   goalsScored: number;
@@ -20,7 +20,7 @@ interface statsInterface {
 export async function getTeamsController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.id;
@@ -35,7 +35,7 @@ export async function getTeamsController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -43,7 +43,7 @@ export async function getTeamsController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -54,7 +54,7 @@ export async function getTeamsController(
       return next(
         new ErrorHandling(400, {
           message: `This league does not have ${divisionRequested} divisions. Highest division is ${league.divisionsCount} divisions`,
-        })
+        }),
       );
     }
 
@@ -74,22 +74,42 @@ export async function getTeamsController(
     }
 
     let teams = league.tables.filter(
-      (t) => t.season === seasonRequested && t.division === +divisionRequested
+      (t) => t.season === seasonRequested && t.division === +divisionRequested,
     )[0].teams as ITeamsSchema[];
-    teams = await sortTeams(leagueId, teams)
-    teams = teams.map((team, i) => {
-      return { position: i + 1, ...team.toObject() } as ITeamsSchema;
-    });
+    teams = await sortTeams(leagueId, teams);
+    // const teamsWithDetails = Promise.all(
+    //   teams.map(async (team, i) => {
+    //     const teamDetails = await calculateTeamDetails(
+    //       league,
+    //       team._id,
+    //       seasonRequested,
+    //     );
+    //     return { position: i + 1, ...teamDetails };
+    //   }),
+    // );
 
-    res.status(200).json({ status: 'success', data: { teams: teams } });
+    const teamsWithDetails = await Promise.all(
+      teams.map(async (team) => {
+        const res = await calculateTeamDetails(
+          league,
+          team._id,
+          seasonRequested,
+        );
+        return res;
+      }),
+    );
+
+    res
+      .status(200)
+      .json({ status: 'success', data: { teams: teamsWithDetails } });
   } catch (e: any) {
     console.error(e);
     return next(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error calculating the season summary statistics. ${e.message}`
-      )
+        `There was an error calculating the season summary statistics. ${e.message}`,
+      ),
     );
   }
 }

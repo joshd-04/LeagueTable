@@ -1,6 +1,6 @@
 'use client';
 import useAccount from '@/hooks/useAccount';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Heading1 from '@/components/text/Heading1';
 
@@ -17,26 +17,28 @@ import { API_URL } from '@/util/config';
 import AiInsights from './(widgets)/aiInsights';
 import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
 import { individualTeamPagesEnabled } from '@/util/featureToggle';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export default function FixtureClient({
   league,
-  fixture,
+  fixtureDTO,
 }: {
   league: League;
-  fixture: Fixture;
+  fixtureDTO: SingleFixtureDTO;
 }) {
   const { user, isLoggedIn } = useAccount();
 
-  const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
+  const [selectedFixture, setSelectedFixture] =
+    useState<SingleFixtureDTO | null>(null);
 
   const { data: fixtureResultStatusData, isLoading } = useQuery({
     queryFn: () => {
       return fetchAPI(
-        `${API_URL}/leagues/${league._id}/fixture-result-status/${fixture._id}`,
+        `${API_URL}/leagues/${league._id}/fixture-result-status/${fixtureDTO.fixture._id}`,
         {
           method: 'GET',
           credentials: 'include',
-        }
+        },
       );
     },
     queryKey: ['fixture-result-status'],
@@ -48,7 +50,9 @@ export default function FixtureClient({
       if (fixtureResultStatusData.status === 'success') {
         const { isFixture, isResult } = fixtureResultStatusData.data;
         if (isResult) {
-          router.push(`/leagues/${league._id}/result/${fixture._id}`);
+          router.push(
+            `/leagues/${league._id}/result/${fixtureDTO.fixture._id}`,
+          );
         } else if (isFixture) {
           // do nothing
         } else {
@@ -76,7 +80,7 @@ export default function FixtureClient({
 
   function handleFixtureToResultCompletion(isSuccess: boolean) {
     if (isSuccess) {
-      router.push(`/leagues/${league._id}/result/${fixture._id}`);
+      router.push(`/leagues/${league._id}/result/${fixtureDTO.fixture._id}`);
     } else {
       // Error toasts are now handled by the fixture to result form itself using API message
       // addToast({
@@ -93,7 +97,7 @@ export default function FixtureClient({
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%]">
           <div
             className={`w-full ${
-              fixture.neutralGround ? 'hidden' : 'flex'
+              fixtureDTO.fixture.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
             <p className="text-sm">Home</p>
@@ -110,7 +114,7 @@ export default function FixtureClient({
                 href={'/'}
                 style={{ padding: 0, width: 'max-content' }}
               >
-                <Heading1>{fixture.homeTeamDetails.name}</Heading1>
+                <Heading1>{fixtureDTO.homeDetails.name}</Heading1>
               </LinkButton>
               <Heading1>v</Heading1>
               <LinkButton
@@ -122,16 +126,16 @@ export default function FixtureClient({
                 href={'/'}
                 style={{ padding: 0, width: 'max-content' }}
               >
-                <Heading1>{fixture.awayTeamDetails.name}</Heading1>
+                <Heading1>{fixtureDTO.awayDetails.name}</Heading1>
               </LinkButton>
             </div>
           ) : (
             <div className="flex flex-row justify-between gap-[20px]">
-              <Heading1>{fixture.homeTeamDetails.name}</Heading1>
+              <Heading1>{fixtureDTO.homeDetails.name}</Heading1>
 
               <Heading1>v</Heading1>
 
-              <Heading1>{fixture.awayTeamDetails.name}</Heading1>
+              <Heading1>{fixtureDTO.awayDetails.name}</Heading1>
             </div>
           )}
         </div>
@@ -142,17 +146,17 @@ export default function FixtureClient({
       >
         <DetailsRibbon
           league={league}
-          fixture={fixture}
+          fixtureDTO={fixtureDTO}
           setSelectedFixture={setSelectedFixture}
           onFixtureToResultOpen={onFixtureToResultOpen}
         />
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-5 ">
-          <AiInsights league={league} fixture={fixture} />
-          <MatchPreview league={league} fixture={fixture} />
+          <AiInsights league={league} fixture={fixtureDTO.fixture} />
+          <MatchPreview league={league} fixtureDTO={fixtureDTO} />
           <HeadToHead
             teams={{
-              home: fixture.homeTeamDetails.name,
-              away: fixture.awayTeamDetails.name,
+              home: fixtureDTO.homeDetails.name,
+              away: fixtureDTO.awayDetails.name,
             }}
             league={league}
             userOwnsThisLeague={userOwnsThisLeague}
@@ -173,20 +177,20 @@ export default function FixtureClient({
 
 function DetailsRibbon({
   league,
-  fixture,
+  fixtureDTO,
   setSelectedFixture,
   onFixtureToResultOpen,
 }: {
   league: League;
-  fixture: Fixture;
-  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  fixtureDTO: SingleFixtureDTO;
+  setSelectedFixture: Dispatch<SetStateAction<SingleFixtureDTO | null>>;
   onFixtureToResultOpen: () => void;
 }) {
   // Just incase, make sure the seasons are verified here too
   const isFutureFixture =
-    (fixture.matchweek > league.currentMatchweek &&
-      fixture.season == league.currentSeason) ||
-    fixture.season > league.currentSeason;
+    (fixtureDTO.fixture.matchweek > league.currentMatchweek &&
+      fixtureDTO.fixture.season == league.currentSeason) ||
+    fixtureDTO.fixture.season > league.currentSeason;
 
   return (
     <div className="grid grid-rows-1 grid-cols-3 place-self-center place-items-center text-base">
@@ -202,7 +206,7 @@ function DetailsRibbon({
         color="primary"
         className="font-semibold justify-self-start"
         onPress={() => {
-          setSelectedFixture(fixture);
+          setSelectedFixture(fixtureDTO);
           onFixtureToResultOpen();
         }}
         isDisabled={isFutureFixture}

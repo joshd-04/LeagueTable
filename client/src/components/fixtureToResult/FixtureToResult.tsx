@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import FixtureToResultBasic from './(basic)/FixtureToResultBasic';
 import FixtureToResultAdvanced from './(advanced)/FixtureToResultAdvanced';
 import useAccount from '@/hooks/useAccount';
 import { doesUserOwnThisLeague } from '@/util/helpers';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export default function FixtureToResult({
   league,
@@ -15,8 +16,8 @@ export default function FixtureToResult({
   onResolution,
 }: {
   league: League;
-  fixtureObj: Fixture | null;
-  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  fixtureObj: SingleFixtureDTO | null;
+  setSelectedFixture: Dispatch<SetStateAction<SingleFixtureDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;

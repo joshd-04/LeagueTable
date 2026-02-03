@@ -36,7 +36,6 @@ export async function getFixtureByIdController(
         }),
       );
     }
-    console.log('HIT 0');
 
     if (!league) {
       return next(
@@ -63,8 +62,6 @@ export async function getFixtureByIdController(
     //   ? fixture.awayTeamDetails
     //   : null;
 
-    console.log('HIT 1');
-
     let homeDetails = await calculateTeamDetails(
       league,
       fixture.homeTeamId,
@@ -77,8 +74,6 @@ export async function getFixtureByIdController(
       fixture.season,
       fixture.matchweek,
     );
-
-    console.log('HIT 2');
 
     if (homeDetails === null || awayDetails === null) {
       return next(

@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
-import { Result } from '@/util/definitions';
-
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
@@ -15,6 +13,7 @@ import {
   ModalHeader,
 } from '@heroui/react';
 import { FaTrashAlt } from 'react-icons/fa';
+import { SingleResultDTO } from '@/util/dto/results';
 
 export default function EditResultModalBasic({
   resultObj,
@@ -24,15 +23,15 @@ export default function EditResultModalBasic({
   invalidateDashboardQueries,
   onResolution,
 }: {
-  resultObj: Result;
-  setSelectedResult: Dispatch<SetStateAction<Result | null>>;
+  resultObj: SingleResultDTO;
+  setSelectedResult: Dispatch<SetStateAction<SingleResultDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
   onResolution?: (isSuccess: boolean) => void;
 }) {
   const [matchStory, setMatchStory] = useState<('home' | 'away')[]>(
-    resultObj.basicOutcome || []
+    resultObj.result.basicOutcome || [],
   );
 
   const [userRequestedNilNil, setUserRequestedNilNil] = useState(false);
@@ -45,7 +44,7 @@ export default function EditResultModalBasic({
   function mutationFunction() {
     const basicOutcome = matchStory;
     const x = {
-      fixtureId: resultObj._id,
+      fixtureId: resultObj.result._id,
       basicOutcome: basicOutcome,
     };
     return fetchAPI(`${API_URL}/result`, {
@@ -126,11 +125,11 @@ export default function EditResultModalBasic({
               <ModalHeader className="flex flex-col gap-1">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-xl">
-                    {resultObj.homeTeamDetails.name}{' '}
+                    {resultObj.homeDetails.name}{' '}
                     {matchStory.length === 0
                       ? 'vs'
                       : calculateScore(matchStory.length - 1)}{' '}
-                    {resultObj.awayTeamDetails.name}
+                    {resultObj.awayDetails.name}
                   </h3>
                   <p className="text-sm text-muted font-normal">
                     Fixture into result
@@ -186,7 +185,7 @@ function ResultFormBasic({
   setMatchStory,
   calculateScore,
 }: {
-  result: Result;
+  result: SingleResultDTO;
   matchStory: ('home' | 'away')[];
   setMatchStory: Dispatch<SetStateAction<('home' | 'away')[]>>;
   calculateScore: (i: number) => string;
@@ -233,8 +232,8 @@ function ResultFormBasic({
                   <div>
                     <p>
                       {goal === 'home'
-                        ? result.homeTeamDetails.name
-                        : result.awayTeamDetails.name}{' '}
+                        ? result.homeDetails.name
+                        : result.awayDetails.name}{' '}
                       ({calculateScore(i)})
                     </p>
                   </div>
@@ -260,14 +259,14 @@ function ResultFormBasic({
             onPress={() => addGoal('home')}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {result.homeTeamDetails.name} goal
+            Add {result.homeDetails.name} goal
           </Button>
           <Button
             color="default"
             onPress={() => addGoal('away')}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {result.awayTeamDetails.name} goal
+            Add {result.awayDetails.name} goal
           </Button>
         </div>
       </div>

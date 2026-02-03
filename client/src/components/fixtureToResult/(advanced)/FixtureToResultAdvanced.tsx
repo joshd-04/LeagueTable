@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
-import { Fixture } from '@/util/definitions';
-
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
@@ -20,6 +18,7 @@ import {
 import { FaTrashAlt } from 'react-icons/fa';
 import { PiSoccerBallFill } from 'react-icons/pi';
 import { GiRunningShoe } from 'react-icons/gi';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export default function FixtureToResultAdvanced({
   fixtureObj,
@@ -29,8 +28,8 @@ export default function FixtureToResultAdvanced({
   invalidateDashboardQueries,
   onResolution,
 }: {
-  fixtureObj: Fixture;
-  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  fixtureObj: SingleFixtureDTO;
+  setSelectedFixture: Dispatch<SetStateAction<SingleFixtureDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
@@ -58,7 +57,7 @@ export default function FixtureToResultAdvanced({
   function handleSubmit() {
     const basicOutcome = matchStory.map((goal) => goal.team);
     const x = {
-      fixtureId: fixtureObj._id,
+      fixtureId: fixtureObj.fixture._id,
       basicOutcome: basicOutcome,
       detailedOutcome: matchStory,
     };
@@ -131,11 +130,11 @@ export default function FixtureToResultAdvanced({
               <ModalHeader className="flex flex-col gap-1">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-xl">
-                    {fixtureObj.homeTeamDetails.name}{' '}
+                    {fixtureObj.homeDetails.name}{' '}
                     {matchStory.length === 0
                       ? 'vs'
                       : calculateScore(matchStory.length - 1)}{' '}
-                    {fixtureObj.awayTeamDetails.name}
+                    {fixtureObj.awayDetails.name}
                   </h3>
                   <p className="text-sm text-muted font-normal">
                     Fixture into result
@@ -198,7 +197,7 @@ function ResultFormAdvanced({
   setMatchStory,
   calculateScore,
 }: {
-  fixture: Fixture;
+  fixture: SingleFixtureDTO;
   matchStory: GoalAdvanced[];
   setMatchStory: Dispatch<SetStateAction<GoalAdvanced[]>>;
   calculateScore: (i: number) => string;
@@ -307,7 +306,7 @@ function ResultFormAdvanced({
                   'shrink-0 inline-flex min-w-max bg-content2 min-h-full my-0 mr-1',
                   'hover:bg-content3 items-center justify-start',
                   'cursor-pointer rounded-lg gap-2 px-4 border-2 border-transparent',
-                  'data-[selected=true]:border-primary transition-colors duration-200'
+                  'data-[selected=true]:border-primary transition-colors duration-200',
                 ),
                 label: 'w-full text-sm',
               }}
@@ -332,7 +331,7 @@ function ResultFormAdvanced({
             }}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {fixture.homeTeamDetails.name} goal
+            Add {fixture.homeDetails.name} goal
           </Button>
           <Button
             color="default"
@@ -346,7 +345,7 @@ function ResultFormAdvanced({
             }}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {fixture.awayTeamDetails.name} goal
+            Add {fixture.awayDetails.name} goal
           </Button>
         </div>
       </div>
@@ -361,7 +360,7 @@ function GoalRow({
   removeGoal,
   calculateScore,
 }: {
-  fixture: Fixture;
+  fixture: SingleFixtureDTO;
   goal: GoalAdvanced;
   goalIndex: number;
   removeGoal: (i: number) => void;
@@ -381,8 +380,8 @@ function GoalRow({
         <div>
           <p>
             {goal.team === 'home'
-              ? fixture.homeTeamDetails.name
-              : fixture.awayTeamDetails.name}{' '}
+              ? fixture.homeDetails.name
+              : fixture.awayDetails.name}{' '}
             ({calculateScore(goalIndex)})
           </p>
           <span

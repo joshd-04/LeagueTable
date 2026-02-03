@@ -3,9 +3,10 @@ import FixturesClient from './fixturesClient';
 import { fetchAPI } from '@/util/api';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import { redirect } from 'next/navigation';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import SetupIncomplete from '../setupIncomplete';
 import { Metadata } from 'next';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export async function generateMetadata({
   params,
@@ -54,7 +55,7 @@ export default async function Page({ params }) {
     `${API_URL}/leagues/${leagueId}/fixtures?matchweek=${league.data.league.currentMatchweek}`,
     {
       method: 'GET',
-    }
+    },
   );
 
   if (league.statusCode === 403) {
@@ -71,7 +72,7 @@ export default async function Page({ params }) {
     return redirect('/');
   }
   const l = league.data.league as League;
-  const f = fixtures.data.fixtures as Fixture[];
+  const f = fixtures.data.fixtures as SingleFixtureDTO[];
 
   return <FixturesClient league={l} fixtures={f} />;
 }

@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
-import { Fixture } from '@/util/definitions';
-
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
@@ -15,6 +13,7 @@ import {
   ModalHeader,
 } from '@heroui/react';
 import { FaTrashAlt } from 'react-icons/fa';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export default function FixtureToResultBasic({
   fixtureObj,
@@ -24,8 +23,8 @@ export default function FixtureToResultBasic({
   invalidateDashboardQueries,
   onResolution,
 }: {
-  fixtureObj: Fixture;
-  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  fixtureObj: SingleFixtureDTO;
+  setSelectedFixture: Dispatch<SetStateAction<SingleFixtureDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
@@ -43,7 +42,7 @@ export default function FixtureToResultBasic({
   function mutationFunction() {
     const basicOutcome = matchStory;
     const x = {
-      fixtureId: fixtureObj._id,
+      fixtureId: fixtureObj.fixture._id,
       basicOutcome: basicOutcome,
     };
     return fetchAPI(`${API_URL}/result`, {
@@ -124,11 +123,11 @@ export default function FixtureToResultBasic({
               <ModalHeader className="flex flex-col gap-1">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-xl">
-                    {fixtureObj.homeTeamDetails.name}{' '}
+                    {fixtureObj.homeDetails.name}{' '}
                     {matchStory.length === 0
                       ? 'vs'
                       : calculateScore(matchStory.length - 1)}{' '}
-                    {fixtureObj.awayTeamDetails.name}
+                    {fixtureObj.awayDetails.name}
                   </h3>
                   <p className="text-sm text-muted font-normal">
                     Fixture into result
@@ -184,7 +183,7 @@ function ResultFormBasic({
   setMatchStory,
   calculateScore,
 }: {
-  fixture: Fixture;
+  fixture: SingleFixtureDTO;
   matchStory: ('home' | 'away')[];
   setMatchStory: Dispatch<SetStateAction<('home' | 'away')[]>>;
   calculateScore: (i: number) => string;
@@ -231,8 +230,8 @@ function ResultFormBasic({
                   <div>
                     <p>
                       {goal === 'home'
-                        ? fixture.homeTeamDetails.name
-                        : fixture.awayTeamDetails.name}{' '}
+                        ? fixture.homeDetails.name
+                        : fixture.awayDetails.name}{' '}
                       ({calculateScore(i)})
                     </p>
                   </div>
@@ -258,14 +257,14 @@ function ResultFormBasic({
             onPress={() => addGoal('home')}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {fixture.homeTeamDetails.name} goal
+            Add {fixture.homeDetails.name} goal
           </Button>
           <Button
             color="default"
             onPress={() => addGoal('away')}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {fixture.awayTeamDetails.name} goal
+            Add {fixture.awayDetails.name} goal
           </Button>
         </div>
       </div>

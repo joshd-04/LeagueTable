@@ -1,5 +1,5 @@
 'use client';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
 
 import LeagueBanner from '@/components/leagueBanner/LeagueBanner';
@@ -14,13 +14,14 @@ import FixtureRow from './widgets/fixtureRow';
 import { Button, cn, Select, SelectItem, Spinner } from '@heroui/react';
 import Link from 'next/link';
 import NoFixtures from './widgets/noFixtures';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export default function FixturesClient({
   league,
   fixtures,
 }: {
   league: League;
-  fixtures: Fixture[];
+  fixtures: SingleFixtureDTO[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -35,7 +36,7 @@ export default function FixturesClient({
     matchweek >= 1 && matchweek <= league.finalMatchweek ? matchweek : null;
 
   const [matchweekViewing, setMatchweekViewing] = useState(
-    specifiedPage || league.currentMatchweek
+    specifiedPage || league.currentMatchweek,
   );
 
   function handleClick(id: string) {
@@ -44,13 +45,13 @@ export default function FixturesClient({
 
   const [displayedFixtures, setDisplayedFixtures] = useState(fixtures);
 
-  let filteredFixtures: Fixture[] = [];
+  let filteredFixtures: SingleFixtureDTO[] = [];
 
   if (divisionFilter === 0) {
     filteredFixtures = displayedFixtures;
   } else {
     filteredFixtures = displayedFixtures.filter(
-      (fixture) => fixture.division === divisionFilter
+      (fixture) => fixture.fixture.division === divisionFilter,
     );
   }
 
@@ -61,14 +62,14 @@ export default function FixturesClient({
           `${API_URL}/leagues/${league._id}/fixtures?matchweek=${matchweekViewing}`,
           {
             method: 'GET',
-          }
+          },
         ),
       queryKey: ['fixtures'],
       staleTime: 1000 * 60 * 1,
       gcTime: 1000 * 60 * 10,
 
       enabled: false,
-    }
+    },
   );
 
   useEffect(() => {
@@ -124,17 +125,17 @@ export default function FixturesClient({
                     +matchweekViewing > league.currentMatchweek ? (
                       <FixtureRowFuture
                         league={league}
-                        fixture={fixture}
+                        fixtureDTO={fixture}
                         key={i}
                       />
                     ) : (
                       <FixtureRow
                         league={league}
-                        fixture={fixture}
+                        fixtureDTO={fixture}
                         key={i}
                         handleClick={handleClick}
                       />
-                    )
+                    ),
                   )
                 ) : (
                   <NoFixtures matchweek={+matchweekViewing} league={league} />

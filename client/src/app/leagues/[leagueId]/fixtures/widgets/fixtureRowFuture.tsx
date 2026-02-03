@@ -1,23 +1,24 @@
 import TruncatedText from '@/components/formattedText/truncatedText';
 import TeamForm from '@/components/teamForm/TeamForm';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 import { meetsMinimumTierLevel } from '@/util/helpers';
 import { Card, CardBody } from '@heroui/react';
 
 export default function FixtureRowFuture({
   league,
-  fixture,
+  fixtureDTO,
 }: {
   league: League;
-  fixture: Fixture;
+  fixtureDTO: SingleFixtureDTO;
 }) {
   const homePoints =
-    fixture.homeTeamDetails.wins * 3 + fixture.homeTeamDetails.draws;
+    fixtureDTO.homeDetails.wins * 3 + fixtureDTO.homeDetails.draws;
   const awayPoints =
-    fixture.awayTeamDetails.wins * 3 + fixture.awayTeamDetails.draws;
+    fixtureDTO.awayDetails.wins * 3 + fixtureDTO.awayDetails.draws;
   const shouldShowTeamForm = meetsMinimumTierLevel(
     'pro',
-    league.leagueOwner.accountType
+    league.leagueOwner.accountType,
   );
   return (
     <Card className="opacity-60">
@@ -28,7 +29,7 @@ export default function FixtureRowFuture({
             {/* Form - disappears first */}
             {shouldShowTeamForm && (
               <div className="@[800px]:block hidden flex-shrink-0">
-                <TeamForm form={fixture.homeTeamDetails.form} />
+                <TeamForm form={fixtureDTO.homeDetails.form} />
               </div>
             )}
 
@@ -40,11 +41,11 @@ export default function FixtureRowFuture({
             {/* Name - always visible, truncates */}
             <div className="min-w-0 flex-shrink flex-grow max-w-50 ">
               <TruncatedText
-                content={fixture.homeTeamDetails.name}
+                content={fixtureDTO.homeDetails.name}
                 placement="top-end"
                 textClassName="text-right whitespace-nowrap overflow-hidden text-ellipsis w-full text-lg"
               >
-                {fixture.homeTeamDetails.name}
+                {fixtureDTO.homeDetails.name}
               </TruncatedText>
             </div>
           </div>
@@ -57,11 +58,11 @@ export default function FixtureRowFuture({
             {/* Name - always visible, truncates */}
             <div className="min-w-0 flex-shrink flex-grow max-w-50 ">
               <TruncatedText
-                content={fixture.awayTeamDetails.name}
+                content={fixtureDTO.awayDetails.name}
                 placement="top-start"
                 textClassName="text-left whitespace-nowrap overflow-hidden text-ellipsis w-full text-lg"
               >
-                {fixture.awayTeamDetails.name}
+                {fixtureDTO.awayDetails.name}
               </TruncatedText>
             </div>
 
@@ -73,13 +74,13 @@ export default function FixtureRowFuture({
             {/* Form - disappears first */}
             {shouldShowTeamForm && (
               <div className="@[800px]:block hidden flex-shrink-0">
-                <TeamForm form={fixture.awayTeamDetails.form} />
+                <TeamForm form={fixtureDTO.awayDetails.form} />
               </div>
             )}
           </div>
         </div>
       </CardBody>
-      {fixture._id}
+      {fixtureDTO.fixture._id}
     </Card>
   );
 }

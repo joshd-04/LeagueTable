@@ -7,7 +7,10 @@ import {
   IUserSchema,
 } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
-import { shouldGrantAccessToFeature } from '../../../util/helpers';
+import {
+  calculateTeamDetails,
+  shouldGrantAccessToFeature,
+} from '../../../util/helpers';
 
 export async function getResultsController(
   req: Request,
@@ -35,6 +38,7 @@ export async function getResultsController(
           path: 'results',
         },
         { path: 'leagueOwner' },
+        { path: 'tables.teams' },
       ]);
     } catch {
       return next(
@@ -197,7 +201,33 @@ export async function getResultsController(
       results = results.slice(0, +req.query.limit);
     }
 
-    res.status(200).json({ status: 'success', data: { results: results } });
+    // Go through results and add the team details
+
+    const resultsWithTeamDetails = await Promise.all(
+      results.map(async (result) => {
+        const homeDetails = await calculateTeamDetails(
+          league,
+          result.homeTeamId,
+          result.season,
+          result.matchweek,
+        );
+        const awayDetails = await calculateTeamDetails(
+          league,
+          result.awayTeamId,
+          result.season,
+          result.matchweek,
+        );
+        return {
+          result: result,
+          homeDetails: homeDetails,
+          awayDetails: awayDetails,
+        };
+      }),
+    );
+
+    res
+      .status(200)
+      .json({ status: 'success', data: { results: resultsWithTeamDetails } });
   } catch (e: any) {
     console.error(e);
     return next(

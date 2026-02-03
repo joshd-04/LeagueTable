@@ -75,17 +75,17 @@ export default function Stats({
     shouldGrantAccessToFeature(
       'pro',
       league.leagueLevel,
-      league.leagueOwner.accountType
+      league.leagueOwner.accountType,
     ) && league.leagueType === 'advanced'
       ? allPossibleStats.find((s) => s.key === 'topScorers')
-      : allPossibleStats.find((s) => s.key === 'cleansheets')
+      : allPossibleStats.find((s) => s.key === 'cleansheets'),
   );
 
   const { data, isLoading } = useQuery({
     queryFn: () =>
       fetchAPI(
         `${API_URL}/leagues/${league._id}/stats?season=${seasonViewing}`,
-        { method: 'GET' }
+        { method: 'GET' },
       ),
     queryKey: ['stats', league._id, seasonViewing],
   });
@@ -105,12 +105,14 @@ export default function Stats({
     const statNames = Object.keys(stats);
 
     const filteredStats = allPossibleStats.filter((stat) =>
-      statNames.includes(stat.key)
+      statNames.includes(stat.key),
     );
 
     setAvailableStats(filteredStats);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stats]);
+
+  console.log(availableStats);
 
   return (
     <Card className="p-[10px] h-full w-full row-span-2">
@@ -210,7 +212,13 @@ function StatsTablePlayerBased({
 }: {
   stat: IStat;
   data:
-    | { position: number; player: string; team: string; value: number }[]
+    | {
+        position: number;
+        player: string;
+        team: string;
+        teamId: string;
+        value: number;
+      }[]
     | undefined;
 }) {
   return (
@@ -229,7 +237,7 @@ function StatsTablePlayerBased({
           <TableColumn>{stat.unit}</TableColumn>
         </TableHeader>
         <TableBody
-          items={data}
+          items={data || []}
           emptyContent={
             <p className="italic text-muted text-sm">No data to display</p>
           }
@@ -253,7 +261,9 @@ function StatsTableTeamBased({
   data,
 }: {
   stat: IStat;
-  data: { position: number; team: string; value: number }[] | undefined;
+  data:
+    | { position: number; team: string; value: number; teamId: string }[]
+    | undefined;
 }) {
   return (
     <div className="max-h-[21rem] overflow-y-auto">

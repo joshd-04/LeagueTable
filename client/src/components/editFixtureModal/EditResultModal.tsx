@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import EditResultModalBasic from './(basic)/EditResultModalBasic';
 import EditResultModalAdvanced from './(advanced)/EditResultModalAdvanced';
 import useAccount from '@/hooks/useAccount';
 import { doesUserOwnThisLeague } from '@/util/helpers';
+import { SingleResultDTO } from '@/util/dto/results';
 
 export default function EditResultModal({
   league,
@@ -15,8 +16,8 @@ export default function EditResultModal({
   onResolution,
 }: {
   league: League;
-  resultObj: Result | null;
-  setSelectedResult: Dispatch<SetStateAction<Result | null>>;
+  resultObj: SingleResultDTO | null;
+  setSelectedResult: Dispatch<SetStateAction<SingleResultDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;

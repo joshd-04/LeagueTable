@@ -1,4 +1,4 @@
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { MouseEvent, useState } from 'react';
@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { API_URL } from '@/util/config';
 import { fetchAPI } from '@/util/api';
 import { Card, CardBody } from '@heroui/react';
+import { ResultsListDTO, SingleResultDTO } from '@/util/dto/results';
 
 export default function LatestResults({
   league,
@@ -23,12 +24,14 @@ export default function LatestResults({
         `${API_URL}/leagues/${league._id}/results?limit=3&season=${seasonViewing}`,
         {
           method: 'GET',
-        }
+        },
       ),
     queryKey: ['results', league._id, seasonViewing],
   });
 
-  const mostRecentResults: Result[] = data?.data.results.slice(0, 3);
+  const resultsData: ResultsListDTO | undefined = data?.data;
+
+  const mostRecentResults = resultsData?.results.slice(0, 3);
 
   function handleCardClick() {
     router.push(`/leagues/${league._id}/results?season=${seasonViewing}`);
@@ -56,8 +59,8 @@ export default function LatestResults({
         <span>
           <p className="align-middle inline text-base">Latest Results</p>
         </span>
-        {isLoading ? (
-          <div>
+        {isLoading || mostRecentResults === undefined ? (
+          <div className="animate-pulse">
             <ResultRowSkeleton />
             <ResultRowSkeleton />
             <ResultRowSkeleton />
@@ -70,7 +73,7 @@ export default function LatestResults({
                 onMouseEnter={() => setIsHoveringOuterPanel(false)}
                 onMouseLeave={() => setIsHoveringOuterPanel(true)}
               >
-                <ResultRow result={result} league={league} />
+                <ResultRow resultDTO={result} league={league} />
               </div>
             ))}
           </div>
@@ -86,8 +89,16 @@ export default function LatestResults({
   );
 }
 
-function ResultRow({ league, result }: { league: League; result: Result }) {
+function ResultRow({
+  league,
+  resultDTO,
+}: {
+  league: League;
+  resultDTO: SingleResultDTO;
+}) {
   const router = useRouter();
+
+  const result = resultDTO.result;
 
   function handleResultClick(e: MouseEvent) {
     e.stopPropagation();
@@ -96,11 +107,11 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
 
   const homeGoals = result.basicOutcome.reduce(
     (acc, cur) => (cur === 'home' ? acc + 1 : acc),
-    0
+    0,
   );
   const awayGoals = result.basicOutcome.reduce(
     (acc, cur) => (cur === 'away' ? acc + 1 : acc),
-    0
+    0,
   );
 
   return (
@@ -114,13 +125,13 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {result.homeTeamDetails.name}
+          {resultDTO.homeDetails.name}
         </p>
         <p className="w-full text-center font-normal text-muted">
           {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
         <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {result.awayTeamDetails.name}
+          {resultDTO.awayDetails.name}
         </p>
       </div>
       {/* {userOwnsThisLeague && (
@@ -142,6 +153,7 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
     </motion.div>
   );
 
+  // FIXME: fix this unreachable code, might need deleting
   return (
     <div
       className="bg-content2 hover:bg-content3 h-[36px] border-0 border-divider  flex flex-row justify-baseline items-center px-[10px]"
@@ -151,13 +163,13 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       <p className="flex-none w-max h-min text-sm">MD {result.matchweek}</p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {result.homeTeamDetails.name}
+          {resultDTO.homeDetails.name}
         </p>
         <p className="w-full text-center font-normal text-muted">
           {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
         <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {result.awayTeamDetails.name}
+          {resultDTO.awayDetails.name}
         </p>
       </div>
       {/* {userOwnsThisLeague && (
@@ -182,6 +194,6 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
 
 function ResultRowSkeleton() {
   return (
-    <div className="bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] flex flex-row justify-baseline items-center animate-pulse "></div>
+    <div className="bg-content2 h-[36px] border-0 border-divider rounded-[10px]"></div>
   );
 }

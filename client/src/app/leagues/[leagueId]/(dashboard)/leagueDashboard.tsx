@@ -105,7 +105,7 @@ export default function LeagueDashboard() {
       const allowSeasonRewind = shouldGrantAccessToFeature(
         'pro',
         league.leagueLevel,
-        league.leagueOwner.accountType
+        league.leagueOwner.accountType,
       );
 
       if (
@@ -143,7 +143,7 @@ export default function LeagueDashboard() {
     const allowSeasonRewind = shouldGrantAccessToFeature(
       'pro',
       league.leagueLevel,
-      league.leagueOwner.accountType
+      league.leagueOwner.accountType,
     );
 
     // If league doesn't have season rewind, clear the season param

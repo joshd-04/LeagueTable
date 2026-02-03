@@ -1,12 +1,13 @@
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { Spinner } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import ResultRow from './resultRow';
 import ViewingOldSeasonAlert from '@/components/alerts/viewingOldSeason';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ResultsListDTO, SingleResultDTO } from '@/util/dto/results';
 
 export default function ResultsByMostRecent({
   league,
@@ -23,7 +24,7 @@ export default function ResultsByMostRecent({
   oldSeasonAlertVisible: boolean;
   setOldSeasonAlertVisible: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [results, setResults] = useState<Result[]>([]);
+  const [results, setResults] = useState<SingleResultDTO[]>([]);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -44,7 +45,7 @@ export default function ResultsByMostRecent({
         `${API_URL}/leagues/${league._id}/results?season=${seasonViewing}`,
         {
           method: 'GET',
-        }
+        },
       ),
     queryKey: ['resultsRecent', league._id, seasonViewing],
     staleTime: 1000 * 60 * 1,
@@ -53,20 +54,30 @@ export default function ResultsByMostRecent({
 
   useEffect(() => {
     if (resultsAreLoading === false) {
-      setResults(resultsData.data.results);
+      const resultsDataTyped: ResultsListDTO = resultsData.data;
+      setResults(resultsDataTyped.results);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultsAreLoading]);
 
-  const organisedResults: { matchweek: number; results: Result[] }[] = [];
+  const organisedResults: { matchweek: number; results: SingleResultDTO[] }[] =
+    [];
 
-  results.forEach((result) => {
+  results.forEach((resultDTO) => {
     if (organisedResults.length === 0) {
-      organisedResults.push({ matchweek: result.matchweek, results: [result] });
-    } else if (organisedResults.slice(-1)[0].matchweek === result.matchweek) {
-      organisedResults.slice(-1)[0].results.push(result);
+      organisedResults.push({
+        matchweek: resultDTO.result.matchweek,
+        results: [resultDTO],
+      });
+    } else if (
+      organisedResults.slice(-1)[0].matchweek === resultDTO.result.matchweek
+    ) {
+      organisedResults.slice(-1)[0].results.push(resultDTO);
     } else {
-      organisedResults.push({ matchweek: result.matchweek, results: [result] });
+      organisedResults.push({
+        matchweek: resultDTO.result.matchweek,
+        results: [resultDTO],
+      });
     }
   });
 
@@ -100,7 +111,7 @@ export default function ResultsByMostRecent({
           <div className="flex flex-col gap-[10px]">
             {data.results.map((result, i) => (
               <ResultRow
-                result={result}
+                resultDTO={result}
                 league={league}
                 key={i}
                 handleClick={handleClick}

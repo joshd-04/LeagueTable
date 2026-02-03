@@ -12,6 +12,7 @@ import {
   shouldGrantAccessToFeature,
 } from '../../util/helpers';
 import { Types } from 'mongoose';
+import Team from '../../models/teamModel';
 
 interface statsInterface {
   topScorers?: {
@@ -61,6 +62,7 @@ export async function calculateSeasonStatsController(
   next: NextFunction,
 ) {
   try {
+    const startMs = Date.now();
     /* 
       query parameters:
       
@@ -399,7 +401,10 @@ export async function calculateSeasonStatsController(
       });
     });
 
-    res.status(200).json({ status: 'success', data: { stats: stats } });
+    const end = Date.now();
+    const fullData = await addTeamNamesToStats(stats);
+    console.log(end - startMs);
+    res.status(200).json({ status: 'success', data: { stats: fullData } });
   } catch (e: any) {
     console.error(e);
     return next(
@@ -410,4 +415,121 @@ export async function calculateSeasonStatsController(
       ),
     );
   }
+}
+
+// async function addTeamNamesToStats(stats: statsInterface) {
+//   const cleansheets = await Promise.all(
+//     stats.cleansheets.map(async (x) => {
+//       return await Promise.all(
+//         x.data.map(async (record) => {
+//           const teamId = record.teamId;
+//           const team = await Team.findById(teamId);
+//           console.log(team?.name);
+//           return { ...record, team: team?.name };
+//         }),
+//       );
+//     }),
+//   );
+//   const topScorers =
+//     stats.topScorers &&
+//     (await Promise.all(
+//       stats.topScorers.map(async (x) => {
+//         return await Promise.all(
+//           x.data.map(async (record) => {
+//             const teamId = record.teamId;
+//             const team = await Team.findById(teamId);
+//             console.log(team?.name);
+//             return { ...record, team: team?.name };
+//           }),
+//         );
+//       }),
+//     ));
+//   const mostAssists =
+//     stats.mostAssists &&
+//     (await Promise.all(
+//       stats.mostAssists.map(async (x) => {
+//         return await Promise.all(
+//           x.data.map(async (record) => {
+//             const teamId = record.teamId;
+//             const team = await Team.findById(teamId);
+//             console.log(team?.name);
+//             return { ...record, team: team?.name };
+//           }),
+//         );
+//       }),
+//     ));
+//   const ownGoals =
+//     stats.ownGoals &&
+//     (await Promise.all(
+//       stats.ownGoals.map(async (x) => {
+//         return await Promise.all(
+//           x.data.map(async (record) => {
+//             const teamId = record.teamId;
+//             const team = await Team.findById(teamId);
+//             console.log(team?.name);
+//             return { ...record, team: team?.name };
+//           }),
+//         );
+//       }),
+//     ));
+
+//   console.log({ cleansheets, topScorers, mostAssists, ownGoals });
+//   return { cleansheets, topScorers, mostAssists, ownGoals };
+// }
+async function addTeamNamesToStats(stats: statsInterface) {
+  const cleansheets = await Promise.all(
+    stats.cleansheets.map(async (x) => ({
+      ...x,
+      data: await Promise.all(
+        x.data.map(async (record) => {
+          const team = await Team.findById(record.teamId).lean();
+          return { ...record, team: team?.name };
+        }),
+      ),
+    })),
+  );
+
+  const topScorers =
+    stats.topScorers &&
+    (await Promise.all(
+      stats.topScorers.map(async (x) => ({
+        ...x,
+        data: await Promise.all(
+          x.data.map(async (record) => {
+            const team = await Team.findById(record.teamId).lean();
+            return { ...record, team: team?.name };
+          }),
+        ),
+      })),
+    ));
+
+  const mostAssists =
+    stats.mostAssists &&
+    (await Promise.all(
+      stats.mostAssists.map(async (x) => ({
+        ...x,
+        data: await Promise.all(
+          x.data.map(async (record) => {
+            const team = await Team.findById(record.teamId).lean();
+            return { ...record, team: team?.name };
+          }),
+        ),
+      })),
+    ));
+
+  const ownGoals =
+    stats.ownGoals &&
+    (await Promise.all(
+      stats.ownGoals.map(async (x) => ({
+        ...x,
+        data: await Promise.all(
+          x.data.map(async (record) => {
+            const team = await Team.findById(record.teamId).lean();
+            return { ...record, team: team?.name };
+          }),
+        ),
+      })),
+    ));
+
+  return { cleansheets, topScorers, mostAssists, ownGoals };
 }

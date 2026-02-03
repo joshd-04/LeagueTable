@@ -4,8 +4,9 @@ import { fetchAPI } from '@/util/api';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import SetupIncomplete from '../../setupIncomplete';
 import { redirect } from 'next/navigation';
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { Metadata } from 'next';
+import { SingleResultDTO } from '@/util/dto/results';
 
 export async function generateMetadata({
   params,
@@ -36,16 +37,17 @@ export async function generateMetadata({
   }
 
   const leagueObj: League = league.data.league;
-  const resultObj: Result = result.data.result;
-  const homeGoals = resultObj.basicOutcome.reduce(
+  const resultObj: SingleResultDTO = result.data;
+
+  const homeGoals = resultObj.result.basicOutcome.reduce(
     (acc, team) => (team === 'home' ? acc + 1 : acc),
-    0
+    0,
   );
-  const awayGoals = resultObj.basicOutcome.reduce(
+  const awayGoals = resultObj.result.basicOutcome.reduce(
     (acc, team) => (team === 'away' ? acc + 1 : acc),
-    0
+    0,
   );
-  const resultName = `${resultObj.homeTeamDetails.name} ${homeGoals}-${awayGoals} ${resultObj.awayTeamDetails.name}`;
+  const resultName = `${resultObj.homeDetails.name} ${homeGoals}-${awayGoals} ${resultObj.awayDetails.name}`;
 
   return {
     title: `${resultName} • ${leagueObj.name} • ${WEBSITE_NAME}`,
@@ -85,5 +87,6 @@ export default async function Page({ params }) {
     return redirect('/');
   }
   const l = league.data.league as League;
-  return <ResultClient league={l} result={result.data.result} />;
+  const r: SingleResultDTO = result.data;
+  return <ResultClient league={l} resultDTO={r} />;
 }

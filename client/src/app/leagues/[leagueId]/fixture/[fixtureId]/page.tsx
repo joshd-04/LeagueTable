@@ -4,8 +4,9 @@ import { fetchAPI } from '@/util/api';
 import { API_URL, WEBSITE_NAME } from '@/util/config';
 import SetupIncomplete from '../../setupIncomplete';
 import { redirect } from 'next/navigation';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { Metadata } from 'next';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export async function generateMetadata({
   params,
@@ -40,11 +41,11 @@ export async function generateMetadata({
   }
 
   const leagueObj: League = league.data.league;
-  const fixtureObj: Fixture = fixture.data.fixture;
+  const fixtureObj: SingleFixtureDTO = fixture.data;
 
   return {
-    title: `${fixtureObj.homeTeamDetails.name} v ${fixtureObj.awayTeamDetails.name} • ${leagueObj.name} • ${WEBSITE_NAME}`,
-    description: `Fixture preview, stats and head to head record for ${fixtureObj.homeTeamDetails.name} v ${fixtureObj.awayTeamDetails.name}. (${leagueObj.name}, season ${fixtureObj.season} matchweek ${fixtureObj.matchweek})`,
+    title: `${fixtureObj.homeDetails.name} v ${fixtureObj.awayDetails.name} • ${leagueObj.name} • ${WEBSITE_NAME}`,
+    description: `Fixture preview, stats and head to head record for ${fixtureObj.homeDetails.name} v ${fixtureObj.awayDetails.name}. (${leagueObj.name}, season ${fixtureObj.fixture.season} matchweek ${fixtureObj.fixture.matchweek})`,
   };
 }
 
@@ -82,7 +83,7 @@ export default async function Page({ params }) {
     return redirect(`/leagues/${leagueId}/result/${fixtureId}`);
   }
   const l = league.data.league as League;
-  const f = fixture.data.fixture as Fixture;
+  const f = fixture.data as SingleFixtureDTO;
 
-  return <FixtureClient league={l} fixture={f} />;
+  return <FixtureClient league={l} fixtureDTO={f} />;
 }

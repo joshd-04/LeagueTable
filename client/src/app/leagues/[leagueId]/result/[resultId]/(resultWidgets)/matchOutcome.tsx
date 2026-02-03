@@ -1,6 +1,7 @@
 import EditResultModal from '@/components/editFixtureModal/EditResultModal';
 import useAccount from '@/hooks/useAccount';
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
+import { SingleResultDTO } from '@/util/dto/results';
 import { doesUserOwnThisLeague } from '@/util/helpers';
 import { Button, Card, CardBody, useDisclosure } from '@heroui/react';
 import { useState } from 'react';
@@ -8,12 +9,12 @@ import { PiSoccerBallFill } from 'react-icons/pi';
 
 export default function MatchOutcome({
   league,
-  result,
+  resultDTO,
 }: {
   league: League;
-  result: Result;
+  resultDTO: SingleResultDTO;
 }) {
-  const [r, setR] = useState<Result | null>(result);
+  const [r, setR] = useState<SingleResultDTO | null>(resultDTO);
   const {
     isOpen: isEditResultModalOpen,
     onOpen: onEditResultModalOpen,
@@ -25,7 +26,7 @@ export default function MatchOutcome({
   function calculateScore(index: number) {
     let homeGoals = 0;
     let awayGoals = 0;
-    result.basicOutcome.forEach((goal, i) => {
+    resultDTO.result.basicOutcome.forEach((goal, i) => {
       if (i > index) return;
       if (goal === 'home') homeGoals += 1;
       if (goal === 'away') awayGoals += 1;
@@ -59,34 +60,35 @@ export default function MatchOutcome({
             }}
           >
             <p className="text-sm">Match start. 0-0</p>
-            {result.detailedOutcome !== undefined &&
-            result.detailedOutcome.length !== 0
-              ? result.detailedOutcome.map((goal, i) => {
+            {resultDTO.result.detailedOutcome !== undefined &&
+            resultDTO.result.detailedOutcome.length !== 0
+              ? resultDTO.result.detailedOutcome.map((goal, i) => {
                   const score = calculateScore(i);
                   return (
                     <MatchOutcomeRowAdvanced
                       goal={goal}
-                      homeTeamDetails={result.homeTeamDetails}
-                      awayTeamDetails={result.awayTeamDetails}
+                      homeDetails={resultDTO.homeDetails}
+                      awayDetails={resultDTO.awayDetails}
                       score={score}
                       key={i}
                     />
                   );
                 })
-              : result.basicOutcome.map((goal, i) => {
+              : resultDTO.result.basicOutcome.map((goal, i) => {
                   const score = calculateScore(i);
                   return (
                     <MatchOutcomeRowBasic
                       goal={goal}
-                      homeTeamDetails={result.homeTeamDetails}
-                      awayTeamDetails={result.awayTeamDetails}
+                      homeDetails={resultDTO.homeDetails}
+                      awayDetails={resultDTO.awayDetails}
                       score={score}
                       key={i}
                     />
                   );
                 })}
             <p className="text-sm">
-              Full time: {calculateScore(result.basicOutcome.length - 1)}
+              Full time:{' '}
+              {calculateScore(resultDTO.result.basicOutcome.length - 1)}
             </p>
           </div>
         </CardBody>
@@ -106,13 +108,13 @@ export default function MatchOutcome({
 
 function MatchOutcomeRowBasic({
   goal,
-  homeTeamDetails,
-  awayTeamDetails,
+  homeDetails,
+  awayDetails,
   score,
 }: {
   goal: 'home' | 'away';
 
-  homeTeamDetails: {
+  homeDetails: {
     division: number;
     form: string;
     leaguePosition: number;
@@ -121,7 +123,7 @@ function MatchOutcomeRowBasic({
     points: number;
     teamId: string;
   };
-  awayTeamDetails: {
+  awayDetails: {
     division: number;
     form: string;
     leaguePosition: number;
@@ -141,7 +143,7 @@ function MatchOutcomeRowBasic({
     >
       {goal === 'home' ? (
         <div className="flex flex-col justify-center text-sm">
-          <p>Goal: {homeTeamDetails.name}</p>
+          <p>Goal: {homeDetails.name}</p>
         </div>
       ) : (
         <div></div>
@@ -163,7 +165,7 @@ function MatchOutcomeRowBasic({
       </div>
       {goal === 'away' ? (
         <div className="flex flex-col justify-center items-end text-sm">
-          <p>Goal: {awayTeamDetails.name}</p>
+          <p>Goal: {awayDetails.name}</p>
         </div>
       ) : (
         <div></div>
@@ -174,8 +176,8 @@ function MatchOutcomeRowBasic({
 
 function MatchOutcomeRowAdvanced({
   goal,
-  homeTeamDetails,
-  awayTeamDetails,
+  homeDetails,
+  awayDetails,
   score,
 }: {
   goal: {
@@ -185,7 +187,7 @@ function MatchOutcomeRowAdvanced({
     isOwnGoal: boolean;
     _id: string;
   };
-  homeTeamDetails: {
+  homeDetails: {
     division: number;
     form: string;
     leaguePosition: number;
@@ -194,7 +196,7 @@ function MatchOutcomeRowAdvanced({
     points: number;
     teamId: string;
   };
-  awayTeamDetails: {
+  awayDetails: {
     division: number;
     form: string;
     leaguePosition: number;
@@ -210,7 +212,7 @@ function MatchOutcomeRowAdvanced({
     <div className="grid grid-cols-[1fr_max-content_1fr] bg-content2 px-4 py-2 rounded-[10px] w-full">
       {goal.team === 'home' ? (
         <div className="place-self-start flex flex-col items-start text-sm">
-          <p>Goal: {homeTeamDetails.name}</p>
+          <p>Goal: {homeDetails.name}</p>
           <span className="flex flex-row gap-1 items-center">
             <PiSoccerBallFill
               className={`w-4 h-4 inline ${
@@ -243,7 +245,7 @@ function MatchOutcomeRowAdvanced({
       </div>
       {goal.team === 'away' ? (
         <div className="place-self-end flex flex-col items-end text-sm">
-          <p>Goal: {awayTeamDetails.name}</p>
+          <p>Goal: {awayDetails.name}</p>
           <span className="flex flex-row gap-1 items-center">
             <PiSoccerBallFill
               className={`w-4 h-4 inline ${

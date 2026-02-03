@@ -3,7 +3,8 @@
 import ProChip from '@/components/chips/ProChip';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
+import { HeadToHeadDTO, SingleResultDTO } from '@/util/dto/results';
 import { meetsMinimumTierLevel } from '@/util/helpers';
 import { Card, CardBody } from '@heroui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -22,7 +23,7 @@ export default function HeadToHead({
 }) {
   const shouldShowHeadToHead = meetsMinimumTierLevel(
     'pro',
-    league.leagueOwner.accountType
+    league.leagueOwner.accountType,
   );
   // const shouldShowHeadToHead = false;
 
@@ -86,17 +87,18 @@ function HeadToHeadBody({
     queryFn: () =>
       fetchAPI(
         `${API_URL}/leagues/${league._id}/headtohead/${encodeURIComponent(
-          teams.home
+          teams.home,
         )}/${encodeURIComponent(teams.away)}`,
-        { method: 'GET' }
+        { method: 'GET' },
       ),
     queryKey: ['headtohead', league._id, teams.home, teams.away],
   });
 
-  const results: Result[] = data?.data.headtohead;
+  const resultsData: HeadToHeadDTO | undefined = data?.data;
+  const results = resultsData?.headtohead;
   return (
     <div>
-      {isLoading ? (
+      {isLoading || !results ? (
         <p className="text-sm">Loading...</p>
       ) : results.length > 0 ? (
         <div className="flex flex-col gap-2">
@@ -104,7 +106,7 @@ function HeadToHeadBody({
             <div className="w-full flex flex-col gap-1 max-h-[300px] overflow-auto">
               {results.map((result, i) => (
                 <div key={i} className="flex flex-col gap-1">
-                  <ResultRow league={league} result={result} />
+                  <ResultRow league={league} resultDTO={result} />
                 </div>
               ))}
             </div>
@@ -117,8 +119,15 @@ function HeadToHeadBody({
   );
 }
 
-function ResultRow({ league, result }: { league: League; result: Result }) {
+function ResultRow({
+  league,
+  resultDTO,
+}: {
+  league: League;
+  resultDTO: SingleResultDTO;
+}) {
   const router = useRouter();
+  const result = resultDTO.result;
 
   function handleResultClick(e: MouseEvent) {
     e.stopPropagation();
@@ -127,11 +136,11 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
 
   const homeGoals = result.basicOutcome.reduce(
     (acc, cur) => (cur === 'home' ? acc + 1 : acc),
-    0
+    0,
   );
   const awayGoals = result.basicOutcome.reduce(
     (acc, cur) => (cur === 'away' ? acc + 1 : acc),
-    0
+    0,
   );
 
   return (
@@ -163,13 +172,13 @@ function ResultRow({ league, result }: { league: League; result: Result }) {
       </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_80px_1fr] flex-grow place-items-end text-base">
         <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {result.homeTeamDetails.name}
+          {resultDTO.homeDetails.name}
         </p>
         <p className="w-full text-center font-normal text-muted">
           {homeGoals} <span className="text-muted">-</span> {awayGoals}
         </p>
         <p className="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
-          {result.awayTeamDetails.name}
+          {resultDTO.awayDetails.name}
         </p>
       </div>
     </motion.div>

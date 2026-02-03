@@ -8,7 +8,11 @@ import {
   IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { meetsMinimumTierLevel, sortTeams } from '../../util/helpers';
+import {
+  calculateTeamDetails,
+  meetsMinimumTierLevel,
+  sortTeams,
+} from '../../util/helpers';
 
 interface statsInterface {
   goalsScored: number;
@@ -36,6 +40,7 @@ export async function getHeadToHeadController(
           path: 'results',
         },
         { path: 'leagueOwner' },
+        { path: 'tables.teams' },
       ]);
     } catch {
       return next(
@@ -76,9 +81,34 @@ export async function getHeadToHeadController(
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+    const headtoheadWithTeamDetails = await Promise.all(
+      headtohead.map(async (result) => {
+        const homeDetails = await calculateTeamDetails(
+          league,
+          result.homeTeamId,
+          result.season,
+          result.matchweek,
+        );
+        const awayDetails = await calculateTeamDetails(
+          league,
+          result.awayTeamId,
+          result.season,
+          result.matchweek,
+        );
+        return {
+          result: result,
+          homeDetails: homeDetails,
+          awayDetails: awayDetails,
+        };
+      }),
+    );
+
     res
       .status(200)
-      .json({ status: 'success', data: { headtohead: headtohead } });
+      .json({
+        status: 'success',
+        data: { headtohead: headtoheadWithTeamDetails },
+      });
   } catch (e: any) {
     console.error(e);
     return next(

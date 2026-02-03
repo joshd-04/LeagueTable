@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import League from '../../../models/leagueModel';
 import { IFixtureSchema, ILeagueSchema } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
+import { calculateTeamDetails } from '../../../util/helpers';
 
 export async function getFixturesController(
   req: Request,
@@ -22,10 +23,10 @@ export async function getFixturesController(
 
     // Check if league exists
     try {
-      league = await League.findById(leagueId).populate({
-        path: 'fixtures',
-        populate: [{ path: 'homeTeamId' }, { path: 'awayTeamId' }],
-      });
+      league = await League.findById(leagueId).populate([
+        { path: 'fixtures' },
+        { path: 'tables.teams' },
+      ]);
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -86,12 +87,36 @@ export async function getFixturesController(
       fixtures = fixtures.slice(0, +req.query.limit);
     }
 
+    // Go through fixtures and add the team details
+
+    const fixturesWithTeamDetails = await Promise.all(
+      fixtures.map(async (fixture) => {
+        const homeDetails = await calculateTeamDetails(
+          league,
+          fixture.homeTeamId,
+          fixture.season,
+          fixture.matchweek,
+        );
+        const awayDetails = await calculateTeamDetails(
+          league,
+          fixture.awayTeamId,
+          fixture.season,
+          fixture.matchweek,
+        );
+        return {
+          fixture: fixture,
+          homeDetails: homeDetails,
+          awayDetails: awayDetails,
+        };
+      }),
+    );
+
     res.status(200).json({
       status: 'success',
       data: {
         totalFixtures: totalFixtures,
-        fixturesReturned: req.query.limit ? +req.query.limit : totalFixtures,
-        fixtures: fixtures,
+        fixturesReturned: req.query.limit ? fixtures.length : totalFixtures,
+        fixtures: fixturesWithTeamDetails,
       },
     });
   } catch (e: any) {

@@ -1,6 +1,6 @@
 'use client';
 import useAccount from '@/hooks/useAccount';
-import { League, Result } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import Heading1 from '@/components/text/Heading1';
 
 import LinkButton from '@/components/text/LinkButton';
@@ -11,24 +11,25 @@ import { individualTeamPagesEnabled } from '@/util/featureToggle';
 import { Button, Link } from '@heroui/react';
 import { useScrollbarMargin } from '@/hooks/useScrollbarMargin';
 import HeadToHead from '../../fixture/[fixtureId]/(widgets)/headToHead';
+import { SingleResultDTO } from '@/util/dto/results';
 
 export default function ResultClient({
   league,
-  result,
+  resultDTO,
 }: {
   league: League;
-  result: Result;
+  resultDTO: SingleResultDTO;
 }) {
   const { user, isLoggedIn } = useAccount();
   const mr = useScrollbarMargin(20);
 
-  const homeGoals = result.basicOutcome.reduce(
+  const homeGoals = resultDTO.result.basicOutcome.reduce(
     (acc, team) => (team === 'home' ? acc + 1 : acc),
-    0
+    0,
   );
-  const awayGoals = result.basicOutcome.reduce(
+  const awayGoals = resultDTO.result.basicOutcome.reduce(
     (acc, team) => (team === 'away' ? acc + 1 : acc),
-    0
+    0,
   );
 
   // so the user can edit the result
@@ -46,7 +47,7 @@ export default function ResultClient({
         <div className="absolute bottom-0 left-[50%] translate-x-[-50%] w-max">
           <div
             className={`w-full ${
-              result.neutralGround ? 'hidden' : 'flex'
+              resultDTO.result.neutralGround ? 'hidden' : 'flex'
             } flex-row justify-between mb-[-20px] `}
           >
             <p className="text-sm">Home</p>
@@ -64,7 +65,7 @@ export default function ResultClient({
                 href={'/'}
                 style={{ padding: 0, width: 'max-content' }}
               >
-                <Heading1>{result.homeTeamDetails.name}</Heading1>
+                <Heading1>{resultDTO.homeDetails.name}</Heading1>
               </LinkButton>
               <Heading1>
                 {homeGoals} - {awayGoals}
@@ -78,18 +79,18 @@ export default function ResultClient({
                 href={'/'}
                 style={{ padding: 0, width: 'max-content' }}
               >
-                <Heading1>{result.awayTeamDetails.name}</Heading1>
+                <Heading1>{resultDTO.awayDetails.name}</Heading1>
               </LinkButton>
             </div>
           ) : (
             <div className="flex flex-row justify-between gap-[20px]">
-              <Heading1>{result.homeTeamDetails.name}</Heading1>
+              <Heading1>{resultDTO.homeDetails.name}</Heading1>
 
               <Heading1>
                 {homeGoals} - {awayGoals}
               </Heading1>
 
-              <Heading1>{result.awayTeamDetails.name}</Heading1>
+              <Heading1>{resultDTO.awayDetails.name}</Heading1>
             </div>
           )}
         </div>
@@ -98,16 +99,16 @@ export default function ResultClient({
         className="flex flex-col gap-5 mx-5"
         style={{ marginRight: `${mr}px` }}
       >
-        <DetailsRibbon league={league} result={result} />
+        <DetailsRibbon league={league} resultDTO={resultDTO} />
         <div className="w-full grid grid-cols-3 grid-rows-[repeat(3,min-content)] gap-5">
           {/* <AiSummary league={league} result={result} /> */}
 
-          <AsItStood league={league} result={result} />
-          <MatchOutcome league={league} result={result} />
+          <AsItStood league={league} resultDTO={resultDTO} />
+          <MatchOutcome league={league} resultDTO={resultDTO} />
           <HeadToHead
             teams={{
-              home: result.homeTeamDetails.name,
-              away: result.awayTeamDetails.name,
+              home: resultDTO.homeDetails.name,
+              away: resultDTO.awayDetails.name,
             }}
             league={league}
             userOwnsThisLeague={userOwnsThisLeague}
@@ -118,7 +119,13 @@ export default function ResultClient({
   );
 }
 
-function DetailsRibbon({ league, result }: { league: League; result: Result }) {
+function DetailsRibbon({
+  league,
+  resultDTO,
+}: {
+  league: League;
+  resultDTO: SingleResultDTO;
+}) {
   return (
     <div className="grid grid-rows-1 grid-cols-3 place-self-center place-items-center text-base">
       <p className="justify-self-end">
@@ -129,9 +136,12 @@ function DetailsRibbon({ league, result }: { league: League; result: Result }) {
         {league.name}
       </Button>
       <p className="text-base justify-self-start">
-        {league.tables[result.division - 1].name} (Division {result.division})
+        {league.tables[resultDTO.result.division - 1].name} (Division{' '}
+        {resultDTO.result.division})
       </p>
-      {result.neutralGround && <p className="text-base">Neutral Ground</p>}
+      {resultDTO.result.neutralGround && (
+        <p className="text-base">Neutral Ground</p>
+      )}
     </div>
   );
 }

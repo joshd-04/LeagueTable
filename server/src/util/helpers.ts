@@ -64,7 +64,6 @@ export async function sortTeams(
 
   const entries = await Promise.all(
     teams.map(async (team) => {
-      console.log('💣', team);
       const teamStats = await calculateTeamStats(
         league,
         team,
@@ -91,7 +90,8 @@ export async function sortTeams(
   */
   teams.sort((teamA, teamB) => {
     const teamADetails = teamStatsData[teamA._id.toString()];
-    const teamBDetails = teamStatsData[teamA._id.toString()];
+    const teamBDetails = teamStatsData[teamB._id.toString()];
+
     // 1. More points
     const pointsA = teamADetails.points;
     const pointsB = teamBDetails.points;
@@ -184,7 +184,7 @@ export async function sortTeams(
     }
 
     // Otherwise just return alphabetical order because the chances of getting here is very unlikely
-    console.log(teamADetails.name, teamADetails);
+
     return teamADetails.name.localeCompare(teamBDetails.name);
   });
 
@@ -287,7 +287,7 @@ Array.prototype.rotateRight = function <T>(this: T[], n = 1): T[] {
 export async function findLeaguePosition(
   league: ILeagueSchema,
   division: number,
-  teamName: string,
+  teamId: Types.ObjectId,
   season?: number,
   matchweek?: number,
 ) {
@@ -302,7 +302,9 @@ export async function findLeaguePosition(
       ) as ITable
     ).teams as ITeamsSchema[],
   );
-  return teams.map((team) => team.name).indexOf(teamName) + 1;
+  return (
+    teams.map((team) => team._id.toString()).indexOf(teamId.toString()) + 1
+  );
 }
 
 /**
@@ -351,19 +353,13 @@ export async function calculateTeamDetails(
   league: ILeagueSchema,
   teamId: Types.ObjectId,
   season?: number,
-  asOfTheEndOfMathweek?: number,
+  asOfTheEndOfMatchweek?: number,
 ): Promise<ITeamDetails | null> {
-  console.log('HIT 1.0');
   const team = await Team.findById(teamId);
-  console.log('HIT 1.1');
   if (!team) return null;
 
   const seasonOfInterest = season || league.currentSeason;
-  const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
-  console.log('HIT 1.2');
-
-  console.log(team);
-  console.log('HIT 1.3');
+  const matchweekOfInterest = asOfTheEndOfMatchweek || league.currentMatchweek;
 
   const teamStats = await calculateTeamStats(
     league,
@@ -375,11 +371,10 @@ export async function calculateTeamDetails(
   const position = await findLeaguePosition(
     league,
     team.division,
-    team.name,
+    team._id,
     seasonOfInterest,
     matchweekOfInterest,
   );
-  console.log('HIT 1.4');
 
   return {
     teamId: teamId,
@@ -403,8 +398,6 @@ async function calculateTeamStats(
   season?: number,
   asOfTheEndOfMathweek?: number,
 ): Promise<ITeamStats> {
-  console.log('💥💥', team);
-
   if (!league)
     return {
       name: '',
@@ -424,13 +417,9 @@ async function calculateTeamStats(
   const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
 
   // Get the results from the specified season upto the specified matchweek
-  const homeResults = await Result.find({
-    homeTeamId: team._id,
-    season: seasonOfInterest,
-    matchweek: { $lte: matchweekOfInterest },
-  });
-  const awayResults = await Result.find({
-    awayTeamId: team._id,
+
+  const allResults = await Result.find({
+    $or: [{ homeTeamId: team._id }, { awayTeamId: team._id }],
     season: seasonOfInterest,
     matchweek: { $lte: matchweekOfInterest },
   });
@@ -444,11 +433,21 @@ async function calculateTeamStats(
   let goalsAgainst = 0;
   let points = 0;
 
-  homeResults.forEach((result) => {
-    const gFor = result.basicOutcome.filter((goal) => goal === 'home').length;
-    const gAgainst = result.basicOutcome.filter(
-      (goal) => goal === 'away',
-    ).length;
+  allResults.forEach((result) => {
+    const match: 'home' | 'away' = result.homeTeamId.equals(team._id)
+      ? 'home'
+      : 'away';
+
+    let gFor: number;
+    let gAgainst: number;
+
+    if (match === 'home') {
+      gFor = result.basicOutcome.filter((goal) => goal === 'home').length;
+      gAgainst = result.basicOutcome.filter((goal) => goal === 'away').length;
+    } else {
+      gFor = result.basicOutcome.filter((goal) => goal === 'away').length;
+      gAgainst = result.basicOutcome.filter((goal) => goal === 'home').length;
+    }
 
     if (gFor > gAgainst) {
       // win
@@ -468,36 +467,14 @@ async function calculateTeamStats(
     goalsFor += gFor;
     goalsAgainst += gAgainst;
   });
-  awayResults.forEach((result) => {
-    const gFor = result.basicOutcome.filter((goal) => goal === 'away').length;
-    const gAgainst = result.basicOutcome.filter(
-      (goal) => goal === 'home',
-    ).length;
 
-    if (gFor > gAgainst) {
-      // win
-      wins += 1;
-      points += 3;
-    } else if (gFor < gAgainst) {
-      // loss
-      losses += 1;
-      points += 0;
-    } else {
-      // draw
-      draws += 1;
-      points += 1;
-    }
-    // increment rest of stats
-    matchesPlayed += 1;
-    goalsFor += gFor;
-    goalsAgainst += gAgainst;
-  });
+  const form = determineRecentForm(team._id, allResults);
 
   return {
     name: team.name,
     leagueId: team.leagueId,
     division: team.division,
-    form: '',
+    form: form,
     matchesPlayed: matchesPlayed,
     wins: wins,
     draws: draws,
@@ -506,4 +483,61 @@ async function calculateTeamStats(
     goalsAgainst: goalsAgainst,
     points: points,
   };
+}
+
+function determineRecentForm(teamId: Types.ObjectId, results: IResultSchema[]) {
+  // Change the form of the away and the home team
+  // -----, W----, WD---, WDL--, WDLW-, WDLWD, DLWDL
+
+  results.sort((resultA, resultB) => {
+    // This will put the most recent game at the end
+    // We will need to slice the list to get the 5 most recent games
+    return resultA.date.getTime() - resultB.date.getTime();
+  });
+
+  const last5Results = results.slice(-5);
+
+  const form = last5Results.map((result) => {
+    const isHomeGame = result.homeTeamId.equals(teamId);
+
+    let goalsFor: number;
+    let goalsAgainst: number;
+
+    if (isHomeGame) {
+      goalsFor = result.basicOutcome.reduce(
+        (prev, val) => (val === 'home' ? prev + 1 : prev),
+        0,
+      );
+
+      goalsAgainst = result.basicOutcome.reduce(
+        (prev, val) => (val === 'away' ? prev + 1 : prev),
+        0,
+      );
+    } else {
+      goalsFor = result.basicOutcome.reduce(
+        (prev, val) => (val === 'away' ? prev + 1 : prev),
+        0,
+      );
+
+      goalsAgainst = result.basicOutcome.reduce(
+        (prev, val) => (val === 'home' ? prev + 1 : prev),
+        0,
+      );
+    }
+
+    if (goalsFor > goalsAgainst) {
+      // win
+      return 'W';
+    } else if (goalsFor < goalsAgainst) {
+      // loss
+      return 'L';
+    } else {
+      // draw
+      return 'D';
+    }
+  });
+
+  const formStr = form.join('').padEnd(5, '-');
+
+  return formStr;
 }

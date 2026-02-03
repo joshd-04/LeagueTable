@@ -2,6 +2,17 @@ import { Document, Types } from 'mongoose';
 
 export type AccountTypeInterface = 'free' | 'pro' | 'pro+';
 
+export interface IUserSchema extends Document {
+  _id: Types.ObjectId;
+  username: string;
+  email: string;
+  passwordHash: string;
+  accountType: AccountTypeInterface;
+  leaguesCreated: [];
+  favoriteLeagues: [];
+  followedLeagues: [];
+}
+
 export interface ILeagueSchema extends Document {
   _id: Types.ObjectId;
   name: string;
@@ -127,15 +138,4 @@ export interface ITeamStats {
   goalsFor: number;
   goalsAgainst: number;
   points: number;
-}
-
-export interface IUserSchema extends Document {
-  _id: Types.ObjectId;
-  username: string;
-  email: string;
-  passwordHash: string;
-  accountType: AccountTypeInterface;
-  leaguesCreated: [];
-  favoriteLeagues: [];
-  followedLeagues: [];
 }

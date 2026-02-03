@@ -9,31 +9,32 @@ import {
   CardBody,
 } from '@heroui/react';
 import TeamForm from '@/components/teamForm/TeamForm';
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import ordinal from 'ordinal';
 import TeamFormLocked from '@/components/teamForm/TeamFormLocked';
 import { doesUserOwnThisLeague, meetsMinimumTierLevel } from '@/util/helpers';
 import useAccount from '@/hooks/useAccount';
+import { SingleFixtureDTO } from '@/util/dto/fixtures';
 
 interface TableStat {
   key: string;
   label: string;
-  homeValue: (fixture: Fixture) => React.ReactNode;
-  awayValue: (fixture: Fixture) => React.ReactNode;
+  homeValue: (fixture: SingleFixtureDTO) => React.ReactNode;
+  awayValue: (fixture: SingleFixtureDTO) => React.ReactNode;
 }
 
 export default function MatchPreview({
   league,
-  fixture,
+  fixtureDTO,
 }: {
   league: League;
-  fixture: Fixture;
+  fixtureDTO: SingleFixtureDTO;
 }) {
   return (
     <Card className="h-full w-full px-[10px] ">
       <CardBody className="flex flex-col gap-2">
         {/* <p className="text-base">Match preview</p> */}
-        <PreviewTable league={league} fixture={fixture} />
+        <PreviewTable league={league} fixtureDTO={fixtureDTO} />
       </CardBody>
     </Card>
   );
@@ -41,15 +42,15 @@ export default function MatchPreview({
 
 function PreviewTable({
   league,
-  fixture,
+  fixtureDTO,
 }: {
   league: League;
-  fixture: Fixture;
+  fixtureDTO: SingleFixtureDTO;
 }) {
   const homeGD =
-    fixture.homeTeamDetails.goalsFor - fixture.homeTeamDetails.goalsAgainst;
+    fixtureDTO.homeDetails.goalsFor - fixtureDTO.homeDetails.goalsAgainst;
   const awayGD =
-    fixture.awayTeamDetails.goalsFor - fixture.awayTeamDetails.goalsAgainst;
+    fixtureDTO.awayDetails.goalsFor - fixtureDTO.awayDetails.goalsAgainst;
 
   const { user, isLoggedIn } = useAccount();
 
@@ -59,44 +60,44 @@ function PreviewTable({
     {
       key: 'form',
       label: 'Form',
-      homeValue: (f) => <TeamForm form={f.homeTeamDetails.form} />,
-      awayValue: (f) => <TeamForm form={f.awayTeamDetails.form} />,
+      homeValue: (f) => <TeamForm form={f.homeDetails.form} />,
+      awayValue: (f) => <TeamForm form={f.awayDetails.form} />,
     },
     {
       key: 'position',
       label: 'Position',
-      homeValue: (f) => ordinal(f.homeTeamDetails.position),
-      awayValue: (f) => ordinal(f.awayTeamDetails.position),
+      homeValue: (f) => ordinal(f.homeDetails.leaguePosition),
+      awayValue: (f) => ordinal(f.awayDetails.leaguePosition),
     },
     {
       key: 'points',
       label: 'Points',
-      homeValue: (f) => f.homeTeamDetails.wins * 3 + f.homeTeamDetails.draws,
-      awayValue: (f) => f.awayTeamDetails.wins * 3 + f.awayTeamDetails.draws,
+      homeValue: (f) => f.homeDetails.wins * 3 + f.homeDetails.draws,
+      awayValue: (f) => f.awayDetails.wins * 3 + f.awayDetails.draws,
     },
     {
       key: 'wins',
       label: 'Wins',
-      homeValue: (f) => f.homeTeamDetails.wins,
-      awayValue: (f) => f.awayTeamDetails.wins,
+      homeValue: (f) => f.homeDetails.wins,
+      awayValue: (f) => f.awayDetails.wins,
     },
     {
       key: 'draws',
       label: 'Draws',
-      homeValue: (f) => f.homeTeamDetails.draws,
-      awayValue: (f) => f.awayTeamDetails.draws,
+      homeValue: (f) => f.homeDetails.draws,
+      awayValue: (f) => f.awayDetails.draws,
     },
     {
       key: 'losses',
       label: 'Losses',
-      homeValue: (f) => f.homeTeamDetails.losses,
-      awayValue: (f) => f.awayTeamDetails.losses,
+      homeValue: (f) => f.homeDetails.losses,
+      awayValue: (f) => f.awayDetails.losses,
     },
     {
       key: 'goalsScored',
       label: 'Goals scored',
-      homeValue: (f) => f.homeTeamDetails.goalsFor,
-      awayValue: (f) => f.awayTeamDetails.goalsFor,
+      homeValue: (f) => f.homeDetails.goalsFor,
+      awayValue: (f) => f.awayDetails.goalsFor,
     },
     {
       key: 'goalDiff',
@@ -108,7 +109,7 @@ function PreviewTable({
 
   const shouldShowTeamForm = meetsMinimumTierLevel(
     'pro',
-    league.leagueOwner.accountType
+    league.leagueOwner.accountType,
   );
 
   return (
@@ -124,11 +125,11 @@ function PreviewTable({
     >
       <TableHeader>
         <TableColumn className="text-right text-base">
-          {fixture.homeTeamDetails.name}
+          {fixtureDTO.homeDetails.name}
         </TableColumn>
         <TableColumn className="text-center w-[140px]"> </TableColumn>
         <TableColumn className="text-left text-base">
-          {fixture.awayTeamDetails.name}
+          {fixtureDTO.awayDetails.name}
         </TableColumn>
       </TableHeader>
       <TableBody>
@@ -139,7 +140,7 @@ function PreviewTable({
                 <TableRow key={stat.key}>
                   <TableCell className={`place-items-end text-right`}>
                     {shouldShowTeamForm ? (
-                      stat.homeValue(fixture)
+                      stat.homeValue(fixtureDTO)
                     ) : (
                       <TeamFormLocked userOwnsThisLeague={userOwnsThisLeague} />
                     )}
@@ -147,7 +148,7 @@ function PreviewTable({
                   <TableCell className="text-center ">{stat.label}</TableCell>
                   <TableCell className={`place-items-start text-left`}>
                     {shouldShowTeamForm ? (
-                      stat.awayValue(fixture)
+                      stat.awayValue(fixtureDTO)
                     ) : (
                       <TeamFormLocked userOwnsThisLeague={userOwnsThisLeague} />
                     )}
@@ -158,11 +159,11 @@ function PreviewTable({
               return (
                 <TableRow key={stat.key}>
                   <TableCell className={`place-items-end text-right`}>
-                    {stat.homeValue(fixture)}
+                    {stat.homeValue(fixtureDTO)}
                   </TableCell>
                   <TableCell className="text-center ">{stat.label}</TableCell>
                   <TableCell className={`place-items-start text-left`}>
-                    {stat.awayValue(fixture)}
+                    {stat.awayValue(fixtureDTO)}
                   </TableCell>
                 </TableRow>
               );

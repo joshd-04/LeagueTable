@@ -3,7 +3,7 @@ import TeamForm from '@/components/teamForm/TeamForm';
 import TeamFormLocked from '@/components/teamForm/TeamFormLocked';
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
-import { League, Team } from '@/util/definitions';
+import { League, TeamDetails } from '@/util/definitions';
 import { meetsMinimumTierLevel } from '@/util/helpers';
 import {
   Card,
@@ -51,11 +51,11 @@ export default function TableWidget({
         `${API_URL}/leagues/${league._id}/teams?division=${divisionViewing}&season=${seasonViewing}`,
         {
           method: 'GET',
-        }
+        },
       ),
     queryKey: ['table', league._id, divisionViewing, seasonViewing],
   });
-  const teams: Team[] | undefined = data?.data.teams;
+  const teams: TeamDetails[] | undefined = data?.data.teams;
 
   const [displayAsProLeague, setDisplayAsProLeague] = useState(
     /* League-dependent */
@@ -66,7 +66,7 @@ export default function TableWidget({
     // );
 
     /* Account dependent */
-    meetsMinimumTierLevel('pro', league.leagueOwner.accountType)
+    meetsMinimumTierLevel('pro', league.leagueOwner.accountType),
   );
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function TableWidget({
 
     /* Account dependent */
     setDisplayAsProLeague(
-      meetsMinimumTierLevel('pro', league.leagueOwner.accountType)
+      meetsMinimumTierLevel('pro', league.leagueOwner.accountType),
     );
   }, [league]);
 
@@ -176,7 +176,7 @@ function TableComponent({
   ref,
 }: {
   displayAsProLeague: boolean;
-  teams: Team[] | undefined;
+  teams: TeamDetails[] | undefined;
   league: League;
   divisionViewing: number;
   isLoading: boolean;
@@ -241,7 +241,7 @@ function TableComponent({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [teams]
+    [teams],
   );
 
   const columns: TableColumn[] = [
@@ -272,7 +272,7 @@ function TableComponent({
       const points = 3 * team.wins + team.draws;
       return {
         key: i,
-        position: team.position,
+        position: team.leaguePosition,
         team: team.name,
         matchesPlayed: team.matchesPlayed,
         wins: team.wins,
@@ -336,7 +336,7 @@ function TableComponent({
       numberOfTeamsToBePromoted: number;
       numberOfTeamsToBeRelegated: number;
       numberOfTeams: number;
-    }
+    },
   ): 'promotion' | 'relegation' | 'none' {
     if (!position) return 'none';
 

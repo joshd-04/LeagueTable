@@ -1,6 +1,6 @@
 'use client';
 
-import { Fixture, League } from '@/util/definitions';
+import { League } from '@/util/definitions';
 import { useParams, useRouter } from 'next/navigation';
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 import { motion } from 'motion/react';
@@ -11,6 +11,7 @@ import { Card, CardBody, useDisclosure } from '@heroui/react';
 import { FaRegEdit } from 'react-icons/fa';
 import FixtureToResult from '@/components/fixtureToResult/FixtureToResult';
 import TruncatedText from '@/components/formattedText/truncatedText';
+import { FixturesListDTO, SingleFixtureDTO } from '@/util/dto/fixtures';
 
 export default function NextFixtures({
   league,
@@ -23,7 +24,8 @@ export default function NextFixtures({
   userOwnsThisLeague: boolean;
   invalidateDashboardQueries: () => void;
 }) {
-  const [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null);
+  const [selectedFixture, setSelectedFixture] =
+    useState<SingleFixtureDTO | null>(null);
 
   const {
     isOpen: isFixtureToResultOpen,
@@ -37,20 +39,14 @@ export default function NextFixtures({
         `${API_URL}/leagues/${league._id}/fixtures?limit=3&season=${seasonViewing}`,
         {
           method: 'GET',
-        }
+        },
       ),
     queryKey: ['fixtures', league._id, seasonViewing],
   });
 
-  const fixtures:
-    | {
-        totalFixtures: number;
-        fixturesReturned: number;
-        fixtures: Fixture[];
-      }
-    | undefined = data?.data;
+  const fixtures: FixturesListDTO | undefined = data?.data;
 
-  const nextFixtures: Fixture[] | undefined = data?.data.fixtures.slice(0, 3);
+  const nextFixtures = fixtures?.fixtures.slice(0, 3);
 
   const [isHoveringOuterPanel, setIsHoveringOuterPanel] = useState(false);
   const router = useRouter();
@@ -97,11 +93,11 @@ export default function NextFixtures({
               )}
           </div>
           {isLoading || nextFixtures === undefined || fixtures === undefined ? (
-            <>
+            <div className="animate-pulse">
               <FixtureRowSkeleton />
               <FixtureRowSkeleton />
               <FixtureRowSkeleton />
-            </>
+            </div>
           ) : nextFixtures.length > 0 ? (
             <div className="flex flex-col gap-1">
               {nextFixtures.map((f, i) => (
@@ -147,8 +143,8 @@ function FixtureRow({
   onFixtureToResultOpen,
 }: {
   userOwnsThisLeague: boolean;
-  fixtureObj: Fixture;
-  setSelectedFixture: Dispatch<SetStateAction<Fixture | null>>;
+  fixtureObj: SingleFixtureDTO;
+  setSelectedFixture: Dispatch<SetStateAction<SingleFixtureDTO | null>>;
   onFixtureToResultOpen: () => void;
 }) {
   const router = useRouter();
@@ -158,7 +154,7 @@ function FixtureRow({
 
   function handleFixtureClick(e: MouseEvent) {
     e.stopPropagation();
-    router.push(`/leagues/${leagueId}/fixture/${fixtureObj._id}`);
+    router.push(`/leagues/${leagueId}/fixture/${fixtureObj.fixture._id}`);
   }
 
   return (
@@ -173,23 +169,23 @@ function FixtureRow({
           rowHover && editHover
             ? 'hsl(var(--heroui-content2)/1)'
             : rowHover
-            ? 'hsl(var(--heroui-content3)/1)'
-            : 'hsl(var(--heroui-content2)/1)',
+              ? 'hsl(var(--heroui-content3)/1)'
+              : 'hsl(var(--heroui-content2)/1)',
       }}
     >
       <p className="px-[10px] w-max h-min flex-none text-sm">
-        MD {fixtureObj.matchweek}
+        MD {fixtureObj.fixture.matchweek}
       </p>
       <div className="grid grid-rows-1 grid-cols-[1fr_40px_1fr] flex-grow place-items-end">
         {/* <p className="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden">
           {fixtureObj.homeTeamDetails.name}
         </p> */}
         <TruncatedText
-          content={fixtureObj.homeTeamDetails.name}
+          content={fixtureObj.homeDetails.name}
           placement="top-end"
           textClassName="w-full text-right text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
         >
-          {fixtureObj.homeTeamDetails.name}
+          {fixtureObj.homeDetails.name}
         </TruncatedText>
 
         <p className="w-full text-center text-sm text-muted">vs</p>
@@ -198,11 +194,11 @@ function FixtureRow({
           {fixtureObj.awayTeamDetails.name}
         </p> */}
         <TruncatedText
-          content={fixtureObj.awayTeamDetails.name}
+          content={fixtureObj.awayDetails.name}
           placement="top-start"
           textClassName="w-full text-left text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
         >
-          {fixtureObj.awayTeamDetails.name}
+          {fixtureObj.awayDetails.name}
         </TruncatedText>
       </div>
       {userOwnsThisLeague && (
@@ -226,6 +222,6 @@ function FixtureRow({
 }
 function FixtureRowSkeleton() {
   return (
-    <div className="bg-[var(--bg-light)] rounded-[10px] h-[36px] border-1 border-[var(--border)] flex flex-row justify-baseline items-center animate-pulse "></div>
+    <div className="bg-content2 h-[36px] border-0 border-divider rounded-[10px]"></div>
   );
 }

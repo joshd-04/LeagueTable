@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
-import { Result } from '@/util/definitions';
-
 import { fetchAPI } from '@/util/api';
 import { API_URL } from '@/util/config';
 import { useMutation } from '@tanstack/react-query';
@@ -20,6 +18,7 @@ import {
 import { FaTrashAlt } from 'react-icons/fa';
 import { PiSoccerBallFill } from 'react-icons/pi';
 import { GiRunningShoe } from 'react-icons/gi';
+import { SingleResultDTO } from '@/util/dto/results';
 
 export default function EditResultModalAdvanced({
   resultObj,
@@ -29,15 +28,15 @@ export default function EditResultModalAdvanced({
   invalidateDashboardQueries,
   onResolution,
 }: {
-  resultObj: Result;
-  setSelectedResult: Dispatch<SetStateAction<Result | null>>;
+  resultObj: SingleResultDTO;
+  setSelectedResult: Dispatch<SetStateAction<SingleResultDTO | null>>;
   isModalOpen: boolean;
   onModalClose?: () => void;
   invalidateDashboardQueries?: () => void;
   onResolution?: (isSuccess: boolean) => void;
 }) {
   const [matchStory, setMatchStory] = useState<GoalAdvanced[]>(
-    resultObj.detailedOutcome || []
+    resultObj.result.detailedOutcome || [],
   );
   const [userRequestedNilNil, setUserRequestedNilNil] = useState(false);
 
@@ -60,7 +59,7 @@ export default function EditResultModalAdvanced({
   function handleSubmit() {
     const basicOutcome = matchStory.map((goal) => goal.team);
     const x = {
-      fixtureId: resultObj._id,
+      fixtureId: resultObj.result._id,
       basicOutcome: basicOutcome,
       detailedOutcome: matchStory,
     };
@@ -133,11 +132,11 @@ export default function EditResultModalAdvanced({
               <ModalHeader className="flex flex-col gap-1">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-xl">
-                    {resultObj.homeTeamDetails.name}{' '}
+                    {resultObj.homeDetails.name}{' '}
                     {matchStory.length === 0
                       ? 'vs'
                       : calculateScore(matchStory.length - 1)}{' '}
-                    {resultObj.awayTeamDetails.name}
+                    {resultObj.awayDetails.name}
                   </h3>
                   <p className="text-sm text-muted font-normal">
                     Fixture into result
@@ -200,7 +199,7 @@ function ResultFormAdvanced({
   setMatchStory,
   calculateScore,
 }: {
-  result: Result;
+  result: SingleResultDTO;
   matchStory: GoalAdvanced[];
   setMatchStory: Dispatch<SetStateAction<GoalAdvanced[]>>;
   calculateScore: (i: number) => string;
@@ -309,7 +308,7 @@ function ResultFormAdvanced({
                   'shrink-0 inline-flex min-w-max bg-content2 min-h-full my-0 mr-1',
                   'hover:bg-content3 items-center justify-start',
                   'cursor-pointer rounded-lg gap-2 px-4 border-2 border-transparent',
-                  'data-[selected=true]:border-primary transition-colors duration-200'
+                  'data-[selected=true]:border-primary transition-colors duration-200',
                 ),
                 label: 'w-full text-sm',
               }}
@@ -334,7 +333,7 @@ function ResultFormAdvanced({
             }}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {result.homeTeamDetails.name} goal
+            Add {result.homeDetails.name} goal
           </Button>
           <Button
             color="default"
@@ -348,7 +347,7 @@ function ResultFormAdvanced({
             }}
             className="text-sm text-nowrap overflow-ellipsis whitespace-nowrap overflow-hidden"
           >
-            Add {result.awayTeamDetails.name} goal
+            Add {result.awayDetails.name} goal
           </Button>
         </div>
       </div>
@@ -363,7 +362,7 @@ function GoalRow({
   removeGoal,
   calculateScore,
 }: {
-  result: Result;
+  result: SingleResultDTO;
   goal: GoalAdvanced;
   goalIndex: number;
   removeGoal: (i: number) => void;
@@ -383,8 +382,8 @@ function GoalRow({
         <div>
           <p>
             {goal.team === 'home'
-              ? result.homeTeamDetails.name
-              : result.awayTeamDetails.name}{' '}
+              ? result.homeDetails.name
+              : result.awayDetails.name}{' '}
             ({calculateScore(goalIndex)})
           </p>
           <span

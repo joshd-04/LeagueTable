@@ -21,9 +21,10 @@ export async function getResultByIdController(
 
     // Check if league exists
     try {
-      league = await League.findById(leagueId)
-        .populate({ path: 'tables.teams' })
-        .populate({ path: 'results' });
+      league = await League.findById(leagueId).populate([
+        { path: 'tables.teams' },
+        { path: 'results' },
+      ]);
     } catch {
       return next(
         new ErrorHandling(404, {

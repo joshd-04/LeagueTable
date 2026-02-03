@@ -26,7 +26,7 @@ export default function ResultsByMatchweek({
 
   const [displayedResults, setDisplayedResults] = useState([]);
   const [matchweekViewing, setMatchweekViewing] = useState(
-    specifiedPage || league.currentMatchweek
+    specifiedPage || league.currentMatchweek,
   );
 
   const { refetch: refetchResults, isFetching: isFetchingResults } = useQuery({
@@ -35,7 +35,7 @@ export default function ResultsByMatchweek({
         `${API_URL}/leagues/${league._id}/results?matchweek=${matchweekViewing}`,
         {
           method: 'GET',
-        }
+        },
       ),
     queryKey: ['resultsMatchweek', league._id, matchweekViewing],
     staleTime: 1000 * 60 * 1,
@@ -83,7 +83,7 @@ export default function ResultsByMatchweek({
             {displayedResults.length > 0 ? (
               displayedResults.map((result, i) => (
                 <ResultRow
-                  result={result}
+                  resultDTO={result}
                   league={league}
                   key={i}
                   handleClick={handleClick}
