@@ -4,24 +4,17 @@ import {
   AccountTypeInterface,
   IFixtureSchema,
   ILeagueSchema,
-  ITeamsSchema,
   IUserSchema,
 } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
-import Team from '../../../models/teamModel';
-import {
-  calculateTeamPoints,
-  findLeaguePosition,
-  meetsMinimumTierLevel,
-  sortTeams,
-} from '../../../util/helpers';
+import { meetsMinimumTierLevel } from '../../../util/helpers';
 import Fixture from '../../../models/fixtureModel';
 import Result from '../../../models/resultModel';
 
 export async function turnFixtureIntoResult(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   /*  Args: fixtureId, basicOutcome, detailedOutcome?
     
@@ -45,28 +38,25 @@ export async function turnFixtureIntoResult(
     // Check if fixture exists
     let fixture: IFixtureSchema | null;
     try {
-      fixture = await Fixture.findById(fixtureId).populate([
-        { path: 'homeTeamDetails' },
-        { path: 'awayTeamDetails' },
-      ]);
+      fixture = await Fixture.findById(fixtureId);
     } catch {
       return next(
         new ErrorHandling(404, {
           message: `Fixture with ID '${fixtureId}' not found`,
-        })
+        }),
       );
     }
     if (!fixture) {
       return next(
         new ErrorHandling(404, {
           message: `Fixture with ID '${fixtureId}' not found`,
-        })
+        }),
       );
     }
-    const homeDetails = fixture.homeTeamDetails as unknown as ITeamsSchema;
-    const awayDetails = fixture.awayTeamDetails as unknown as ITeamsSchema;
+    const homeTeamId = fixture.homeTeamId;
+    const awayTeamId = fixture.awayTeamId;
 
-    const leagueId = homeDetails.leagueId;
+    const leagueId = fixture.leagueId;
     let league: ILeagueSchema | null;
 
     // Check if league exists
@@ -75,7 +65,6 @@ export async function turnFixtureIntoResult(
         { path: 'tables.teams' },
         {
           path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
         { path: 'leagueOwner' },
       ]);
@@ -83,7 +72,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -91,7 +80,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -100,7 +89,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(403, {
           message: `You are not permitted to make edits to this league`,
-        })
+        }),
       );
     }
 
@@ -110,7 +99,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(403, {
           message: `This fixture is from a different season and cannot be updated.`,
-        })
+        }),
       );
     }
 
@@ -121,7 +110,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(403, {
           message: `This fixture isn't released yet. Progress through the season to upload the result.`,
-        })
+        }),
       );
     }
 
@@ -142,7 +131,7 @@ export async function turnFixtureIntoResult(
     }
     const isValid = meetsMinimumTierLevel(
       requiredLevel,
-      leagueOwner.accountType
+      leagueOwner.accountType,
     );
     if (!isValid) {
       switch (requiredLevel) {
@@ -150,25 +139,25 @@ export async function turnFixtureIntoResult(
           return next(
             new ErrorHandling(403, {
               message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
-            })
+            }),
           );
         case 'pro':
           return next(
             new ErrorHandling(403, {
               message: `Pro required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         case 'pro+':
           return next(
             new ErrorHandling(403, {
               message: `Pro+ required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         default:
           return next(
             new ErrorHandling(403, {
               message: `We could not verify your account subscription tier.`,
-            })
+            }),
           );
       }
     }
@@ -189,7 +178,7 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(400, {
           message: `Property 'basicOutcome' must be an array of "home" or "away"`,
-        })
+        }),
       );
     }
 
@@ -230,49 +219,19 @@ export async function turnFixtureIntoResult(
       return next(
         new ErrorHandling(400, {
           message: `Property 'detailedOutcome' is required because this league is an 'advanced' league. Make sure the same number of goals are provided as the basicOutcome. Property 'detailedOutcome' must have a team: "home" | "away", scorer: str, assist?: str | undefined, isOwnGoal?: boolean | undefined`,
-        })
+        }),
       );
     }
-
-    // Start creating the result
-    const homeTeamPosition = await findLeaguePosition(
-      league,
-      homeDetails.division,
-      fixture.season,
-      homeDetails.name
-    );
-    const awayTeamPosition = await findLeaguePosition(
-      league,
-      awayDetails.division,
-      fixture.season,
-      awayDetails.name
-    );
 
     const result = await Result.create({
       _id: fixtureId,
       date: Date.now(),
+      leagueId: leagueId,
       season: fixture.season,
       division: fixture.division,
       matchweek: fixture.matchweek,
-      homeTeamDetails: {
-        teamId: homeDetails._id,
-        name: homeDetails.name,
-
-        division: homeDetails.division,
-        leaguePosition: homeTeamPosition,
-        form: homeDetails.form,
-        matchesPlayed: homeDetails.matchesPlayed,
-        points: calculateTeamPoints(homeDetails),
-      },
-      awayTeamDetails: {
-        teamId: awayDetails._id,
-        name: awayDetails.name,
-        division: awayDetails.division,
-        leaguePosition: awayTeamPosition,
-        form: awayDetails.form,
-        matchesPlayed: awayDetails.matchesPlayed,
-        points: calculateTeamPoints(awayDetails),
-      },
+      homeTeamId: homeTeamId,
+      awayTeamId: awayTeamId,
       neutralGround: fixture.neutralGround,
       kickoff: fixture.kickoff,
       basicOutcome: basicOutcome,
@@ -302,121 +261,56 @@ export async function turnFixtureIntoResult(
       });
     }
 
-    // Change the form of the away and the home team
-    // -----, W----, WD---, WDL--, WDLW-, WDLWD, DLWDL
+    // // Change the form of the away and the home team
+    // // -----, W----, WD---, WDL--, WDLW-, WDLWD, DLWDL
 
-    let newHomeForm: string;
-    let newAwayForm: string;
-    const homeGoals = basicOutcome.reduce(
-      (prev, val) => (val === 'home' ? prev + 1 : prev),
-      0
-    );
-    const awayGoals = basicOutcome.reduce(
-      (prev, val) => (val === 'away' ? prev + 1 : prev),
-      0
-    );
+    // let newHomeForm: string;
+    // let newAwayForm: string;
+    // const homeGoals = basicOutcome.reduce(
+    //   (prev, val) => (val === 'home' ? prev + 1 : prev),
+    //   0,
+    // );
+    // const awayGoals = basicOutcome.reduce(
+    //   (prev, val) => (val === 'away' ? prev + 1 : prev),
+    //   0,
+    // );
 
-    const matchOutcome: 'home' | 'draw' | 'away' =
-      homeGoals === awayGoals
-        ? 'draw'
-        : homeGoals > awayGoals
-        ? 'home'
-        : 'away';
+    // const matchOutcome: 'home' | 'draw' | 'away' =
+    //   homeGoals === awayGoals
+    //     ? 'draw'
+    //     : homeGoals > awayGoals
+    //       ? 'home'
+    //       : 'away';
 
-    let newHomeFormArr = homeDetails.form.split('');
-    const homeLetter =
-      matchOutcome === 'home' ? 'W' : matchOutcome === 'away' ? 'L' : 'D';
+    // let newHomeFormArr = homeDetails.form.split('');
+    // const homeLetter =
+    //   matchOutcome === 'home' ? 'W' : matchOutcome === 'away' ? 'L' : 'D';
 
-    if (newHomeFormArr.includes('-')) {
-      const index = newHomeFormArr.indexOf('-');
-      newHomeFormArr.forEach((_x, i) => {
-        if (i === index) newHomeFormArr[index] = homeLetter;
-      });
-      newHomeForm = newHomeFormArr.join('');
-    } else {
-      newHomeFormArr.push(homeLetter);
-      newHomeForm = newHomeFormArr.slice(1).join('');
-    }
+    // if (newHomeFormArr.includes('-')) {
+    //   const index = newHomeFormArr.indexOf('-');
+    //   newHomeFormArr.forEach((_x, i) => {
+    //     if (i === index) newHomeFormArr[index] = homeLetter;
+    //   });
+    //   newHomeForm = newHomeFormArr.join('');
+    // } else {
+    //   newHomeFormArr.push(homeLetter);
+    //   newHomeForm = newHomeFormArr.slice(1).join('');
+    // }
 
-    let newAwayFormArr = awayDetails.form.split('');
-    const awayLetter =
-      matchOutcome === 'home' ? 'L' : matchOutcome === 'away' ? 'W' : 'D';
+    // let newAwayFormArr = awayDetails.form.split('');
+    // const awayLetter =
+    //   matchOutcome === 'home' ? 'L' : matchOutcome === 'away' ? 'W' : 'D';
 
-    if (newAwayFormArr.includes('-')) {
-      const index = newAwayFormArr.indexOf('-');
-      newAwayFormArr.forEach((_x, i) => {
-        if (i === index) newAwayFormArr[index] = awayLetter;
-      });
-      newAwayForm = newAwayFormArr.join('');
-    } else {
-      newAwayFormArr.push(awayLetter);
-      newAwayForm = newAwayFormArr.splice(1).join('');
-    }
-
-    let newHomeMatchesPlayed = homeDetails.matchesPlayed;
-    let newHomeWins: number = homeDetails.wins;
-    let newHomeDraws: number = homeDetails.draws;
-    let newHomeLosses: number = homeDetails.losses;
-    let newHomeGoalsFor: number = homeDetails.goalsFor;
-    let newHomeGoalsAgainst: number = homeDetails.goalsAgainst;
-
-    let newAwayMatchesPlayed = awayDetails.matchesPlayed;
-    let newAwayWins: number = awayDetails.wins;
-    let newAwayDraws: number = awayDetails.draws;
-    let newAwayLosses: number = awayDetails.losses;
-    let newAwayGoalsFor: number = awayDetails.goalsFor;
-    let newAwayGoalsAgainst: number = awayDetails.goalsAgainst;
-
-    switch (matchOutcome) {
-      case 'home':
-        newHomeWins += 1;
-        newAwayLosses += 1;
-        break;
-
-      case 'draw':
-        newHomeDraws += 1;
-        newAwayDraws += 1;
-        break;
-
-      case 'away':
-        newAwayWins += 1;
-        newHomeLosses += 1;
-        break;
-    }
-
-    newHomeGoalsFor += homeGoals;
-    newAwayGoalsAgainst += homeGoals;
-
-    newHomeGoalsAgainst += awayGoals;
-    newAwayGoalsFor += awayGoals;
-
-    newHomeMatchesPlayed += 1;
-    newAwayMatchesPlayed += 1;
-
-    await Promise.all([
-      Team.findByIdAndUpdate(homeDetails._id, {
-        $set: {
-          matchesPlayed: newHomeMatchesPlayed,
-          wins: newHomeWins,
-          draws: newHomeDraws,
-          losses: newHomeLosses,
-          goalsFor: newHomeGoalsFor,
-          goalsAgainst: newHomeGoalsAgainst,
-          form: newHomeForm,
-        },
-      }),
-      Team.findByIdAndUpdate(awayDetails._id, {
-        $set: {
-          matchesPlayed: newAwayMatchesPlayed,
-          wins: newAwayWins,
-          draws: newAwayDraws,
-          losses: newAwayLosses,
-          goalsFor: newAwayGoalsFor,
-          goalsAgainst: newAwayGoalsAgainst,
-          form: newAwayForm,
-        },
-      }),
-    ]);
+    // if (newAwayFormArr.includes('-')) {
+    //   const index = newAwayFormArr.indexOf('-');
+    //   newAwayFormArr.forEach((_x, i) => {
+    //     if (i === index) newAwayFormArr[index] = awayLetter;
+    //   });
+    //   newAwayForm = newAwayFormArr.join('');
+    // } else {
+    //   newAwayFormArr.push(awayLetter);
+    //   newAwayForm = newAwayFormArr.splice(1).join('');
+    // }
 
     res.status(200).json({ status: 'success', data: { result: result } });
   } catch (e: any) {
@@ -425,8 +319,8 @@ export async function turnFixtureIntoResult(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error turning the fixture into a result. ${e.message}`
-      )
+        `There was an error turning the fixture into a result. ${e.message}`,
+      ),
     );
   }
 }

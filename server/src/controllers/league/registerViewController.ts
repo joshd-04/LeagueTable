@@ -20,7 +20,7 @@ function resolveIdentity(req: Request) {
 export async function RegisterViewController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { leagueId } = req.params;
   const identity = resolveIdentity(req);
@@ -29,7 +29,7 @@ export async function RegisterViewController(
     return next(
       new ErrorHandling(400, {
         message: `Unable to increment view count for league ${leagueId} .`,
-      })
+      }),
     );
   }
 
@@ -47,13 +47,13 @@ export async function RegisterViewController(
       return next(
         new ErrorHandling(400, {
           message: `View has already been registered for league ${leagueId} recently.`,
-        })
+        }),
       );
     }
     return next(
       new ErrorHandling(400, {
         message: `Something went wrong registering the view.`,
-      })
+      }),
     );
   }
 
@@ -68,7 +68,7 @@ export async function RegisterViewController(
     return next(
       new ErrorHandling(500, {
         message: `Something went wrong registering the view.`,
-      })
+      }),
     );
 
   const withinOneWeek =
@@ -99,7 +99,7 @@ export async function RegisterViewController(
 
   await League.findByIdAndUpdate(leagueId, update);
 
-  res.status(204).json({
+  res.status(200).json({
     status: 'success',
     data: { message: 'Successfully registered view!' },
   });

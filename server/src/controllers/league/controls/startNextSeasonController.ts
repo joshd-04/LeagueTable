@@ -19,7 +19,7 @@ import {
 export async function startNextSeasonController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   /* 
     1. Ensure the league exists and the user is the owner
@@ -43,7 +43,7 @@ export async function startNextSeasonController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -51,7 +51,7 @@ export async function startNextSeasonController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -59,7 +59,7 @@ export async function startNextSeasonController(
       return next(
         new ErrorHandling(403, {
           message: `You are not permitted to make edits to this league`,
-        })
+        }),
       );
     }
     // Based on the league type (basic/advanced), restrict access if the owner doesnt have correct account level
@@ -79,7 +79,7 @@ export async function startNextSeasonController(
     }
     const isValid = meetsMinimumTierLevel(
       requiredLevel,
-      leagueOwner.accountType
+      leagueOwner.accountType,
     );
     if (!isValid) {
       switch (requiredLevel) {
@@ -87,25 +87,25 @@ export async function startNextSeasonController(
           return next(
             new ErrorHandling(403, {
               message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
-            })
+            }),
           );
         case 'pro':
           return next(
             new ErrorHandling(403, {
               message: `Pro required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         case 'pro+':
           return next(
             new ErrorHandling(403, {
               message: `Pro+ required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         default:
           return next(
             new ErrorHandling(403, {
               message: `We could not verify your account subscription tier.`,
-            })
+            }),
           );
       }
     }
@@ -127,7 +127,7 @@ export async function startNextSeasonController(
       return next(
         new ErrorHandling(403, {
           message: 'You must add teams to this league first.',
-        })
+        }),
       );
     }
 
@@ -135,7 +135,7 @@ export async function startNextSeasonController(
       return next(
         new ErrorHandling(403, {
           message: 'The season is not over yet.',
-        })
+        }),
       );
     }
 
@@ -145,7 +145,7 @@ export async function startNextSeasonController(
         new ErrorHandling(403, {
           message:
             'You have reached the maximum number of seasons of this league. Upgrade the league level to continue this league.',
-        })
+        }),
       );
     }
 
@@ -165,21 +165,21 @@ export async function startNextSeasonController(
       // 1. Gather previous season's tables (do not mutate them)
       const prevSeason = newLeague.currentSeason - 1;
       const prevSeasonTables = newLeague.tables.filter(
-        (table) => table.season === prevSeason
+        (table) => table.season === prevSeason,
       );
 
       // 2. Sort teams in each division
       const sortedTeamsByDivision: ITeamsSchema[][] = await Promise.all(
         prevSeasonTables.map(
           async (table) =>
-            await sortTeams(leagueId, table.teams as ITeamsSchema[])
-        )
+            await sortTeams(leagueId, table.teams as ITeamsSchema[]),
+        ),
       );
 
       const divisionsCount = prevSeasonTables.length;
       const newTeamsByDivision: ITeamsSchema[][] = Array.from(
         { length: divisionsCount },
-        () => []
+        () => [],
       );
 
       // 3. Promotion and relegation logic
@@ -197,7 +197,7 @@ export async function startNextSeasonController(
           const aboveTable = prevSeasonTables[div - 1];
           const aboveTeams = sortedTeamsByDivision[div - 1];
           const relegatedFromAbove = aboveTeams.slice(
-            aboveTeams.length - aboveTable.numberOfTeamsToBeRelegated
+            aboveTeams.length - aboveTable.numberOfTeamsToBeRelegated,
           );
           stayingTeams = [...relegatedFromAbove, ...stayingTeams];
         }
@@ -208,7 +208,7 @@ export async function startNextSeasonController(
           const belowTeams = sortedTeamsByDivision[div + 1];
           const promotedFromBelow = belowTeams.slice(
             0,
-            belowTable.numberOfTeamsToBePromoted
+            belowTable.numberOfTeamsToBePromoted,
           );
           stayingTeams = [...stayingTeams, ...promotedFromBelow];
         }
@@ -227,17 +227,11 @@ export async function startNextSeasonController(
                 _id: new Types.ObjectId(),
                 division: prevTable.division,
                 leagueId: leagueId,
-                matchesPlayed: 0,
-                wins: 0,
-                draws: 0,
-                losses: 0,
-                goalsFor: 0,
-                goalsAgainst: 0,
-                form: '-----',
-              } as ITeamsSchema;
+                season: newLeague.currentSeason,
+              };
               const t = await Team.create(updatedTeam);
               return t._id as Types.ObjectId;
-            })
+            }),
           );
           return {
             season: newLeague.currentSeason,
@@ -248,7 +242,7 @@ export async function startNextSeasonController(
             numberOfTeamsToBeRelegated: prevTable.numberOfTeamsToBeRelegated,
             numberOfTeamsToBePromoted: prevTable.numberOfTeamsToBePromoted,
           };
-        })
+        }),
       );
 
       // 5. Append new tables for the new season (do not overwrite previous tables)
@@ -257,7 +251,7 @@ export async function startNextSeasonController(
 
     // Generate the fixtures
     const fixtures: IFixtureSchema[] = (await generateFixtures(
-      newLeague
+      newLeague,
     )) as IFixtureSchema[];
 
     const finalMatchweek = fixtures.reduce((acc, fixture) => {
@@ -282,8 +276,8 @@ export async function startNextSeasonController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error starting the season. ${e.message}`
-      )
+        `There was an error starting the season. ${e.message}`,
+      ),
     );
   }
 }

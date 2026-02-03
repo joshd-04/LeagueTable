@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 export type AccountTypeInterface = 'free' | 'pro' | 'pro+';
 
 export interface ILeagueSchema extends Document {
+  _id: Types.ObjectId;
   name: string;
   leagueLevel: AccountTypeInterface;
   announcement?: {
@@ -50,30 +51,43 @@ export interface ITeamDetails {
   division: number;
   leaguePosition: number;
   form: string;
-  matchesPlayed: string;
+  matchesPlayed: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
   points: number;
 }
 
 type team = 'home' | 'away';
 
 export interface IFixtureSchema extends Document {
+  _id: Types.ObjectId;
+  leagueId: Types.ObjectId;
   season: number;
   division: number;
   matchweek: number;
-  homeTeamDetails: Types.ObjectId | ITeamsSchema;
-  awayTeamDetails: Types.ObjectId | ITeamsSchema;
+  // homeTeamDetails: Types.ObjectId | ITeamsSchema;
+  // awayTeamDetails: Types.ObjectId | ITeamsSchema;
+  homeTeamId: Types.ObjectId;
+  awayTeamId: Types.ObjectId;
   neutralGround: boolean;
   kickoff?: Date;
 }
 
 export interface IResultSchema extends Document {
+  _id: Types.ObjectId;
   date: Date;
+  leagueId: Types.ObjectId;
   season: number;
   name: string;
   division: number;
   matchweek: number;
-  homeTeamDetails: ITeamDetails;
-  awayTeamDetails: ITeamDetails;
+  // homeTeamDetails: ITeamDetails;
+  // awayTeamDetails: ITeamDetails;
+  homeTeamId: Types.ObjectId;
+  awayTeamId: Types.ObjectId;
   neutralGround: boolean;
   kickoff?: Date;
   basicOutcome: team[];
@@ -86,20 +100,37 @@ export interface IResultSchema extends Document {
 }
 
 export interface ITeamsSchema extends Document {
-  position?: number;
+  _id: Types.ObjectId;
+  // position?: number;
   name: string;
   leagueId: Types.ObjectId;
   division: number;
+  season: number;
+  // matchesPlayed: number;
+  // wins: number;
+  // draws: number;
+  // losses: number;
+  // goalsFor: number;
+  // goalsAgainst: number;
+  // form: string;
+}
+
+export interface ITeamStats {
+  name: string;
+  leagueId: Types.ObjectId | null;
+  division: number;
+  form: string;
   matchesPlayed: number;
   wins: number;
   draws: number;
   losses: number;
   goalsFor: number;
   goalsAgainst: number;
-  form: string;
+  points: number;
 }
 
 export interface IUserSchema extends Document {
+  _id: Types.ObjectId;
   username: string;
   email: string;
   passwordHash: string;

@@ -6,7 +6,7 @@ import { ErrorHandling } from '../../../util/errorChecking';
 export async function getFixturesController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     /* 
@@ -24,13 +24,13 @@ export async function getFixturesController(
     try {
       league = await League.findById(leagueId).populate({
         path: 'fixtures',
-        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
+        populate: [{ path: 'homeTeamId' }, { path: 'awayTeamId' }],
       });
     } catch {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -38,7 +38,7 @@ export async function getFixturesController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
     let fixtures = league.fixtures as unknown as IFixtureSchema[];
@@ -49,7 +49,7 @@ export async function getFixturesController(
     if (league.leagueLevel === 'free' || req.query.season === undefined) {
       // Get this seasons fixtures
       fixtures = fixtures.filter(
-        (fixture) => fixture.season === league.currentSeason
+        (fixture) => fixture.season === league.currentSeason,
       );
     } else {
       if (
@@ -57,11 +57,11 @@ export async function getFixturesController(
         Number.isInteger(Number(req.query.season))
       ) {
         fixtures = fixtures.filter(
-          (fixture) => fixture.season === Number(req.query.season)
+          (fixture) => fixture.season === Number(req.query.season),
         );
       } else {
         fixtures = fixtures.filter(
-          (fixture) => fixture.season === league.currentSeason
+          (fixture) => fixture.season === league.currentSeason,
         );
       }
     }
@@ -72,7 +72,7 @@ export async function getFixturesController(
     // If its a number, find the associated matchweek and return just that
     else if (!isNaN(Number(req.query.matchweek))) {
       fixtures = fixtures.filter(
-        (fixture) => fixture.matchweek === Number(req.query.matchweek)
+        (fixture) => fixture.matchweek === Number(req.query.matchweek),
       );
     } else {
       // If user does not specify they want all fixtures, then just return the fixtures up until the current matchweek
@@ -100,8 +100,8 @@ export async function getFixturesController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the fixtures that are still to be played. ${e.message}`
-      )
+        `There was an error fetching the fixtures that are still to be played. ${e.message}`,
+      ),
     );
   }
 }

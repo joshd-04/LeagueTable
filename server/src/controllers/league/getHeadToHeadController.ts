@@ -21,20 +21,19 @@ interface statsInterface {
 export async function getHeadToHeadController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.id;
     let league: ILeagueSchema | null;
-    const teamAName = req.params.teamA;
-    const teamBName = req.params.teamB;
+    const teamAId = req.params.teamA;
+    const teamBId = req.params.teamB;
 
     // Check if league exists
     try {
       league = await League.findById(leagueId).populate([
         {
           path: 'results',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
         { path: 'leagueOwner' },
       ]);
@@ -42,7 +41,7 @@ export async function getHeadToHeadController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -50,7 +49,7 @@ export async function getHeadToHeadController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -60,7 +59,7 @@ export async function getHeadToHeadController(
       return next(
         new ErrorHandling(403, {
           message: `Upgrade to account to pro to unlock head-to-head history`,
-        })
+        }),
       );
     }
 
@@ -69,10 +68,10 @@ export async function getHeadToHeadController(
     const headtohead = allResults
       .filter((result) => {
         return (
-          (result.homeTeamDetails.name === teamAName &&
-            result.awayTeamDetails.name === teamBName) ||
-          (result.homeTeamDetails.name === teamBName &&
-            result.awayTeamDetails.name === teamAName)
+          (result.homeTeamId.equals(teamAId) &&
+            result.awayTeamId.equals(teamBId)) ||
+          (result.homeTeamId.equals(teamBId) &&
+            result.awayTeamId.equals(teamAId))
         );
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -86,8 +85,8 @@ export async function getHeadToHeadController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error getting the head to head. ${e.message}`
-      )
+        `There was an error getting the head to head. ${e.message}`,
+      ),
     );
   }
 }

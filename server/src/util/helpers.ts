@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandling } from './errorChecking';
-import jwt from 'jsonwebtoken';
 import { requiredFields as rF } from '..';
 import {
   AccountTypeInterface,
@@ -8,12 +7,15 @@ import {
   ILeagueSchema,
   IResultSchema,
   ITable,
+  ITeamDetails,
   ITeamsSchema,
+  ITeamStats,
 } from './definitions';
 import { Types } from 'mongoose';
 import Fixture from '../models/fixtureModel';
 import League from '../models/leagueModel';
 import Result from '../models/resultModel';
+import Team from '../models/teamModel';
 
 export type RequiredFields = { [key: string]: string[] };
 
@@ -42,76 +44,40 @@ export function enforceRequiredFields(
   } else next();
 }
 
-export async function calculateTeamPoints(
-  team: ITeamsSchema,
-  asOfTheEndOfMathweek?: number,
+export async function sortTeams(
+  leagueId: string,
+  teams: ITeamsSchema[],
   season?: number,
+  asOfTheEndOfMathweek?: number,
 ) {
-  const league = await League.findById(team.leagueId);
-  if (!league) return 0;
-
-  if (!asOfTheEndOfMathweek || !season) return team.wins * 3 + team.draws * 1;
-
-  const seasonOfInterest = season || league.currentSeason;
-  const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
-
-  const homeResults = await Result.find({
-    'homeTeamDetails.teamId': team._id,
-    season: seasonOfInterest,
-    matchweek: { $lte: matchweekOfInterest },
-  });
-  const awayResults = await Result.find({
-    'awayTeamDetails.teamId': team._id,
-    season: seasonOfInterest,
-    matchweek: { $lte: matchweekOfInterest },
-  });
-
-  const points =
-    homeResults.reduce((points, result) => {
-      const homeGoals = result.basicOutcome.filter(
-        (goal) => goal === 'home',
-      ).length;
-      const awayGoals = result.basicOutcome.filter(
-        (goal) => goal === 'away',
-      ).length;
-
-      if (homeGoals > awayGoals) return points + 3;
-      if (homeGoals === awayGoals) return points + 1;
-      return points;
-    }, 0) +
-    awayResults.reduce((points, result) => {
-      const homeGoals = result.basicOutcome.filter(
-        (goal) => goal === 'home',
-      ).length;
-      const awayGoals = result.basicOutcome.filter(
-        (goal) => goal === 'away',
-      ).length;
-
-      if (homeGoals < awayGoals) return points + 3;
-      if (homeGoals === awayGoals) return points + 1;
-      return points;
-    }, 0);
-
-  return points;
-}
-
-export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
   const league = await League.findById(leagueId).populate({
     path: 'results',
-    populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
   });
   if (league === null) return teams;
-  const allResults = league.results as unknown as IResultSchema[];
+
+  const seasonOfInterest = season || league.currentSeason;
+
+  const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
+  const allResults = (league.results as unknown as IResultSchema[]).filter(
+    (result) => result.matchweek <= matchweekOfInterest,
+  );
 
   const entries = await Promise.all(
     teams.map(async (team) => {
-      const points = await calculateTeamPoints(team);
+      console.log('💣', team);
+      const teamStats = await calculateTeamStats(
+        league,
+        team,
+        seasonOfInterest,
+        matchweekOfInterest,
+      );
       const teamId: Types.ObjectId = team._id as Types.ObjectId;
-      return [teamId.toString(), points] as const;
+
+      return [teamId.toString(), teamStats] as const;
     }),
   );
 
-  const teamPoints: Record<string, number> = Object.fromEntries(entries);
+  const teamStatsData: Record<string, ITeamStats> = Object.fromEntries(entries);
 
   /* compareFn: positive = swap, negative = dont swap, equal = equal
   descending order: b-a
@@ -124,24 +90,26 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
   5. Team who scored most away goals in the H2H
   */
   teams.sort((teamA, teamB) => {
+    const teamADetails = teamStatsData[teamA._id.toString()];
+    const teamBDetails = teamStatsData[teamA._id.toString()];
     // 1. More points
-    const pointsA = teamPoints[teamA._id as string];
-    const pointsB = teamPoints[teamB._id as string];
+    const pointsA = teamADetails.points;
+    const pointsB = teamBDetails.points;
 
     if (pointsA !== pointsB) {
       return pointsB - pointsA;
     }
     // 2. Better goal difference
-    const gdA = teamA.goalsFor - teamA.goalsAgainst;
-    const gdB = teamB.goalsFor - teamB.goalsAgainst;
+    const gdA = teamADetails.goalsFor - teamADetails.goalsAgainst;
+    const gdB = teamBDetails.goalsFor - teamBDetails.goalsAgainst;
 
     if (gdA !== gdB) {
       return gdB - gdA;
     }
 
     // 3. Goals scored
-    if (teamA.goalsFor !== teamB.goalsFor) {
-      return teamB.goalsFor - teamA.goalsFor;
+    if (teamADetails.goalsFor !== teamBDetails.goalsFor) {
+      return teamBDetails.goalsFor - teamADetails.goalsFor;
     }
     // this is temporary:
     // return teamB.goalsFor - teamA.goalsFor;
@@ -151,14 +119,16 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
     // Taking teamA's perspective:
     const homeResult = allResults.find(
       (result) =>
-        result.homeTeamDetails.name === teamA.name &&
-        result.awayTeamDetails.name === teamB.name,
+        result.homeTeamId.equals(teamA._id) &&
+        result.awayTeamId.equals(teamB._id),
     );
     const awayResult = allResults.find(
       (result) =>
-        result.homeTeamDetails.name === teamB.name &&
-        result.awayTeamDetails.name === teamA.name,
+        result.homeTeamId.equals(teamB._id) &&
+        result.awayTeamId.equals(teamA._id),
     );
+
+    // TODO: Make use of teamDetails for points and goals
     let teamAPoints = 0;
     let teamBPoints = 0;
     let teamAGoals = 0;
@@ -214,7 +184,8 @@ export async function sortTeams(leagueId: string, teams: ITeamsSchema[]) {
     }
 
     // Otherwise just return alphabetical order because the chances of getting here is very unlikely
-    return teamA.name.localeCompare(teamB.name);
+    console.log(teamADetails.name, teamADetails);
+    return teamADetails.name.localeCompare(teamBDetails.name);
   });
 
   return teams;
@@ -258,11 +229,12 @@ export async function generateFixtures(league: ILeagueSchema) {
           if (home.name !== 'BYE' && away.name !== 'BYE') {
             roundFixtures.push({
               _id: new Types.ObjectId(),
+              leagueId: league._id,
               season: league.currentSeason,
               division: table.division,
               matchweek: round + 1,
-              homeTeamDetails: home._id,
-              awayTeamDetails: away._id,
+              homeTeamId: home._id,
+              awayTeamId: away._id,
               neutralGround: false,
             } as IFixtureSchema);
           }
@@ -282,8 +254,8 @@ export async function generateFixtures(league: ILeagueSchema) {
           ...fixture,
           _id: new Types.ObjectId(),
           matchweek: matchweeks.length + i + 1,
-          homeTeamDetails: fixture.awayTeamDetails,
-          awayTeamDetails: fixture.homeTeamDetails,
+          homeTeamId: fixture.awayTeamId,
+          awayTeamId: fixture.homeTeamId,
         }));
       });
 
@@ -310,30 +282,27 @@ Array.prototype.rotateRight = function <T>(this: T[], n = 1): T[] {
   return this.slice(-n).concat(this.slice(0, -n));
 };
 
+// Assumes teamNames are unique
+// TODO: Make use of teamId instead
 export async function findLeaguePosition(
   league: ILeagueSchema,
   division: number,
-  season: number,
   teamName: string,
+  season?: number,
+  matchweek?: number,
 ) {
+  const seasonOfInterest = season || league.currentSeason;
+
   const teams = await sortTeams(
-    String(league._id),
+    league._id.toString(),
     (
       league.tables.find(
-        (table) => table.division === division && table.season === season,
+        (table) =>
+          table.division === division && table.season === seasonOfInterest,
       ) as ITable
     ).teams as ITeamsSchema[],
   );
   return teams.map((team) => team.name).indexOf(teamName) + 1;
-}
-
-/**
- *  Used to check if a team: ITeamsSchema | Types.ObjectId is a team under the ITeamsSchema interface.
- *
- *
- */
-export function isTeam(doc: any): doc is ITeamsSchema {
-  return doc && typeof doc === 'object' && 'name' in doc && 'division' in doc;
 }
 
 /**
@@ -372,4 +341,169 @@ export function shouldGrantAccessToFeature(
     meetsMinimumTierLevel(featureLevel, accountType) &&
     meetsMinimumTierLevel(featureLevel, leagueLevel)
   );
+}
+
+/**
+ *
+ * Parameters that vary: season, matchweek
+ */
+export async function calculateTeamDetails(
+  league: ILeagueSchema,
+  teamId: Types.ObjectId,
+  season?: number,
+  asOfTheEndOfMathweek?: number,
+): Promise<ITeamDetails | null> {
+  console.log('HIT 1.0');
+  const team = await Team.findById(teamId);
+  console.log('HIT 1.1');
+  if (!team) return null;
+
+  const seasonOfInterest = season || league.currentSeason;
+  const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
+  console.log('HIT 1.2');
+
+  console.log(team);
+  console.log('HIT 1.3');
+
+  const teamStats = await calculateTeamStats(
+    league,
+    team,
+    seasonOfInterest,
+    matchweekOfInterest,
+  );
+
+  const position = await findLeaguePosition(
+    league,
+    team.division,
+    team.name,
+    seasonOfInterest,
+    matchweekOfInterest,
+  );
+  console.log('HIT 1.4');
+
+  return {
+    teamId: teamId,
+    name: team.name,
+    division: team.division,
+    leaguePosition: position,
+    form: teamStats.form,
+    matchesPlayed: teamStats.matchesPlayed,
+    wins: teamStats.wins,
+    draws: teamStats.draws,
+    losses: teamStats.losses,
+    goalsFor: teamStats.goalsFor,
+    goalsAgainst: teamStats.goalsAgainst,
+    points: teamStats.points,
+  };
+}
+
+async function calculateTeamStats(
+  league: ILeagueSchema,
+  team: ITeamsSchema,
+  season?: number,
+  asOfTheEndOfMathweek?: number,
+): Promise<ITeamStats> {
+  console.log('💥💥', team);
+
+  if (!league)
+    return {
+      name: '',
+      leagueId: null,
+      division: 0,
+      form: '',
+      matchesPlayed: 0,
+      wins: 0,
+      draws: 0,
+      losses: 0,
+      goalsFor: 0,
+      goalsAgainst: 0,
+      points: 0,
+    };
+
+  const seasonOfInterest = season || league.currentSeason;
+  const matchweekOfInterest = asOfTheEndOfMathweek || league.currentMatchweek;
+
+  // Get the results from the specified season upto the specified matchweek
+  const homeResults = await Result.find({
+    homeTeamId: team._id,
+    season: seasonOfInterest,
+    matchweek: { $lte: matchweekOfInterest },
+  });
+  const awayResults = await Result.find({
+    awayTeamId: team._id,
+    season: seasonOfInterest,
+    matchweek: { $lte: matchweekOfInterest },
+  });
+
+  // Go through homeResults
+  let matchesPlayed = 0;
+  let wins = 0;
+  let draws = 0;
+  let losses = 0;
+  let goalsFor = 0;
+  let goalsAgainst = 0;
+  let points = 0;
+
+  homeResults.forEach((result) => {
+    const gFor = result.basicOutcome.filter((goal) => goal === 'home').length;
+    const gAgainst = result.basicOutcome.filter(
+      (goal) => goal === 'away',
+    ).length;
+
+    if (gFor > gAgainst) {
+      // win
+      wins += 1;
+      points += 3;
+    } else if (gFor < gAgainst) {
+      // loss
+      losses += 1;
+      points += 0;
+    } else {
+      // draw
+      draws += 1;
+      points += 1;
+    }
+    // increment rest of stats
+    matchesPlayed += 1;
+    goalsFor += gFor;
+    goalsAgainst += gAgainst;
+  });
+  awayResults.forEach((result) => {
+    const gFor = result.basicOutcome.filter((goal) => goal === 'away').length;
+    const gAgainst = result.basicOutcome.filter(
+      (goal) => goal === 'home',
+    ).length;
+
+    if (gFor > gAgainst) {
+      // win
+      wins += 1;
+      points += 3;
+    } else if (gFor < gAgainst) {
+      // loss
+      losses += 1;
+      points += 0;
+    } else {
+      // draw
+      draws += 1;
+      points += 1;
+    }
+    // increment rest of stats
+    matchesPlayed += 1;
+    goalsFor += gFor;
+    goalsAgainst += gAgainst;
+  });
+
+  return {
+    name: team.name,
+    leagueId: team.leagueId,
+    division: team.division,
+    form: '',
+    matchesPlayed: matchesPlayed,
+    wins: wins,
+    draws: draws,
+    losses: losses,
+    goalsFor: goalsFor,
+    goalsAgainst: goalsAgainst,
+    points: points,
+  };
 }

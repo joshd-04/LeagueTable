@@ -33,7 +33,6 @@ export async function getResultsController(
       league = await League.findById(leagueId).populate([
         {
           path: 'results',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
         { path: 'leagueOwner' },
       ]);

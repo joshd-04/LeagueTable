@@ -54,34 +54,24 @@ export interface Fixture {
   season: number;
   matchweek: number;
   neutralGround: false;
-  awayTeamDetails: {
-    position: number;
-    division: number;
-    draws: number;
-    form: string;
-    goalsAgainst: number;
-    goalsFor: number;
-    leagueId: string;
-    losses: number;
-    matchesPlayed: number;
-    name: string;
-    wins: number;
-    _id: string;
-  };
-  homeTeamDetails: {
-    position: number;
-    division: number;
-    draws: number;
-    form: string;
-    goalsAgainst: number;
-    goalsFor: number;
-    leagueId: string;
-    losses: number;
-    matchesPlayed: number;
-    name: string;
-    wins: number;
-    _id: string;
-  };
+  awayTeamId: string;
+  homeTeamId: string;
+  _id: string;
+}
+
+export interface TeamDetails {
+  teamId: string;
+  position: number;
+  division: number;
+  draws: number;
+  form: string;
+  goalsAgainst: number;
+  goalsFor: number;
+  leagueId: string;
+  losses: number;
+  matchesPlayed: number;
+  name: string;
+  wins: number;
   _id: string;
 }
 
@@ -98,24 +88,8 @@ export interface Result {
     isOwnGoal: boolean;
     _id: string;
   }[];
-  homeTeamDetails: {
-    division: number;
-    form: string;
-    leaguePosition: number;
-    matchesPlayed: number;
-    name: string;
-    points: number;
-    teamId: string;
-  };
-  awayTeamDetails: {
-    division: number;
-    form: string;
-    leaguePosition: number;
-    matchesPlayed: number;
-    name: string;
-    points: number;
-    teamId: string;
-  };
+  awayTeamId: string;
+  homeTeamId: string;
   _id: string;
 }
 

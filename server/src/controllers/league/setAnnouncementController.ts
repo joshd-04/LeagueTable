@@ -7,13 +7,12 @@ import {
   IUserSchema,
 } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { findLeaguePosition, isTeam, sortTeams } from '../../util/helpers';
 import User from '../../models/userModel';
 
 export async function setAnnouncementController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.id;
@@ -27,7 +26,7 @@ export async function setAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -35,7 +34,7 @@ export async function setAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -43,7 +42,7 @@ export async function setAnnouncementController(
       return next(
         new ErrorHandling(403, {
           message: `You cannot edit this league`,
-        })
+        }),
       );
     }
 
@@ -51,7 +50,7 @@ export async function setAnnouncementController(
       return next(
         new ErrorHandling(403, {
           message: `Upgrade to Pro level to unlock announcements.`,
-        })
+        }),
       );
     }
 
@@ -63,7 +62,7 @@ export async function setAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League owner account not found.`,
-        })
+        }),
       );
     }
 
@@ -71,7 +70,7 @@ export async function setAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League owner account not found.`,
-        })
+        }),
       );
     }
     const { accountType } = leagueOwner;
@@ -98,7 +97,11 @@ export async function setAnnouncementController(
       });
     } catch {
       return next(
-        new ErrorHandling(500, undefined, 'Error whilst updating announcement.')
+        new ErrorHandling(
+          500,
+          undefined,
+          'Error whilst updating announcement.',
+        ),
       );
     }
 
@@ -117,8 +120,8 @@ export async function setAnnouncementController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error setting the announcement ${e.message}`
-      )
+        `There was an error setting the announcement ${e.message}`,
+      ),
     );
   }
 }

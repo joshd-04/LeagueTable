@@ -11,14 +11,16 @@ import {
   meetsMinimumTierLevel,
   shouldGrantAccessToFeature,
 } from '../../util/helpers';
+import { Types } from 'mongoose';
 
 interface statsInterface {
   topScorers?: {
     division: number;
     data: {
       position?: number;
+      team?: string;
       player: string;
-      team: string;
+      teamId: Types.ObjectId;
       value: number;
     }[];
   }[];
@@ -26,8 +28,9 @@ interface statsInterface {
     division: number;
     data: {
       position?: number;
+      team?: string;
       player: string;
-      team: string;
+      teamId: Types.ObjectId;
       value: number;
     }[];
   }[];
@@ -35,8 +38,9 @@ interface statsInterface {
     division: number;
     data: {
       position?: number;
+      team?: string;
       player: string;
-      team: string;
+      teamId: Types.ObjectId;
       value: number;
     }[];
   }[];
@@ -44,7 +48,8 @@ interface statsInterface {
     division: number;
     data: {
       position?: number;
-      team: string;
+      team?: string;
+      teamId: Types.ObjectId;
       value: number;
     }[];
   }[];
@@ -53,7 +58,7 @@ interface statsInterface {
 export async function calculateSeasonStatsController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     /* 
@@ -69,7 +74,6 @@ export async function calculateSeasonStatsController(
       league = await League.findById(leagueId).populate([
         {
           path: 'results',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
         { path: 'leagueOwner', select: 'username accountType' },
       ]);
@@ -77,7 +81,7 @@ export async function calculateSeasonStatsController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -85,7 +89,7 @@ export async function calculateSeasonStatsController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -113,7 +117,7 @@ export async function calculateSeasonStatsController(
     const allowSeasonRewind = shouldGrantAccessToFeature(
       'pro',
       league.leagueLevel,
-      accountType
+      accountType,
     );
 
     if (
@@ -203,20 +207,20 @@ export async function calculateSeasonStatsController(
           return next(
             new ErrorHandling(403, {
               message: `Upgrade to PRO to view data for season ${requestedSeason}.`,
-            })
+            }),
           );
         }
       } else if (!isValidNum) {
         return next(
           new ErrorHandling(400, {
             message: `Invalid season query given`,
-          })
+          }),
         );
       } else if (!inValidRange) {
         return next(
           new ErrorHandling(400, {
             message: `Season query outside valid range`,
-          })
+          }),
         );
       } else if (+requestedSeason === league.currentSeason) {
         seasonFilter = league.currentSeason;
@@ -232,37 +236,43 @@ export async function calculateSeasonStatsController(
       const division = div.division;
 
       const resultsForThisDivision = results.filter(
-        (res) => res.division === division
+        (res) => res.division === division,
       );
       // calculate cleansheets
       resultsForThisDivision.forEach((result) => {
         // Cleansheets
         if (!result.basicOutcome.includes('home')) {
           // away team kept a cleansheet
-          const team = result.awayTeamDetails.name;
-          const isInList = stats.cleansheets[division - 1].data.some(
-            (x) => x.team === team
+          const teamId = result.awayTeamId;
+          const isInList = stats.cleansheets[division - 1].data.some((x) =>
+            x.teamId.equals(teamId),
           );
           if (!isInList) {
-            stats.cleansheets[division - 1].data.push({ team: team, value: 1 });
+            stats.cleansheets[division - 1].data.push({
+              teamId: teamId,
+              value: 1,
+            });
           } else {
             const index = stats.cleansheets[division - 1].data.findIndex(
-              (div) => div.team === team
+              (div) => div.teamId.equals(teamId),
             );
             stats.cleansheets[division - 1].data[index].value += 1;
           }
         }
         if (!result.basicOutcome.includes('away')) {
           // home team kept a cleansheet
-          const team = result.homeTeamDetails.name;
-          const isInList = stats.cleansheets[division - 1].data.some(
-            (x) => x.team === team
+          const teamId = result.homeTeamId;
+          const isInList = stats.cleansheets[division - 1].data.some((x) =>
+            x.teamId.equals(teamId),
           );
           if (!isInList) {
-            stats.cleansheets[division - 1].data.push({ team: team, value: 1 });
+            stats.cleansheets[division - 1].data.push({
+              teamId: teamId,
+              value: 1,
+            });
           } else {
             const index = stats.cleansheets[division - 1].data.findIndex(
-              (div) => div.team === team
+              (div) => div.teamId.equals(teamId),
             );
             stats.cleansheets[division - 1].data[index].value += 1;
           }
@@ -275,72 +285,75 @@ export async function calculateSeasonStatsController(
           return;
         result.detailedOutcome?.forEach((goal) => {
           if (stats.topScorers !== undefined && !goal.isOwnGoal) {
-            let team: string;
+            let teamId: Types.ObjectId;
             if (goal.team === 'home') {
-              team = result.homeTeamDetails.name;
+              teamId = result.homeTeamId;
             } else {
-              team = result.awayTeamDetails.name;
+              teamId = result.awayTeamId;
             }
             const isInList = stats.topScorers[division - 1].data.some(
-              (x) => x.player === goal.scorer && x.team === team
+              (x) => x.player === goal.scorer && x.teamId.equals(teamId),
             );
             if (!isInList) {
               stats.topScorers[division - 1].data.push({
-                team: team,
+                teamId: teamId,
                 player: goal.scorer,
                 value: 1,
               });
             } else {
               const index = stats.topScorers[division - 1].data.findIndex(
-                (div) => div.team === team && div.player === goal.scorer
+                (div) =>
+                  div.teamId.equals(teamId) && div.player === goal.scorer,
               );
               stats.topScorers[division - 1].data[index].value += 1;
             }
           }
           if (stats.mostAssists !== undefined && goal.assist !== undefined) {
-            let team: string;
+            let teamId: Types.ObjectId;
             if (goal.team === 'home') {
-              team = result.homeTeamDetails.name;
+              teamId = result.homeTeamId;
             } else {
-              team = result.awayTeamDetails.name;
+              teamId = result.awayTeamId;
             }
             const isInList = stats.mostAssists[division - 1].data.some(
-              (x) => x.player === goal.assist && x.team === team
+              (x) => x.player === goal.assist && x.teamId.equals(teamId),
             );
             if (!isInList) {
               stats.mostAssists[division - 1].data.push({
-                team: team,
+                teamId: teamId,
                 player: goal.assist,
                 value: 1,
               });
             } else {
               const index = stats.mostAssists[division - 1].data.findIndex(
-                (div) => div.team === team && div.player === goal.assist
+                (div) =>
+                  div.teamId.equals(teamId) && div.player === goal.assist,
               );
               stats.mostAssists[division - 1].data[index].value += 1;
             }
           }
           if (stats.ownGoals !== undefined && goal.isOwnGoal) {
-            let team: string;
+            let teamId: Types.ObjectId;
 
             // If an own goal is scored in favour of the home team, the own goal was scored by the away team
             if (goal.team === 'home') {
-              team = result.awayTeamDetails.name;
+              teamId = result.awayTeamId;
             } else {
-              team = result.homeTeamDetails.name;
+              teamId = result.homeTeamId;
             }
             const isInList = stats.ownGoals[division - 1].data.some(
-              (x) => x.player === goal.scorer && x.team === team
+              (x) => x.player === goal.scorer && x.teamId.equals(teamId),
             );
             if (!isInList) {
               stats.ownGoals[division - 1].data.push({
-                team: team,
+                teamId: teamId,
                 player: goal.scorer,
                 value: 1,
               });
             } else {
               const index = stats.ownGoals[division - 1].data.findIndex(
-                (div) => div.team === team && div.player === goal.scorer
+                (div) =>
+                  div.teamId.equals(teamId) && div.player === goal.scorer,
               );
               stats.ownGoals[division - 1].data[index].value += 1;
             }
@@ -393,8 +406,8 @@ export async function calculateSeasonStatsController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error calculating the season statistics. ${e.message}`
-      )
+        `There was an error calculating the season statistics. ${e.message}`,
+      ),
     );
   }
 }

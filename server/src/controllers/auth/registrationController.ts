@@ -13,7 +13,7 @@ interface RegisterReqBody {
 export async function registrationController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   /*  Args: email, username, password
     Returns: sanitized user object (username, email, accountType and leaguesCreated)
@@ -41,7 +41,7 @@ export async function registrationController(
       next(
         new ErrorHandling(400, {
           errors: { ...errors },
-        })
+        }),
       );
       return;
     }
@@ -73,7 +73,7 @@ export async function registrationController(
       next(
         new ErrorHandling(400, {
           errors: { ...errors },
-        })
+        }),
       );
       return;
     }
@@ -110,7 +110,7 @@ export async function registrationController(
       next(
         new ErrorHandling(400, {
           errors: { ...errors },
-        })
+        }),
       );
       return;
     }
@@ -129,7 +129,7 @@ export async function registrationController(
     // Create session
     const rememberMe = true;
     req.session.user = {
-      _id: user._id as string,
+      _id: user._id.toString(),
       username: user.username,
       email: user.email,
     };

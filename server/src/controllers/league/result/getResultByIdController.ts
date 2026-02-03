@@ -6,11 +6,12 @@ import {
   IResultSchema,
 } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
+import { calculateTeamDetails } from '../../../util/helpers';
 
 export async function getResultByIdController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.leagueId;
@@ -20,12 +21,14 @@ export async function getResultByIdController(
 
     // Check if league exists
     try {
-      league = await League.findById(leagueId).populate({ path: 'results' });
+      league = await League.findById(leagueId)
+        .populate({ path: 'tables.teams' })
+        .populate({ path: 'results' });
     } catch {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -33,7 +36,7 @@ export async function getResultByIdController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
     const allResults = league.results as unknown as IResultSchema[];
@@ -43,19 +46,38 @@ export async function getResultByIdController(
       return next(
         new ErrorHandling(404, {
           message: `Result with ID '${resultId}' not found`,
-        })
+        }),
       );
     }
+    let homeDetails = await calculateTeamDetails(
+      league,
+      result.homeTeamId,
+      result.season,
+      result.matchweek,
+    );
+    let awayDetails = await calculateTeamDetails(
+      league,
+      result.awayTeamId,
+      result.season,
+      result.matchweek,
+    );
 
-    res.status(200).json({ status: 'success', data: { result: result } });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        result: result,
+        homeDetails: homeDetails,
+        awayDetails: awayDetails,
+      },
+    });
   } catch (e: any) {
     console.error(e);
     return next(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the result. ${e.message}`
-      )
+        `There was an error fetching the result. ${e.message}`,
+      ),
     );
   }
 }

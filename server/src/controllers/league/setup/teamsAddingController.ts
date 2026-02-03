@@ -9,7 +9,7 @@ import Team from '../../../models/teamModel';
 export async function teamsAddingController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   /*  Args: teams: string[]
   Returns: 
@@ -26,7 +26,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(404, {
         message: `League with ID '${leagueId}' not found`,
-      })
+      }),
     );
   }
 
@@ -34,7 +34,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(404, {
         message: `League with ID '${leagueId}' not found`,
-      })
+      }),
     );
   }
 
@@ -42,7 +42,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(403, {
         message: `You are not permitted to make edits to this league`,
-      })
+      }),
     );
   }
   // Make sure the league has tables
@@ -51,7 +51,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(403, {
         message: 'You must add tables to this league first.',
-      })
+      }),
     );
   }
 
@@ -60,7 +60,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(403, {
         message: 'You have already added teams to this league',
-      })
+      }),
     );
   }
 
@@ -70,7 +70,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(400, {
         message: 'Team names must be unique',
-      })
+      }),
     );
   }
   // Make sure the data is in a processable format
@@ -82,7 +82,7 @@ export async function teamsAddingController(
     return next(
       new ErrorHandling(400, {
         message: `Expected ${expectedTeamsCount} teams to be given in a single array. Got ${teamsList.length} teams.`,
-      })
+      }),
     );
   }
 
@@ -95,7 +95,7 @@ export async function teamsAddingController(
     league.tables.map(async (table, i) => {
       const teamsForThisDivision = teamsList.slice(
         pointer,
-        pointer + table.numberOfTeams
+        pointer + table.numberOfTeams,
       );
       pointer += table.numberOfTeams;
 
@@ -105,13 +105,7 @@ export async function teamsAddingController(
             name: teamName,
             leagueId: leagueId,
             division: i + 1,
-            matchesPlayed: 0,
-            wins: 0,
-            draws: 0,
-            losses: 0,
-            goalsFor: 0,
-            goalsAgainst: 0,
-            form: '-----',
+            season: 1,
           });
 
           if (!team._id) {
@@ -119,12 +113,12 @@ export async function teamsAddingController(
           }
 
           return new Types.ObjectId(team._id.toString());
-        })
+        }),
       );
 
       // @ts-ignore
       newTables[i].teams.push(...createdTeams);
-    })
+    }),
   );
 
   if (errorHasOccured) {
@@ -132,8 +126,8 @@ export async function teamsAddingController(
       new ErrorHandling(
         500,
         undefined,
-        'Something went wrong adding your teams to the league'
-      )
+        'Something went wrong adding your teams to the league',
+      ),
     );
   }
 
@@ -149,8 +143,8 @@ export async function teamsAddingController(
       new ErrorHandling(
         500,
         undefined,
-        'Something went wrong adding your teams to the league'
-      )
+        'Something went wrong adding your teams to the league',
+      ),
     );
   }
 

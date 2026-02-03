@@ -1,19 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import League from '../../models/leagueModel';
-import {
-  IFixtureSchema,
-  ILeagueSchema,
-  ITeamsSchema,
-  IUserSchema,
-} from '../../util/definitions';
+import { ILeagueSchema, IUserSchema } from '../../util/definitions';
 import { ErrorHandling } from '../../util/errorChecking';
-import { findLeaguePosition, isTeam, sortTeams } from '../../util/helpers';
 import User from '../../models/userModel';
 
 export async function getAnnouncementController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.id;
@@ -27,7 +21,7 @@ export async function getAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -35,7 +29,7 @@ export async function getAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -43,7 +37,7 @@ export async function getAnnouncementController(
       return next(
         new ErrorHandling(403, {
           message: `Upgrade to standard level to unlock announcements.`,
-        })
+        }),
       );
     }
 
@@ -55,7 +49,7 @@ export async function getAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League owner account not found.`,
-        })
+        }),
       );
     }
 
@@ -63,7 +57,7 @@ export async function getAnnouncementController(
       return next(
         new ErrorHandling(404, {
           message: `League owner account not found.`,
-        })
+        }),
       );
     }
     const { accountType } = leagueOwner;
@@ -99,8 +93,8 @@ export async function getAnnouncementController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the announcement ${e.message}`
-      )
+        `There was an error fetching the announcement ${e.message}`,
+      ),
     );
   }
 }

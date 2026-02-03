@@ -18,7 +18,7 @@ interface statsInterface {
 export async function calculateSeasonSummaryController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     /* 
@@ -33,13 +33,12 @@ export async function calculateSeasonSummaryController(
     try {
       league = await League.findById(leagueId).populate({
         path: 'results',
-        populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
       });
     } catch {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -47,7 +46,7 @@ export async function calculateSeasonSummaryController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -62,7 +61,7 @@ export async function calculateSeasonSummaryController(
     if (league.leagueLevel === 'free' || req.query.season === undefined) {
       // Get this seasons results
       results = allResults.filter(
-        (result) => result.season === league.currentSeason
+        (result) => result.season === league.currentSeason,
       );
     } else {
       if (
@@ -70,18 +69,18 @@ export async function calculateSeasonSummaryController(
         Number.isInteger(Number(req.query.season))
       ) {
         results = allResults.filter(
-          (result) => result.season === Number(req.query.season)
+          (result) => result.season === Number(req.query.season),
         );
       } else {
         results = allResults.filter(
-          (result) => result.season === league.currentSeason
+          (result) => result.season === league.currentSeason,
         );
       }
     }
     // Get number of goals scored
     stats.goalsScored = results.reduce(
       (acc, cur) => acc + cur.basicOutcome.length,
-      0
+      0,
     );
 
     stats.cleansheets = results.reduce((acc, cur) => {
@@ -103,7 +102,7 @@ export async function calculateSeasonSummaryController(
         const soloGoals =
           cur.detailedOutcome?.reduce(
             (a, c) => (c.assist === undefined ? a + 1 : a),
-            0
+            0,
           ) || 0;
         return acc + soloGoals;
       }, 0);
@@ -138,8 +137,8 @@ export async function calculateSeasonSummaryController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error calculating the season summary statistics. ${e.message}`
-      )
+        `There was an error calculating the season summary statistics. ${e.message}`,
+      ),
     );
   }
 }

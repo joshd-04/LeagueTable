@@ -4,15 +4,13 @@ import {
   IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
-  ITeamsSchema,
 } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
-import { findLeaguePosition, isTeam, sortTeams } from '../../../util/helpers';
 
 export async function getFixtureResultStatusByIdController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.leagueId;
@@ -26,17 +24,15 @@ export async function getFixtureResultStatusByIdController(
         .populate({ path: 'tables.teams' })
         .populate({
           path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         })
         .populate({
           path: 'results',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         });
     } catch {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -44,7 +40,7 @@ export async function getFixtureResultStatusByIdController(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
     const allFixtures = league.fixtures as unknown as IFixtureSchema[];
@@ -64,7 +60,7 @@ export async function getFixtureResultStatusByIdController(
       return next(
         new ErrorHandling(404, {
           message: `Fixture or result with ID '${matchId}' not found`,
-        })
+        }),
       );
     }
 
@@ -81,8 +77,8 @@ export async function getFixtureResultStatusByIdController(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the fixture. ${e.message}`
-      )
+        `There was an error fetching the fixture. ${e.message}`,
+      ),
     );
   }
 }

@@ -13,7 +13,7 @@ interface LoginReqBody {
 export async function loginController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const { username, email, password, rememberMe }: LoginReqBody = req.body;
@@ -36,7 +36,7 @@ export async function loginController(
 
     // Create session
     req.session.user = {
-      _id: user._id as string,
+      _id: user._id.toString(),
       username: user.username,
       email: user.email,
     };

@@ -6,13 +6,13 @@ import { ErrorHandling } from '../../util/errorChecking';
 export async function leagueFetcherController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.id;
     if (leagueId.length === 0) {
       return next(
-        new ErrorHandling(400, { message: `League ID must be provided` })
+        new ErrorHandling(400, { message: `League ID must be provided` }),
       );
     }
     let league;
@@ -24,14 +24,14 @@ export async function leagueFetcherController(
         return next(
           new ErrorHandling(404, {
             message: `League with ID '${leagueId}' not found`,
-          })
+          }),
         );
       }
       if (!league) {
         return next(
           new ErrorHandling(404, {
             message: `League with ID '${leagueId}' not found`,
-          })
+          }),
         );
       }
       if (!league.setup.tablesAdded) {
@@ -40,7 +40,7 @@ export async function leagueFetcherController(
             league: league.toObject(),
             message: 'You must add tables to this league first.',
             property: 'tables',
-          })
+          }),
         );
       }
       if (!league.setup.teamsAdded) {
@@ -49,7 +49,7 @@ export async function leagueFetcherController(
             league: league.toObject(),
             message: 'You must add teams to this league first.',
             property: 'teams',
-          })
+          }),
         );
       }
       league = await League.findById(leagueId).populate([
@@ -57,21 +57,20 @@ export async function leagueFetcherController(
         { path: 'leagueOwner', select: 'username accountType' },
         {
           path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
       ]);
     } catch (error) {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
     if (!league) {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -93,7 +92,7 @@ export async function leagueFetcherController(
         .reduce((acc, cur) => acc + cur.numberOfTeams, 0),
       leagueType: league.leagueType,
       tables: league.tables.filter(
-        (table) => table.season === league.currentSeason
+        (table) => table.season === league.currentSeason,
       ),
 
       fixturesCount: league.fixtures.length,

@@ -6,12 +6,15 @@ import {
   ITeamsSchema,
 } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
-import { findLeaguePosition, isTeam, sortTeams } from '../../../util/helpers';
+import {
+  calculateTeamDetails,
+  findLeaguePosition,
+} from '../../../util/helpers';
 
 export async function getFixtureByIdController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const leagueId = req.params.leagueId;
@@ -25,85 +28,93 @@ export async function getFixtureByIdController(
         .populate({ path: 'tables.teams' })
         .populate({
           path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         });
     } catch {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
+    console.log('HIT 0');
 
     if (!league) {
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
     const allFixtures = league.fixtures as unknown as IFixtureSchema[];
-    const fixture = allFixtures.find((f) => f.id === fixtureId);
+    const fixture = allFixtures.find((f) => f._id.equals(fixtureId));
 
     if (fixture === undefined) {
       return next(
         new ErrorHandling(404, {
           message: `Fixture with ID '${fixtureId}' not found`,
-        })
+        }),
       );
     }
 
-    let homeDetails = isTeam(fixture.homeTeamDetails)
-      ? fixture.homeTeamDetails
-      : null;
-    let awayDetails = isTeam(fixture.awayTeamDetails)
-      ? fixture.awayTeamDetails
-      : null;
+    // let homeDetails = isTeam(fixture.homeTeamDetails)
+    //   ? fixture.homeTeamDetails
+    //   : null;
+    // let awayDetails = isTeam(fixture.awayTeamDetails)
+    //   ? fixture.awayTeamDetails
+    //   : null;
+
+    console.log('HIT 1');
+
+    let homeDetails = await calculateTeamDetails(
+      league,
+      fixture.homeTeamId,
+      fixture.season,
+      fixture.matchweek,
+    );
+    let awayDetails = await calculateTeamDetails(
+      league,
+      fixture.awayTeamId,
+      fixture.season,
+      fixture.matchweek,
+    );
+
+    console.log('HIT 2');
 
     if (homeDetails === null || awayDetails === null) {
       return next(
         new ErrorHandling(
           500,
           undefined,
-          'There was a serverside error checking if homedetails are ITeamsSchema in getfixturebyidcontroller'
-        )
+          'There was a serverside error checking if homedetails are ITeamsSchema in getfixturebyidcontroller',
+        ),
       );
     }
 
-    const homeTeamPosition = await findLeaguePosition(
-      league,
-      homeDetails.division,
-      fixture.season,
-      homeDetails.name
-    );
-    const awayTeamPosition = await findLeaguePosition(
-      league,
-      awayDetails.division,
-      fixture.season,
-      awayDetails.name
-    );
+    // homeDetails = {
+    //   ...homeDetails,
+    //   position: homeTeamPosition,
+    // } as ITeamsSchema;
+    // awayDetails = {
+    //   ...awayDetails,
+    //   position: awayTeamPosition,
+    // } as ITeamsSchema;
 
-    homeDetails = {
-      ...homeDetails,
-      position: homeTeamPosition,
-    } as ITeamsSchema;
-    awayDetails = {
-      ...awayDetails,
-      position: awayTeamPosition,
-    } as ITeamsSchema;
-
-    fixture.homeTeamDetails = homeDetails;
-    fixture.awayTeamDetails = awayDetails;
-
-    res.status(200).json({ status: 'success', data: { fixture: fixture } });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        fixture: fixture,
+        homeDetails: homeDetails,
+        awayDetails: awayDetails,
+      },
+    });
   } catch (e: any) {
     console.error(e);
     return next(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error fetching the fixture. ${e.message}`
-      )
+        `There was an error fetching the fixture. ${e.message}`,
+      ),
     );
   }
 }

@@ -12,7 +12,7 @@ import { meetsMinimumTierLevel } from '../../../util/helpers';
 export async function startNextMatchweek(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const userId = req.session.user?._id;
@@ -29,7 +29,6 @@ export async function startNextMatchweek(
       league = await League.findById(leagueId).populate([
         {
           path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
         { path: 'leagueOwner' },
       ]);
@@ -37,7 +36,7 @@ export async function startNextMatchweek(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -45,7 +44,7 @@ export async function startNextMatchweek(
       return next(
         new ErrorHandling(404, {
           message: `League with ID '${leagueId}' not found`,
-        })
+        }),
       );
     }
 
@@ -53,7 +52,7 @@ export async function startNextMatchweek(
       return next(
         new ErrorHandling(403, {
           message: `You are not permitted to make edits to this league`,
-        })
+        }),
       );
     }
 
@@ -74,7 +73,7 @@ export async function startNextMatchweek(
     }
     const isValid = meetsMinimumTierLevel(
       requiredLevel,
-      leagueOwner.accountType
+      leagueOwner.accountType,
     );
     if (!isValid) {
       switch (requiredLevel) {
@@ -82,25 +81,25 @@ export async function startNextMatchweek(
           return next(
             new ErrorHandling(403, {
               message: `You can manage this league with a free account. If you are seeing this error, something went wrong.`,
-            })
+            }),
           );
         case 'pro':
           return next(
             new ErrorHandling(403, {
               message: `Pro required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         case 'pro+':
           return next(
             new ErrorHandling(403, {
               message: `Pro+ required to manage this league. Renew your subscription to continue.`,
-            })
+            }),
           );
         default:
           return next(
             new ErrorHandling(403, {
               message: `We could not verify your account subscription tier.`,
-            })
+            }),
           );
       }
     }
@@ -109,7 +108,7 @@ export async function startNextMatchweek(
       return next(
         new ErrorHandling(403, {
           message: `The season is over. Start a new one to continue.`,
-        })
+        }),
       );
     }
 
@@ -117,7 +116,7 @@ export async function startNextMatchweek(
       return next(
         new ErrorHandling(403, {
           message: `The season has not started, start the season before continuing.`,
-        })
+        }),
       );
     }
 
@@ -126,7 +125,7 @@ export async function startNextMatchweek(
     const allFixtures = league.fixtures as unknown as IFixtureSchema[];
 
     const fixturesNowLeft = allFixtures.filter(
-      (fixture) => fixture.matchweek <= league.currentMatchweek
+      (fixture) => fixture.matchweek <= league.currentMatchweek,
     );
 
     await League.findByIdAndUpdate(leagueId, {
@@ -142,8 +141,8 @@ export async function startNextMatchweek(
       new ErrorHandling(
         500,
         undefined,
-        `There was an error starting the next matchweek. ${e.message}`
-      )
+        `There was an error starting the next matchweek. ${e.message}`,
+      ),
     );
   }
 }

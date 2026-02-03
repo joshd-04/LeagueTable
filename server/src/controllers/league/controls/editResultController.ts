@@ -2,21 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 import League from '../../../models/leagueModel';
 import {
   AccountTypeInterface,
-  IFixtureSchema,
   ILeagueSchema,
   IResultSchema,
-  ITeamsSchema,
   IUserSchema,
 } from '../../../util/definitions';
 import { ErrorHandling } from '../../../util/errorChecking';
-import Team from '../../../models/teamModel';
-import {
-  calculateTeamPoints,
-  findLeaguePosition,
-  meetsMinimumTierLevel,
-  sortTeams,
-} from '../../../util/helpers';
-import Fixture from '../../../models/fixtureModel';
+import { meetsMinimumTierLevel } from '../../../util/helpers';
 import Result from '../../../models/resultModel';
 
 export async function editResultController(
@@ -46,10 +37,7 @@ export async function editResultController(
     // Check if result exists
     let result: IResultSchema | null;
     try {
-      result = await Result.findById(resultId).populate([
-        { path: 'homeTeamDetails' },
-        { path: 'awayTeamDetails' },
-      ]);
+      result = await Result.findById(resultId);
     } catch {
       return next(
         new ErrorHandling(404, {
@@ -64,10 +52,8 @@ export async function editResultController(
         }),
       );
     }
-    const homeDetails = result.homeTeamDetails as unknown as ITeamsSchema;
-    const awayDetails = result.awayTeamDetails as unknown as ITeamsSchema;
 
-    const leagueId = homeDetails.leagueId;
+    const leagueId = result.leagueId;
     let league: ILeagueSchema | null;
 
     // Check if league exists
@@ -76,7 +62,6 @@ export async function editResultController(
         { path: 'tables.teams' },
         {
           path: 'fixtures',
-          populate: [{ path: 'homeTeamDetails' }, { path: 'awayTeamDetails' }],
         },
         { path: 'leagueOwner' },
       ]);
@@ -235,46 +220,15 @@ export async function editResultController(
       );
     }
 
-    // Start creating the result
-    const homeTeamPosition = await findLeaguePosition(
-      league,
-      homeDetails.division,
-      result.season,
-      homeDetails.name,
-    );
-    const awayTeamPosition = await findLeaguePosition(
-      league,
-      awayDetails.division,
-      result.season,
-      awayDetails.name,
-    );
-
     // TODO: PICK UP FROM HERE TO FINISH EDIT RESULT FUNCTIONALITY
+    // side quest: dont store details like position, form, points etc in storage, instead calculate in real time. pickup from #002
     const updatedResult = await Result.findByIdAndUpdate(resultId, {
-      _id: resultId,
       date: Date.now(),
       season: result.season,
       division: result.division,
       matchweek: result.matchweek,
-      homeTeamDetails: {
-        teamId: homeDetails._id,
-        name: homeDetails.name,
-
-        division: homeDetails.division,
-        leaguePosition: homeTeamPosition,
-        form: homeDetails.form,
-        matchesPlayed: homeDetails.matchesPlayed,
-        points: calculateTeamPoints(homeDetails),
-      },
-      awayTeamDetails: {
-        teamId: awayDetails._id,
-        name: awayDetails.name,
-        division: awayDetails.division,
-        leaguePosition: awayTeamPosition,
-        form: awayDetails.form,
-        matchesPlayed: awayDetails.matchesPlayed,
-        points: calculateTeamPoints(awayDetails),
-      },
+      homeTeamId: result._id,
+      awayTeamId: result._id,
       neutralGround: result.neutralGround,
       kickoff: result.kickoff,
       basicOutcome: basicOutcome,
@@ -282,143 +236,27 @@ export async function editResultController(
     });
     // Put result objectid in results array of the league
 
-    await League.findByIdAndUpdate(leagueId, {
-      $push: { results: result._id },
-    });
+    // await League.findByIdAndUpdate(leagueId, {
+    //   $push: { results: result._id },
+    // });
 
     // Delete fixture from fixture list
-    await Fixture.findByIdAndDelete(resultId);
-    await League.findByIdAndUpdate(leagueId, {
-      $pull: { fixtures: resultId },
-    });
+    // await Fixture.findByIdAndDelete(resultId);
+    // await League.findByIdAndUpdate(leagueId, {
+    //   $pull: { fixtures: resultId },
+    // });
 
     // If that was the last fixture, and this is the last season, set the season finished flag to true
-    if (
-      league.currentSeason === league.maxSeasonLimit &&
-      league.currentMatchweek === league.finalMatchweek &&
-      league.fixtures.length === 0
-    ) {
-      // Update setup flag
-      await League.findByIdAndUpdate(leagueId, {
-        $set: { 'setup.leagueFinished': true },
-      });
-    }
-
-    // Change the form of the away and the home team
-    // -----, W----, WD---, WDL--, WDLW-, WDLWD, DLWDL
-
-    let newHomeForm: string;
-    let newAwayForm: string;
-    const homeGoals = basicOutcome.reduce(
-      (prev, val) => (val === 'home' ? prev + 1 : prev),
-      0,
-    );
-    const awayGoals = basicOutcome.reduce(
-      (prev, val) => (val === 'away' ? prev + 1 : prev),
-      0,
-    );
-
-    const matchOutcome: 'home' | 'draw' | 'away' =
-      homeGoals === awayGoals
-        ? 'draw'
-        : homeGoals > awayGoals
-          ? 'home'
-          : 'away';
-
-    let newHomeFormArr = homeDetails.form.split('');
-    const homeLetter =
-      matchOutcome === 'home' ? 'W' : matchOutcome === 'away' ? 'L' : 'D';
-
-    if (newHomeFormArr.includes('-')) {
-      const index = newHomeFormArr.indexOf('-');
-      newHomeFormArr.forEach((_x, i) => {
-        if (i === index) newHomeFormArr[index] = homeLetter;
-      });
-      newHomeForm = newHomeFormArr.join('');
-    } else {
-      newHomeFormArr.push(homeLetter);
-      newHomeForm = newHomeFormArr.slice(1).join('');
-    }
-
-    let newAwayFormArr = awayDetails.form.split('');
-    const awayLetter =
-      matchOutcome === 'home' ? 'L' : matchOutcome === 'away' ? 'W' : 'D';
-
-    if (newAwayFormArr.includes('-')) {
-      const index = newAwayFormArr.indexOf('-');
-      newAwayFormArr.forEach((_x, i) => {
-        if (i === index) newAwayFormArr[index] = awayLetter;
-      });
-      newAwayForm = newAwayFormArr.join('');
-    } else {
-      newAwayFormArr.push(awayLetter);
-      newAwayForm = newAwayFormArr.splice(1).join('');
-    }
-
-    let newHomeMatchesPlayed = homeDetails.matchesPlayed;
-    let newHomeWins: number = homeDetails.wins;
-    let newHomeDraws: number = homeDetails.draws;
-    let newHomeLosses: number = homeDetails.losses;
-    let newHomeGoalsFor: number = homeDetails.goalsFor;
-    let newHomeGoalsAgainst: number = homeDetails.goalsAgainst;
-
-    let newAwayMatchesPlayed = awayDetails.matchesPlayed;
-    let newAwayWins: number = awayDetails.wins;
-    let newAwayDraws: number = awayDetails.draws;
-    let newAwayLosses: number = awayDetails.losses;
-    let newAwayGoalsFor: number = awayDetails.goalsFor;
-    let newAwayGoalsAgainst: number = awayDetails.goalsAgainst;
-
-    switch (matchOutcome) {
-      case 'home':
-        newHomeWins += 1;
-        newAwayLosses += 1;
-        break;
-
-      case 'draw':
-        newHomeDraws += 1;
-        newAwayDraws += 1;
-        break;
-
-      case 'away':
-        newAwayWins += 1;
-        newHomeLosses += 1;
-        break;
-    }
-
-    newHomeGoalsFor += homeGoals;
-    newAwayGoalsAgainst += homeGoals;
-
-    newHomeGoalsAgainst += awayGoals;
-    newAwayGoalsFor += awayGoals;
-
-    newHomeMatchesPlayed += 1;
-    newAwayMatchesPlayed += 1;
-
-    await Promise.all([
-      Team.findByIdAndUpdate(homeDetails._id, {
-        $set: {
-          matchesPlayed: newHomeMatchesPlayed,
-          wins: newHomeWins,
-          draws: newHomeDraws,
-          losses: newHomeLosses,
-          goalsFor: newHomeGoalsFor,
-          goalsAgainst: newHomeGoalsAgainst,
-          form: newHomeForm,
-        },
-      }),
-      Team.findByIdAndUpdate(awayDetails._id, {
-        $set: {
-          matchesPlayed: newAwayMatchesPlayed,
-          wins: newAwayWins,
-          draws: newAwayDraws,
-          losses: newAwayLosses,
-          goalsFor: newAwayGoalsFor,
-          goalsAgainst: newAwayGoalsAgainst,
-          form: newAwayForm,
-        },
-      }),
-    ]);
+    // if (
+    //   league.currentSeason === league.maxSeasonLimit &&
+    //   league.currentMatchweek === league.finalMatchweek &&
+    //   league.fixtures.length === 0
+    // ) {
+    //   // Update setup flag
+    //   await League.findByIdAndUpdate(leagueId, {
+    //     $set: { 'setup.leagueFinished': true },
+    //   });
+    // }
 
     res.status(200).json({ status: 'success', data: { result: result } });
   } catch (e: any) {
