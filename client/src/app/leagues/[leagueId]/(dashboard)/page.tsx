@@ -90,7 +90,7 @@ export async function generateMetadata({
 // ──────────────────────────────────────────────────
 // Main page – now 100% safe
 // ──────────────────────────────────────────────────
-export default async function Page({
+export default async function DashboardPage({
   params,
 }: {
   params: { leagueId: string };

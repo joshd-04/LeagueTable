@@ -93,7 +93,7 @@ export default function NextFixtures({
               )}
           </div>
           {isLoading || nextFixtures === undefined || fixtures === undefined ? (
-            <div className="animate-pulse">
+            <div className="animate-pulse flex flex-col gap-1">
               <FixtureRowSkeleton />
               <FixtureRowSkeleton />
               <FixtureRowSkeleton />

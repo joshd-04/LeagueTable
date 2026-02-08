@@ -1,5 +1,6 @@
 import useAccount from '@/hooks/useAccount';
 import { League } from '@/util/definitions';
+import { Button } from '@heroui/react';
 import { IoPersonSharp } from 'react-icons/io5';
 
 export default function LeagueDetailsRibbon({ league }: { league: League }) {
@@ -27,6 +28,7 @@ export default function LeagueDetailsRibbon({ league }: { league: League }) {
       <p>
         Season {league.currentSeason} Matchweek {league.currentMatchweek}
       </p>
+      <Button onPress={() => {}}>Settings</Button>
     </div>
   );
 }

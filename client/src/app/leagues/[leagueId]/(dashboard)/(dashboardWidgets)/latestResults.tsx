@@ -60,7 +60,7 @@ export default function LatestResults({
           <p className="align-middle inline text-base">Latest Results</p>
         </span>
         {isLoading || mostRecentResults === undefined ? (
-          <div className="animate-pulse">
+          <div className="animate-pulse flex flex-col gap-1">
             <ResultRowSkeleton />
             <ResultRowSkeleton />
             <ResultRowSkeleton />

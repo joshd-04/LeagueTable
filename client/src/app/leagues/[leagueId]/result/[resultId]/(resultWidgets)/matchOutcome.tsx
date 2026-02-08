@@ -4,6 +4,7 @@ import { League } from '@/util/definitions';
 import { SingleResultDTO } from '@/util/dto/results';
 import { doesUserOwnThisLeague } from '@/util/helpers';
 import { addToast, Button, Card, CardBody, useDisclosure } from '@heroui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { PiSoccerBallFill } from 'react-icons/pi';
@@ -23,6 +24,7 @@ export default function MatchOutcome({
   const { isLoggedIn, user } = useAccount();
   const userOwnsThisLeague = doesUserOwnThisLeague(league, user, isLoggedIn);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   function calculateScore(index: number) {
     let homeGoals = 0;
@@ -35,9 +37,21 @@ export default function MatchOutcome({
     return `${homeGoals}-${awayGoals}`;
   }
 
+  function invalidateDashboardQueries() {
+    queryClient.invalidateQueries({ queryKey: ['league', league._id] });
+    queryClient.invalidateQueries({ queryKey: ['fixtures'] });
+    queryClient.invalidateQueries({ queryKey: ['results'] });
+    queryClient.invalidateQueries({ queryKey: ['stats'] });
+    queryClient.invalidateQueries({
+      queryKey: ['seasonSummaryStats'],
+    });
+    queryClient.invalidateQueries({ queryKey: ['table'] });
+  }
+
   function onEditResolution(isSuccess: boolean) {
     if (isSuccess) {
       router.refresh();
+      invalidateDashboardQueries();
       addToast({
         title: 'Success!',
         description: 'Result has been edited',
